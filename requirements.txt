@@ -36,7 +36,6 @@ cmake==3.27.5
 colorama==0.4.6
 colour==0.1.5
 comm==0.2.2
-command-not-found==0.3
 commonmark==0.9.1
 contourpy==1.0.7
 cryptography==38.0.4
