@@ -1,11 +1,4 @@
 import { useState, useEffect } from "react";
-import {
-	Tabs,
-	TabsHeader,
-	TabsBody,
-	Tab,
-	TabPanel,
-  } from "@material-tailwind/react";
 import FilterPanel from "@components/database/FilterPanel";
 import DataTable from "@components/database/DataTable";
 import config, { sampleData0 } from "@lib/dashboardConfig.cjs";
@@ -22,8 +15,9 @@ export default function Database() {
 
   const baseURL =
     process.env.NODE_ENV === "production"
-      ? "http://172.32.79.51:5001"
-      : "http://127.0.0.1:5001";
+    //   ? "http://172.32.79.51:5001"
+	  ? "https://genomics-dashboard-flask.onrender.com"
+      : "https://genomics-dashboard-flask.onrender.com";
   const [view, setView] = useState(true);
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
