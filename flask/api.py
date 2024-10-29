@@ -16,8 +16,7 @@ app = Flask(__name__)
 CORS(app)
 dir = os.getcwd()
 parent = os.path.dirname(dir)
-database, host, user, password, port = get_database_info(
-    os.path.join(parent, "database/active_config.json"))
+database, host, user, password, port = get_database_info()
 conn, cursor = connect_to_postgres(database, host, user, password, port)
 conn.autocommit = True
 
