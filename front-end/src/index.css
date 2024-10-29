@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input[type="number"]::-webkit-inner-spin-button {
+  opacity: 1;
+}
+.h-screen-minus-header {
+  height: calc(100vh - 4.5rem);
+}
+
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 10;
+}
+
+
+/* Ensure the div inside the ol also adheres to the styling */
+.tremor-Legend-root.custom-legend > div {
+  flex-direction: column;
+  width: auto; /* Let the width adjust based on content */
+  overflow: scroll; /* Ensure no content is clipped */
+}
+
+
