@@ -23,7 +23,7 @@ conn.autocommit = True
 where_clause = ''
 
 # Load schema from schema.json
-with open(os.path.join(parent, "database/schema.json"), "r") as f:
+with open(os.path.join(parent, "schema.json"), "r") as f:
     schema = json.load(f)
 
 
