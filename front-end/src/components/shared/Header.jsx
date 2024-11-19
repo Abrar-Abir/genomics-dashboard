@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
+import schema from "@lib/schema.json";
 import {
   Button,
   Navbar,
@@ -8,6 +9,12 @@ import {
   IconButton,
   Breadcrumbs,
 } from "@material-tailwind/react";
+import {
+	Menu,
+	MenuHandler,
+	MenuList,
+	MenuItem,
+  } from "@material-tailwind/react";
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -21,8 +28,8 @@ import {
 } from "@lib/sidebarConfig.jsx";
 import logo from "@assets/logo_without_text.png";
 
+import MenuWithCheckbox from "./Menu";
 import SearchBar from "./SearchBar";
-
 import Datepicker from "react-tailwindcss-datepicker";
 import require$$0 from "dayjs";
 const DATE_FORMAT = "YYYY-MM-DD";
@@ -59,6 +66,11 @@ const generateBreadcrumbs = (location) => {
     );
   });
 };
+  
+const columns = Object.keys(schema.table).flatMap((table) =>
+Object.keys(schema.table[table].entity)
+);
+
 
 export default function Header(props) {
   const [open, setOpen] = useState(false);
@@ -72,6 +84,50 @@ export default function Header(props) {
       () => window.innerWidth >= 960 && setOpen(false)
     );
   }, []);
+
+
+  const [allSuggestions, setAllSuggestions] = useState([]);
+  const SearchMenu = () => {
+	const allKeys = [
+	  'pi',
+	  'project',
+	  'submission',
+	  'flowcell',
+	  'sample'
+	]
+	const handleMenuClick = async (key) => {
+		props.setSearchKey(key);
+		props.setSearchValue('');
+		const apiUrl = `${baseURL}/search/${key}`;
+		const dataResponse = await fetch(apiUrl);
+		if (!dataResponse.ok) {
+		console.error("Server error:", dataResponse);
+		} else {
+		const dataResult = await dataResponse.json();
+        setAllSuggestions(dataResult);
+		// console.log("All suggestions:", dataResult);
+	}
+}  
+	return (
+	  <Menu>
+		<MenuHandler>
+		  <Button variant="outlined">{props.searchKey}</Button>
+		</MenuHandler>
+		<MenuList>
+			{allKeys.map((entity, index) => 
+			<MenuItem key={index} onMouseDown={() => handleMenuClick(entity)}>{entity}</MenuItem>
+			)}
+		</MenuList>
+	  </Menu>
+	);
+  }
+
+  const reset = () => {
+	props.setSearchValue("");
+	props.setSelectedFilter({});
+	props.setSelectedRanges({});
+	props.setSelectedItems({});
+  }
   
   return (
     <Navbar
@@ -95,39 +151,36 @@ export default function Header(props) {
           onClick={props.toggleSideBar}
         />
 
-        {!open && (
+        {/* {!open && (
           <div>
             <Breadcrumbs className="!bg-transparent">
               {generateBreadcrumbs(location)}
             </Breadcrumbs>
           </div>
-        )}
+        )} */}
+		<Button
+                color="gray"
+                variant="outlined"
+                className="flex items-center gap-1 py-1 h-8"
+				onClick={() => reset()}
+              >
+                reset
+                <AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
+              </Button>
 		<div className="flex space-x-4 items-end">
           {location.pathname === "/database" && (
-				<SearchBar></SearchBar>
+				<SearchMenu></SearchMenu>
+			)}
+		{/* </div>
+		<div className="flex space-x-4 items-end"> */}
+          {location.pathname === "/database" && (
+				<SearchBar allSuggestions={allSuggestions} setSearchValue = {props.setSearchValue}></SearchBar>
 			)}
 		</div>
         <div className="flex space-x-4 items-end">
           {location.pathname === "/database" && (
             <div className="flex items-center gap-4">
-              <Button
-                color="gray"
-                variant="outlined"
-                className="flex items-center gap-1 py-1 h-8"
-                onClick={props.toggleDatabaseFilterPanel}
-              >
-                view
-                <AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
-              </Button>
-			  <Button
-                color="gray"
-                variant="outlined"
-                className="flex items-center gap-1 py-1 h-8"
-                onClick={props.toggleDatabaseFilterPanel}
-              >
-                filter
-                <AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
-              </Button>
+            <MenuWithCheckbox columns={columns} selectedColumns={props.selectedColumns} setSelectedColumns={props.setSelectedColumns} ></MenuWithCheckbox>
               <Button
                 color="gray"
                 variant="outlined"

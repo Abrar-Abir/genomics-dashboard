@@ -26,7 +26,7 @@ export default function Dashboard(props) {
     process.env.NODE_ENV === "production"
     //   ? "http://172.32.79.51:5001"
 	  ? "https://genomics-dashboard-flask.onrender.com"
-      : "https://genomics-dashboard-flask.onrender.com";
+      : "http://localhost:5001";
 
   // Function to asynchronously fetch data for all the cards in the dashboard page
   useEffect(() => {

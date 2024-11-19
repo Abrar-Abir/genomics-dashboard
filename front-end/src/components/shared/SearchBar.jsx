@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { Input } from '@material-tailwind/react';
 import { debounce } from 'lodash';
 
-const SearchBar = () => {
-  const allSuggestions = [
-	'pi',
-	'project',
-	'submission',
-	'flowcell',
-	'sample'
-	]
+const SearchBar = (props) => {
+//   console.log("search suggestions", allSuggestions)
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState(allSuggestions);
+  const [suggestions, setSuggestions] = useState(props.allSuggestions);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const fetchSuggestions = async (searchText) => {
-    const mockSuggestions = allSuggestions.filter((item) => item.toLowerCase().includes(searchText.toLowerCase()));
+    const mockSuggestions = props.allSuggestions.filter((item) => item.toLowerCase().includes(searchText.toLowerCase()));
     setSuggestions(mockSuggestions);
   };
 
@@ -30,27 +24,25 @@ const SearchBar = () => {
 
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
+	props.setSearchValue(suggestion);
     setShowSuggestions(false);
   };
 
   return (
     <div className="relative w-[150px] h-[50px] max-w-md mx-auto mt-1">
       <Input
-		placeholder='Entity'
+		placeholder='Type'
 		variant="static"
         value={query}
         onChange={handleInputChange}
         onFocus={() => setShowSuggestions(true)}
         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         className="bg-white rounded shadow-md"
-        // containerProps={{
-        //   className: 'h-full w-full',
-        // }}
       />
 
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute w-full mt-1 bg-white rounded shadow-lg z-10">
-          <ul className="p-0">
+          <ul className="max-h-40 overflow-y-auto p-0">
             {suggestions.map((suggestion, index) => (
               <li
                 key={index}

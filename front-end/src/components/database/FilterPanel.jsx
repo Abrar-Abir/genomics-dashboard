@@ -36,10 +36,10 @@ export default function FilterPanel(props) {
     setAllExpanded(!allExpanded);
   };
 
-  const [selectedItems, setSelectedItems] = useState({});
+//   const [selectedItems, setSelectedItems] = useState({});
   
   const toggleSelection = (filterKey, item) => {
-    setSelectedItems((prevSelectedItems) => {
+    props.setSelectedItems((prevSelectedItems) => {
       const newSelectedItems = { ...prevSelectedItems };
       if (!newSelectedItems[filterKey]) {
         newSelectedItems[filterKey] = [];
@@ -56,8 +56,8 @@ export default function FilterPanel(props) {
     });
   };
   useEffect(() => {
-	props.setSelectedFilter(selectedItems);
-  }, [selectedItems]);
+	props.setSelectedFilter(props.selectedItems);
+  }, [props.selectedItems]);
 
   const handleRangeChange = (key, index, value) => {
     props.setSelectedRanges((prev) => {
@@ -142,7 +142,7 @@ export default function FilterPanel(props) {
               // Check if the item is selected based on the new state
               //   const isSelected = selectedItems[filterKey] === item;
               const isSelected =
-                selectedItems[filterKey]?.includes(value) || false;
+                props.selectedItems[filterKey]?.includes(value) || false;
               return (
                 <div
                   key={index}
@@ -229,9 +229,7 @@ export default function FilterPanel(props) {
   };
   return (
     <div
-      className={` bg-gray-100 p-2 h-screen-minus-header overflow-scroll ${
-        props.databaseFilterButton ? "w-80" : "hidden"
-      }`}
+      className= "bg-gray-100 p-2 h-screen-minus-header overflow-scroll w-80"
     >
       <Typography
         variant="h6"

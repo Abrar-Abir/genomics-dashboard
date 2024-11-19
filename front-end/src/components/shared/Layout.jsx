@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-
+import schema from "@lib/schema.json";
 function Layout() {
   const location = useLocation();
 
@@ -22,11 +22,20 @@ function Layout() {
     setDateRange(newDateRange);
   };
 
-  // for toggling open/close the filter panel in the database page
-  const [databaseFilterButton, setDatabaseFilterButton] = useState(true);
-  const toggleDatabaseFilterPanel = () => {
-    setDatabaseFilterButton(!databaseFilterButton);
-  };
+
+const binaryString = Object.keys(schema.table).map((table) =>
+  Object.keys(schema.table[table].entity).map((column) =>
+    schema.table[table].entity[column].view === true ? '1' : '0'
+  ).join('')
+).join('');
+
+  const [searchKey, setSearchKey] = useState("Search");
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState({});
+  const [selectedRanges, setSelectedRanges] = useState({});
+  const [selectedItems, setSelectedItems] = useState({});
+  const [selectedColumns, setSelectedColumns] = useState(binaryString);
+
 
   useEffect(() => {
     // Reset dateRange when the route changes
@@ -44,13 +53,28 @@ function Layout() {
           toggleSideBar={toggleSideBar}
           dateRange={dateRange}
           handleDateRangeChange={handleDateRangeChange}
-          toggleDatabaseFilterPanel={toggleDatabaseFilterPanel}
+		  searchKey={searchKey}
+		  setSearchKey={setSearchKey}
+		  setSearchValue={setSearchValue}
+		  setSelectedFilter={setSelectedFilter}
+		  setSelectedRanges={setSelectedRanges}
+		  setSelectedItems={setSelectedItems}
+		  selectedColumns={selectedColumns}
+		  setSelectedColumns={setSelectedColumns}
         />
         <div className="flex-1 min-h-0 w-full bg-gray-300/80 z-0 overflow-x-hidden">
           <Outlet
             context={{
               dateRange,
-              databaseFilterButton,
+			  searchKey,
+			  searchValue,
+			  selectedFilter,
+			  setSelectedFilter,
+			  selectedRanges,
+			  setSelectedRanges,
+			  selectedItems,
+			  setSelectedItems,
+			  selectedColumns
             }}
           />
         </div>

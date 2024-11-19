@@ -4,7 +4,7 @@ const options = {
   up: true,
 };
 
-copyfiles(["../database/schema.json", "src/lib/"], options, (err) => {
+copyfiles(["../schema.json", "src/lib/"], options, (err) => {
   if (err) {
     console.error("Error copying file:", err);
   } else {

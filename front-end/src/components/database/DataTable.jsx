@@ -10,6 +10,11 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 function DataTable(props) {
   const data = Array.isArray(props.data) ? props.data : [];
+  const countTrueLanes = (row) => {
+    return Object.keys(row)
+      .filter((key) => key.startsWith('lane_') && row[key] === true)
+      .length;
+  };
 
   return (
     <section className="flex-1 overflow-x-auto overflow-y-hidden h-full">
@@ -40,29 +45,33 @@ function DataTable(props) {
                       <Typography
                         variant="small"
                         color={
-                          head === "position" && typeof row[head] === "boolean"
-                            ? row[head]
-                              ? "indigo"
-                              : "orange"
-                            : typeof row[head] === "boolean"
-                            ? row[head]
-                              ? "green"
-                              : "red"
+                        //   head === "position" && typeof row[head] === "boolean"
+                        //     ? row[head]
+                        //       ? "indigo"
+                        //       : "orange"
+                        //     : 
+							// typeof row[head] === "boolean"
+                            // ? row[head]
+                            //   ? "green"
+                            //   : "red"
+							row[head] === "" ? "red"
                             : "blue-gray"
                         }
                         className={
                           typeof row[head] === "boolean" ? "font-semibold" : ""
                         }
                       >
-                        {head === "position" && typeof row[head] === "boolean"
-                          ? row[head]
+                        {head === "position" 
+                          ? row[head] === "true"
                             ? "A"
                             : "B"
                           : typeof row[head] === "boolean"
                           ? row[head]
                             ? "True"
                             : "False"
-                          : row[head] || "-"}
+                          : head === "yieldq30" ?  (row[head] / Math.pow(10, 9)).toFixed(3) + " Gb"
+						  : head === "mean_qscore" ? (row[head] / (2*countTrueLanes(row))).toFixed(2)
+						  : row[head] || "N/A"}
                       </Typography>
                     </td>
                   ))}

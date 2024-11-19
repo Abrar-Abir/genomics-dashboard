@@ -5,17 +5,20 @@
         "project_id": {
           "type": "VARCHAR(32)",
           "not_null": true,
-          "filter_option": false
+          "filter_option": false,
+		  "view": false
         },
         "project": {
           "type": "VARCHAR(32)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "pi": {
           "type": "VARCHAR(08)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         }
       },
       "primary_key": ["project_id"],
@@ -27,12 +30,14 @@
         "i5_id": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "i5_sequence": {
           "type": "VARCHAR(40)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         }
       },
       "primary_key": ["i5_id"],
@@ -44,12 +49,14 @@
         "i7_id": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "i7_sequence": {
           "type": "VARCHAR(40)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         }
       },
       "primary_key": ["i7_id"],
@@ -61,7 +68,8 @@
         "sequencer_id": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         }
       },
       "primary_key": ["sequencer_id"],
@@ -73,47 +81,56 @@
         "submission_id": {
           "type": "VARCHAR(64)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "submission_date": {
           "type": "DATE",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "datatype": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "requirement": {
           "type": "VARCHAR(32)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "cov": {
           "type": "VARCHAR(16)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "srv": {
           "type": "VARCHAR(16)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "anl": {
           "type": "VARCHAR(16)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "rg": {
           "type": "VARCHAR(16)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "comment": {
           "type": "VARCHAR(100)",
           "not_null": false,
-          "filter_option": false
+          "filter_option": false,
+		  "view": false
         }
       },
       "primary_key": ["submission_id"],
@@ -125,57 +142,68 @@
         "flowcell_id": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "flowcell_type": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "loaded_by": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "loading_date": {
           "type": "DATE",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "completion_date": {
           "type": "DATE",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "demultiplex_date": {
           "type": "DATE",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "process_date": {
           "type": "DATE",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "order_no": {
           "type": "VARCHAR(32)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "position": {
           "type": "VARCHAR(08)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "run_id": {
           "type": "VARCHAR(08)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "multiqc_version": {
           "type": "VARCHAR(04)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         }
       },
       "primary_key": ["flowcell_id"],
@@ -187,67 +215,80 @@
         "pool_id": {
           "type": "VARCHAR(40)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "pf_reads": {
           "type": "NUMERIC(7,2)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "loading_conc": {
           "type": "NUMERIC(7,2)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "q30": {
           "type": "NUMERIC(5,2)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "lane_1": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_2": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_3": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_4": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_5": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_6": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_7": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane_8": {
           "type": "BOOLEAN",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "lane": {
           "type": "VARCHAR(32)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         }
       },
       "primary_key": ["pool_id"],
@@ -259,92 +300,110 @@
         "sample_id": {
           "type": "VARCHAR(11)",
           "not_null": true,
-          "filter_option": false
+          "filter_option": false,
+		  "view": true
         },
         "sample_name": {
           "type": "VARCHAR(64)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "qpcr": {
           "type": "NUMERIC(5,2)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "fragment": {
           "type": "NUMERIC(3,0)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "labchip_conc": {
           "type": "NUMERIC(5,2)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "well": {
           "type": "VARCHAR(32)",
           "not_null": true,
-          "filter_option": false
+          "filter_option": false,
+		  "view": true
         },
         "pre_norm_well": {
           "type": "VARCHAR(32)",
           "not_null": false,
-          "filter_option": false
+          "filter_option": false,
+		  "view": true
         },
         "status": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "urgent": {
           "type": "VARCHAR(16)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "remark": {
           "type": "TEXT",
           "not_null": false,
-          "filter_option": false
+          "filter_option": false,
+		  "view": false
         },
         "lib_received": {
           "type": "VARCHAR(17)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "sample_qc": {
           "type": "VARCHAR(08)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "lib_qc": {
           "type": "VARCHAR(08)",
           "not_null": true,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "stage_date": {
           "type": "DATE",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         },
         "staging_error": {
           "type": "VARCHAR(64)[]",
           "not_null": false,
-          "filter_option": false
+          "filter_option": false,
+		  "view": false
         },
         "mean_qscore": {
           "type": "NUMERIC(5,2)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
-        "yieldQ30": {
+        "yieldq30": {
           "type": "NUMERIC(12,0)",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": true
         },
         "release_date": {
           "type": "DATE",
           "not_null": false,
-          "filter_option": true
+          "filter_option": true,
+		  "view": false
         }
       },
       "primary_key": ["sample_id", "flowcell_id"],

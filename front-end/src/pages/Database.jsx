@@ -6,27 +6,44 @@ import schema from "@lib/schema.json";
 import { useOutletContext } from "react-router-dom";
 
 export default function Database() {
-  const { databaseFilterButton } = useOutletContext();
+  const {selectedFilter} = useOutletContext();
+  const {setSelectedFilter} = useOutletContext();
+  const {selectedRanges} = useOutletContext();
+  const {setSelectedRanges} = useOutletContext();
+  const {searchKey} = useOutletContext();
+  const {searchValue} = useOutletContext();
+  const {selectedItems} = useOutletContext();
+  const {setSelectedItems} = useOutletContext();
+  const {selectedColumns} = useOutletContext();
+
+//   console.log("searchKey", searchKey, "searchValue", searchValue)
   const tableHeaders = Object.keys(schema.table).flatMap((table) =>
     Object.keys(schema.table[table].entity).map((key) => ({
       head: key,
     }))
   );
 
+
+  
+
+
   const baseURL =
     process.env.NODE_ENV === "production"
     //   ? "http://172.32.79.51:5001"
 	  ? "https://genomics-dashboard-flask.onrender.com"
-      : "https://genomics-dashboard-flask.onrender.com";
-  const [view, setView] = useState(true);
+      : "http://localhost:5001";
+
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(50);
   const [filterPanelData, setFilterPanelData] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState({});
-  const [selectedRanges, setSelectedRanges] = useState({});
+  const [columns, setColumns] = useState(tableHeaders);
+
+  const filterColumns = () => {
+    return columns.filter((column, index) => selectedColumns[index] === '1');
+  };
 
   useEffect(() => {
     if (config.useSampleData) {
@@ -36,7 +53,10 @@ export default function Database() {
       async function fetchDataAndFilterPanelData() {
         try {
           const offset = (page - 1) * limit;
-		  let apiUrl = `${baseURL}/type0?limit=${limit}&offset=${offset}`;
+		  let apiUrl = `${baseURL}/type0?cols=${selectedColumns}limit=${limit}&offset=${offset}`;
+		  if (searchValue !== ""){
+			apiUrl += `&search=(${searchKey},${searchValue})`
+		  }
 
           if (Object.keys(selectedFilter).length > 0) {
             Object.entries(selectedFilter).forEach(([key, values]) => {
@@ -62,7 +82,8 @@ export default function Database() {
             setTotalCount(dataResult.total_count);
 			const totalCount = dataResult.total_count;
             setTotalPages(Math.ceil(totalCount / limit));
-
+			setColumns(filterColumns());
+			console.log(columns);
             await delay(5);
 
             const filterPanelResponse = await fetch(`${baseURL}/analytics`);
@@ -80,7 +101,8 @@ export default function Database() {
 
       fetchDataAndFilterPanelData();
     }
-  }, [page, limit, config.useSampleData, selectedFilter, selectedRanges]);
+  }, [page, limit, config.useSampleData, selectedFilter, selectedRanges, searchValue, selectedColumns]);
+
 
   const handlePrev = () => {
     setPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -96,46 +118,15 @@ export default function Database() {
     console.log(number);
   };
 
-  const tabData =  [
-    {
-      label: "Table",
-      value: "table",
-      desc: <DataTable
-	  data={data}
-	  tableHeaders={tableHeaders}
-	  handlePrev={handlePrev}
-	  handleNext={handleNext}
-	  totalPages={totalPages}
-	  totalCount={totalCount}
-	  page={page}
-	  limit={limit}
-	  handleLimit={handleLimit}
-	/>,
-    },
-    {
-      label: "Plot",
-      value: "plot",
-      desc: <DataTable
-	  data={data}
-	  tableHeaders={tableHeaders}
-	  handlePrev={handlePrev}
-	  handleNext={handleNext}
-	  totalPages={totalPages}
-	  totalCount={totalCount}
-	  page={page}
-	  limit={limit}
-	  handleLimit={handleLimit}
-	/>,
-    }
-  ];
 
   return (
     <div className="flex h-screen-minus-header">
       <FilterPanel
         data={filterPanelData}
-        databaseFilterButton={databaseFilterButton}
 		setSelectedFilter={setSelectedFilter}
 		setSelectedRanges={setSelectedRanges}
+		selectedItems={selectedItems}
+		setSelectedItems={setSelectedItems}
       />
 	  <DataTable
 	  data={data}

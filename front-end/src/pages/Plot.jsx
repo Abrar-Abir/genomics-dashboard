@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+import FilterPanel from "@components/database/FilterPanel";
 
 export default function Database() {
-//   const { databaseFilterButton } = useOutletContext();
+  const { databaseFilterButton } = useOutletContext();
 
   const baseURL =
     process.env.NODE_ENV === "production"
       ? "https://genomics-dashboard-flask.onrender.com"
-      : "https://genomics-dashboard-flask.onrender.com";
+      : "http://localhost:5001";
 
 
   const [filterPanelData, setFilterPanelData] = useState(null);
@@ -61,12 +62,12 @@ export default function Database() {
 
   return (
     <div className="flex h-screen-minus-header">
-      {/* <FilterPanel
+      <FilterPanel
         data={filterPanelData}
         databaseFilterButton={databaseFilterButton}
 		setSelectedFilter={setSelectedFilter}
 		setSelectedRanges={setSelectedRanges}
-      /> */}
+      />
 	<div style={{ flex: 1, overflow: 'auto' }}>
 		<div
 			style={{ width: '100%', height: '100%', overflow: 'auto' }}
