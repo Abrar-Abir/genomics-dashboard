@@ -512,7 +512,7 @@
           "not_null": false,
           "filter_option": true,
 		  "view": true,
-		  "alias": "Yeild Q30",
+		  "alias": "Yeild Q30 (Gb)",
 		  "group": 2
         },
         "release_date": {

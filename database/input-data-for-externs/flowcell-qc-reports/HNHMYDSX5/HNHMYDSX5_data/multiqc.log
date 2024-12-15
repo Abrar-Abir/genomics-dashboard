@@ -1,0 +1,226 @@
+[2023-05-23 13:32:01,871] multiqc                                            [DEBUG  ]  This is MultiQC v1.12
+[2023-05-23 13:32:01,871] multiqc                                            [DEBUG  ]  No MultiQC config found: /gpfs/software/genomics/multiqc/v1.12/lib/python3.9/site-packages/multiqc_config.yaml
+[2023-05-23 13:32:01,872] multiqc                                            [DEBUG  ]  No MultiQC config found: /gpfs/home/ngs_admin/.multiqc_config.yaml
+[2023-05-23 13:32:01,872] multiqc                                            [DEBUG  ]  No MultiQC config found: multiqc_config.yaml
+[2023-05-23 13:32:01,872] multiqc                                            [DEBUG  ]  Command used: /gpfs/software/genomics/multiqc/v1.12/bin/multiqc --interactive -o multiqc-HNHMYDSX5 -l HNHMYDSX5.list
+[2023-05-23 13:32:02,115] multiqc                                            [DEBUG  ]  Could not connect to multiqc.info for version check: <urlopen error [Errno 111] Connection refused>
+[2023-05-23 13:32:02,115] multiqc                                            [DEBUG  ]  Command     : /gpfs/software/genomics/multiqc/v1.12/bin/multiqc --interactive -o multiqc-HNHMYDSX5 -l HNHMYDSX5.list
+[2023-05-23 13:32:02,115] multiqc                                            [DEBUG  ]  Working dir : /gpfs/scratch/daily-process/externs/input-data-for-externs
+[2023-05-23 13:32:02,115] multiqc                                            [DEBUG  ]  Template    : default
+[2023-05-23 13:32:02,115] multiqc                                            [DEBUG  ]  Running Python 3.9.7 (default, Sep 16 2021, 13:09:58)  [GCC 7.5.0]
+[2023-05-23 13:32:02,274] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, ccs, ngsderive, purple, conpair, lima, peddy, somalier, methylQA, mosdepth, phantompeakqualtools, qualimap, preseq, quast, qorts, rna_seqc, rockhopper, rsem, rseqc, busco, bustools, goleft_indexcov, gffcompare, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, mirtop, sambamba, homer, hops, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, fgbio, dragen, dedup, pbmarkdup, damageprofiler, biobambam2, jcvi, mtnucratio, picard, vep, sentieon, prokka, qc3C, nanostat, samblaster, samtools, sexdeterrmine, eigenstratdatabasetools, bamtools, jellyfish, vcftools, longranger, stacks, varscan2, snippy, bbmap, bismark, biscuit, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, snpsplit, odgi, pangolin, kat, leehom, adapterRemoval, clipandmerge, cutadapt, flexbar, kaiju, kraken, malt, trimmomatic, sickle, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, pychopper, pycoqc, minionqc, multivcfanalyzer, clusterflow, checkqc, bcl2fastq, bclconvert, interop, ivar, flash, seqyclean, optitype, whatshap
+[2023-05-23 13:32:02,277] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /gpfs/ngsdata/sap_workplace/scratch/tmpsx94ih39
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/DemultiplexingStats.xml
+[2023-05-23 13:32:02,402] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,414] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/AdapterTrimming.txt
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/ConversionStats.xml
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/index.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237961/all/laneBarcode.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237961/all/lane.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237961/CCATTCGA+CGGACAAC/laneBarcode.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237961/CCATTCGA+CGGACAAC/lane.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238011/GCCACAGG+ATGGCATG/laneBarcode.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238011/GCCACAGG+ATGGCATG/lane.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238011/all/laneBarcode.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238011/all/lane.html
+[2023-05-23 13:32:02,415] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237941/all/laneBarcode.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237941/all/lane.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237941/TAAGGTCA+CTACGACA/laneBarcode.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237941/TAAGGTCA+CTACGACA/lane.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237991/TTCCTGTT+AAGATACT/laneBarcode.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237991/TTCCTGTT+AAGATACT/lane.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237991/all/laneBarcode.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237991/all/lane.html
+[2023-05-23 13:32:02,416] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237951/all/laneBarcode.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237951/all/lane.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237951/TTGCCTAG+TAAGTGGT/laneBarcode.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237951/TTGCCTAG+TAAGTGGT/lane.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237911/all/laneBarcode.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237911/all/lane.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237911/GATCTATC+AGCCTCAT/laneBarcode.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237911/GATCTATC+AGCCTCAT/lane.html
+[2023-05-23 13:32:02,417] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237981/GTGTCGGA+GCGCAAGC/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237981/GTGTCGGA+GCGCAAGC/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237981/all/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237981/all/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/all/all/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/all/all/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237901/all/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237901/all/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237901/CATAATAC+CGTTAGAA/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237901/CATAATAC+CGTTAGAA/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237931/CGGAACTG+TCGTAGTG/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237931/CGGAACTG+TCGTAGTG/lane.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237931/all/laneBarcode.html
+[2023-05-23 13:32:02,418] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237931/all/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237971/ACACTAAG+ATATGGAT/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237971/ACACTAAG+ATATGGAT/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237971/all/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237971/all/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237921/AGCTCGCT+GATTCTGC/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237921/AGCTCGCT+GATTCTGC/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237921/all/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701237921/all/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238001/CCTTCACC+GGAGCGTC/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238001/CCTTCACC+GGAGCGTC/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238001/all/laneBarcode.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/BL_SDR400013_230406_mRNA-50_B1/0701238001/all/lane.html
+[2023-05-23 13:32:02,419] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/all/all/all/laneBarcode.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/all/all/all/lane.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/Undetermined/all/laneBarcode.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/Undetermined/all/lane.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/Undetermined/unknown/laneBarcode.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/Undetermined/unknown/lane.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/all/all/laneBarcode.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/HFTVCDRX2/default/all/all/lane.html
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/Report.css
+[2023-05-23 13:32:02,420] multiqc                                            [INFO   ]  Search path : /gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Reports/html/tree.html
+[2023-05-23 13:32:02,486] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,487] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,487] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,491] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,515] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: DemuxSummaryF1L2.txt
+[2023-05-23 13:32:02,534] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,535] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,535] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,537] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,572] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: FastqSummaryF1L2.txt
+[2023-05-23 13:32:02,587] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,588] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,589] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,591] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,615] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: DemuxSummaryF1L1.txt
+[2023-05-23 13:32:02,641] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: DemultiplexingStats.xml
+[2023-05-23 13:32:02,642] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: DemultiplexingStats.xml
+[2023-05-23 13:32:02,642] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: DemultiplexingStats.xml
+[2023-05-23 13:32:02,645] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: DemultiplexingStats.xml
+[2023-05-23 13:32:02,655] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: DemultiplexingStats.xml
+[2023-05-23 13:32:02,674] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,675] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,675] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,678] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,715] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: FastqSummaryF1L1.txt
+[2023-05-23 13:32:02,734] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: AdapterTrimming.txt
+[2023-05-23 13:32:02,736] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: AdapterTrimming.txt
+[2023-05-23 13:32:02,736] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: AdapterTrimming.txt
+[2023-05-23 13:32:02,738] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: AdapterTrimming.txt
+[2023-05-23 13:32:02,845] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: AdapterTrimming.txt
+[2023-05-23 13:32:02,885] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,886] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,887] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by vep/vep_html because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by vep/vep_txt because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by rockhopper because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by rseqc/bam_stat because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by rseqc/junction_annotation because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by rseqc/read_distribution because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by rseqc/infer_experiment because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by snpeff because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:02,889] multiqc                                            [DEBUG  ]  File ignored by stacks/sumstats because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:06,669] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: ConversionStats.xml
+[2023-05-23 13:32:06,884] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,887] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,888] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,895] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,898] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,899] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,906] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,909] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,910] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,917] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,920] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,921] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,928] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,931] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,932] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,940] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,942] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,944] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,951] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,953] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,955] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,962] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,965] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,966] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,973] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,976] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,977] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,985] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,987] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,989] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:06,996] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:06,998] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,000] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,007] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,010] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,011] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,019] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,021] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,023] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,030] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,033] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,034] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,041] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,044] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,045] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,053] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,055] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,057] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,064] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,066] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,068] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,075] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,078] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,079] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,086] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,089] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,090] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,097] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,100] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,101] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,109] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,111] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,113] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,120] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,123] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,124] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,131] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,134] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,135] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,143] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,145] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,146] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,154] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,156] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,158] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,165] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,168] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,169] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,177] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,179] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,181] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,188] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,191] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,192] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,194] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,201] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: laneBarcode.html
+[2023-05-23 13:32:07,203] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,205] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: lane.html
+[2023-05-23 13:32:07,214] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: Report.css
+[2023-05-23 13:32:07,215] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: Report.css
+[2023-05-23 13:32:07,225] multiqc                                            [DEBUG  ]  File ignored by ccs/v4 because it exceeded search pattern filesize limit: tree.html
+[2023-05-23 13:32:07,226] multiqc                                            [DEBUG  ]  File ignored by hicexplorer because it exceeded search pattern filesize limit: tree.html
+[2023-05-23 13:32:07,226] multiqc                                            [DEBUG  ]  File ignored by lima/summary because it exceeded search pattern filesize limit: tree.html
+[2023-05-23 13:32:07,229] multiqc                                            [DEBUG  ]  File ignored by longranger/invocation because it exceeded search pattern filesize limit: tree.html
+[2023-05-23 13:32:07,234] multiqc                                            [DEBUG  ]  File ignored by nanostat because it exceeded search pattern filesize limit: tree.html
+[2023-05-23 13:32:08,350] multiqc.plots.bargraph                             [DEBUG  ]  Using matplotlib version 3.5.1
+[2023-05-23 13:32:08,426] multiqc                                            [INFO   ]  Compressing plot data
+[2023-05-23 13:32:08,449] multiqc                                            [INFO   ]  Report      : multiqc-HNHMYDSX5/multiqc_report.html
+[2023-05-23 13:32:08,449] multiqc                                            [INFO   ]  Data        : multiqc-HNHMYDSX5/multiqc_data
+[2023-05-23 13:32:08,449] multiqc                                            [DEBUG  ]  Moving data file from '/gpfs/ngsdata/sap_workplace/scratch/tmpsx94ih39/multiqc_data' to 'multiqc-HNHMYDSX5/multiqc_data'
+[2023-05-23 13:32:08,734] multiqc                                            [INFO   ]  MultiQC complete

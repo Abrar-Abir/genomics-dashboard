@@ -1,0 +1,8 @@
+{
+  "Staging": "/Users/deepc/genomics-lab-dashboard/database/input-data-for-externs/staging-dirs/",
+  "FC_QC_reports": "/Users/deepc/genomics-lab-dashboard/database/input-data-for-externs/flowcell-qc-reports",
+  "Projects": "/Users/deepc/genomics-lab-dashboard/database/input-data-for-externs/project-dirs",
+  "Raw_info": "/Users/deepc/genomics-lab-dashboard/database/input-data-for-externs/rawinfo-dirs",
+  "Runs": "/Users/deepc/genomics-lab-dashboard/database/input-data-for-externs/Runs",
+  "FC_QC_url": "http://172.32.75.26/sapipe"
+}

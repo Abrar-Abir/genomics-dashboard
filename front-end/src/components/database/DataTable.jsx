@@ -92,7 +92,7 @@ function DataTable(props) {
                           ? row[head]
                             ? "True"
                             : "False"
-                          : head === "yieldq30" ?  (row[head] / Math.pow(10, 9)).toFixed(3) + " Gb"
+                          : head === "yieldq30" ?  (row[head] / Math.pow(10, 9)).toFixed(3)
 						  : head === "mean_qscore" ? (row[head] / (2*countTrueLanes(row))).toFixed(2)
 						  : row[head] || "N/A"}
                       </Typography>

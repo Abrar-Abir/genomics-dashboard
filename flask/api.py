@@ -36,7 +36,7 @@ columnsGrouped = [col[1] + '.' + col[2]
                   for col in sorted(allColumns, key=lambda x: x[0])]
 # print("columnsSorted", columnsSorted)
 # print("columnsGrouped", columnsGrouped)
-
+73
 # def isdigit(obj):
 #     text = str(obj).replace('.', '')
 #     for char in text:

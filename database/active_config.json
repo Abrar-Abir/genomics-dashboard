@@ -1,0 +1,16 @@
+{
+    "database": "sidra",
+    "host": "localhost",
+    "password": "mypassword",
+    "port": "5432",
+    "preprocess_file": "preprocess.json",
+    "schema_file": "schema.json",
+    "runs_file": "runs.json",
+    "FC_QC_url": "http://172.32.75.26/sapipe",
+    "user": "postgres",
+    "staging": "/gpfs/scratch/",
+    "fcqc": "/gpfs/ngsdata/sap_workplace/www/MultiQC/Flowcell/",
+    "projects": "/gpfs/projects/ngs_projects",
+    "rawinfo": "/gpfs/dropbox/conversion/conversion-tasks/",
+    "runs": "/ddn/illumina_raw/"
+}

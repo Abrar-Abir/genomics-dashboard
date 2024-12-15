@@ -1,0 +1,13 @@
+Module	Section	Sample Name	Source
+bcl2fastq	bcl2fastq-bysample	0701237901	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237911	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237921	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237931	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237941	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237951	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237961	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237971	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237981	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701237991	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701238001	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
+bcl2fastq	bcl2fastq-bysample	0701238011	/gpfs/dropbox/conversion/report/HFTVCDRX2_index8/Stats/Stats.json
