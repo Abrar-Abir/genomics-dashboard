@@ -20,70 +20,122 @@ database, host, user, password, port = get_database_info()
 conn, cursor = connect_to_postgres(database, host, user, password, port)
 conn.autocommit = True
 
-where_clause = ''
+filter_dict = {}
+columnString = ''
 
-# Load schema from schema.json
 with open(os.path.join(parent, "schema.json"), "r") as f:
     schema = json.load(f)
 
+allColumns = []
+for table in schema["table"]:
+    allColumns += [(schema["table"][table]["entity"][column]["group"], table, column)
+                   for column in schema["table"][table]["entity"]]
+columnsSorted = [col[1] + '.' + col[2]
+                 for col in sorted(allColumns, key=lambda x: x[2])]
+columnsGrouped = [col[1] + '.' + col[2]
+                  for col in sorted(allColumns, key=lambda x: x[0])]
+# print("columnsSorted", columnsSorted)
+# print("columnsGrouped", columnsGrouped)
 
-def isdigit(obj):
-    text = str(obj).replace('.', '')
-    for char in text:
-        if char not in '0123456789':
-            return False
-    return True
+# def isdigit(obj):
+#     text = str(obj).replace('.', '')
+#     for char in text:
+#         if char not in '0123456789':
+#             return False
+#     return True
 
 
-class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isdigit(obj):
-            return str(obj)
-        if isinstance(obj, date):
-            return datetime.strftime(obj, '%d-%m-%Y')
-        return super(JSONEncoder, self).default(obj)
+# class JSONEncoder(json.JSONEncoder):
+#     def default(self, obj):
+#         if isdigit(obj):
+#             return str(obj)
+#         if isinstance(obj, date):
+#             return datetime.strftime(obj, '%d-%m-%Y')
+#         return super(JSONEncoder, self).default(obj)
 
 
-def parseDate(date):
+def parse_date(date):
     dates = date.split("-")
     start = datetime.strptime(dates[0], '%Y%m%d').date()
     end = datetime.strptime(dates[1], '%Y%m%d').date()
     return start, end
 
 
-def getWhereClause(requestArgs):
-    where_clause = "WHERE"
-    for key in requestArgs.keys():
-        if key not in ('limit', 'offset'):
-            if requestArgs.get(key)[0] == '[' and requestArgs.get(key)[-1] == ']':
-                values = requestArgs.get(key)[1:-1].split(',')
+def set_filter_dict(request_args):
+    global filter_dict
+    filter_dict = {}
+    for key in request_args.keys():
+        if key not in ('limit', 'offset', 'search'):
+            if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
+                values = request_args.get(key)[1:-1].split(',')
                 filter_str = str([value.replace('"', '') for value in values])
-                where_clause += f" {key} IN ({str(filter_str[1:-1])}) AND "
+                filter_dict[key] = f" {key} IN ({str(filter_str[1:-1])})"
             elif key[-1] == '>' or key[-1] == '<':
-                value = requestArgs.get(key)
+                value = request_args.get(key)
                 if 'date' in key:
-                    where_clause += f" {key}= '{value}' AND "
+                    filter_dict[key] = f" {key}= '{value}'"
                 else:
-                    where_clause += f" {key}= {value} AND "
+                    filter_dict[key] = f" {key}= {value}"
+
+        if 'search' in request_args.keys():
+            search_key, search_value = request_args.get('search')[
+                1:-1].split(',')
+            assert (search_key in ['pi', 'project',
+                    "submission", "flowcell", "sample"])
+            if search_key in ['pi', 'project']:
+                filter_key = 'project.' + search_key
+            else:
+                filter_key = search_key + '.' + search_key + '_id'
+            filter_dict['search'] = f" {filter_key} IN ('{search_value}')"
+
+    return 0
+
+
+def set_column_string(cols):
+    global columnString
+    columnString = ''
+    colsParsed = {columnsSorted[i]: cols[i] for i in range(len(cols))}
+    columns = [column for column in columnsGrouped if colsParsed[column] == '1']
+    columnString = ", ".join(columns)
+    # return 0
+
+
+def get_where_clause(filter_key=None):
+    global filter_dict
+    if len(filter_dict) == 0:
+        return ""
+    where_clause = "WHERE"
+    for key in filter_dict:
+        if key != filter_key:
+            where_clause += filter_dict[key] + " AND "
     return where_clause[:-5]
 
 
+def stringify(data):
+    if isinstance(data, list):
+        return [stringify(dataItem) for dataItem in data]
+    if isinstance(data, dict):
+        return {str(key): stringify(value) for key, value in data.items()}
+    return str(data)
+
 ######## table page #######################################
 
-@app.route('/type0')
-def type0():
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1247 CSC IFNg + Butyrate expected count 1 but got count 0
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1076 CSC IFNg + Butyrate expected count 1 but got count 0
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=IBMF-SDR#0014M expected count 1 but got count 0
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1076 FBS IFNg + Butyrate expected count 1 but got count 0
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1247 FBS IFNg + Butyrate expected count 1 but got count 0
-    # AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=IBMF-SDR#0014 expected count 1 but got count 0
-    limit = request.args.get('limit', default=5000, type=int)
-    offset = request.args.get('offset', default=0, type=int)
-    print(request.args)
-    global where_clause
-    where_clause = getWhereClause(request.args)
 
+@ app.route('/type0')
+def type0():
+    limit = request.args.get('limit', default=50, type=int)
+    offset = request.args.get('offset', default=0, type=int)
+
+    global columnString
+    columnString = ''
+    cols = request.args.get('cols', default='1'*len(allColumns), type=str)
+    colsParsed = {columnsSorted[i]: cols[i] for i in range(len(cols))}
+    columns = [column for column in columnsGrouped if colsParsed[column] == '1']
+    columnString = ", ".join(columns)
+
+    set_filter_dict(request.args)
+
+    where_clause = get_where_clause()
     count_query = f"""
         SELECT COUNT(*)
         FROM sample
@@ -96,13 +148,12 @@ def type0():
         LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 		{where_clause}
     """
-    print(count_query)
     total_count = fetch(cursor, count_query, 'one')[0]
 
     data_query = f"""
         SELECT JSON_AGG(result)
         FROM (
-            SELECT *
+            SELECT {columnString}
             FROM sample
             LEFT JOIN pool ON sample.pool_id = pool.pool_id
             LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -115,23 +166,20 @@ def type0():
             LIMIT {limit} OFFSET {offset}
         ) result;
     """
-    print(data_query)
     fetch_result = fetch(cursor, data_query, 'all')
     if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
         results = None
     else:
         results = fetch_result[0][0]
 
-    return jsonify({"data": results, "total_count": total_count})
+    return jsonify({"data": results, "columns": [column.split('.')[-1] for column in columns], "total_count": total_count})
 
 
-@app.route('/export')
-def export():
-    file_format = request.args.get('format', default='csv', type=str).lower()
-    # where_clause = getWhereClause(request.args)
-    global where_clause
+@ app.route('/export/<format>')
+def export(format):
+    where_clause = get_where_clause()
     data_query = f"""
-        SELECT *
+        SELECT {columnString}
         FROM sample
         LEFT JOIN pool ON sample.pool_id = pool.pool_id
         LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -146,25 +194,41 @@ def export():
     fieldnames = [desc[0] for desc in cursor.description]
     df = pd.DataFrame(results, columns=fieldnames)
 
-    csv_buffer = io.StringIO()
-    df.to_csv(csv_buffer, index=False)
-    csv_buffer.seek(0)
+    if format == 'csv':
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_buffer.seek(0)
+        return send_file(io.BytesIO(csv_buffer.getvalue().encode()),
+                         mimetype='text/csv',
+                         as_attachment=True,
+                         download_name='data.csv')
 
-    return send_file(io.BytesIO(csv_buffer.getvalue().encode()),
-                     mimetype='text/csv',
-                     as_attachment=True,
-                     download_name='data.csv')
+    elif format == 'tsv':
+        tsv_buffer = io.StringIO()
+        df.to_csv(tsv_buffer, sep='\t', index=False)
+        tsv_buffer.seek(0)
+        return send_file(io.BytesIO(tsv_buffer.getvalue().encode()),
+                         mimetype='text/tab-separated-values',
+                         as_attachment=True,
+                         download_name='data.tsv')
 
+    elif format == 'json':
+        json_buffer = io.StringIO()
+        df.to_json(json_buffer, orient='records', lines=True)
+        json_buffer.seek(0)
+        return send_file(io.BytesIO(json_buffer.getvalue().encode()),
+                         mimetype='application/json',
+                         as_attachment=True,
+                         download_name='data.json')
 
-def convert_keys_to_strings(data):
-    if isinstance(data, dict):
-        return {str(key): convert_keys_to_strings(value) for key, value in data.items()}
-    return data
+    else:
+        return 'Invalid format', 400
 
 # helper function for analytics
 
 
-def get_counts(column_name, where_clause):
+def get_counts(column_name):
+    where_clause = get_where_clause(column_name)
     query = f"""
         SELECT {column_name}, COUNT(*) AS frequency
         FROM sample
@@ -175,6 +239,7 @@ def get_counts(column_name, where_clause):
         LEFT JOIN i5 ON sample.i5_id = i5.i5_id
         LEFT JOIN i7 ON sample.i7_id = i7.i7_id
         LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+		{where_clause}
         GROUP BY {column_name}
 		ORDER BY frequency DESC
     """
@@ -182,7 +247,8 @@ def get_counts(column_name, where_clause):
     return [(str(row[0]), row[1]) for row in results]
 
 
-def get_range(column_name, where_clause):
+def get_range(column_name):
+    where_clause = get_where_clause()
     query = f"""
         SELECT MIN({column_name}), MAX({column_name})
         FROM sample
@@ -193,39 +259,61 @@ def get_range(column_name, where_clause):
         LEFT JOIN i5 ON sample.i5_id = i5.i5_id
         LEFT JOIN i7 ON sample.i7_id = i7.i7_id
         LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+		{where_clause}
     """
     results = fetch(cursor, query, 'one')
     return (str(results[0]), str(results[1]))
 
 
-@app.route('/analytics')
+@ app.route('/analytics')
 def analytics():
-    # dont change for the entities being filtered on that entity filter [other filetrs apply]
     analytics_data = {}
     for table in schema["table"]:
         for column in schema["table"][table]["entity"]:
             if schema["table"][table]["entity"][column]["filter_option"]:
                 if "NUMERIC" in schema["table"][table]["entity"][column]["type"] or "DATE" in schema["table"][table]["entity"][column]["type"]:
                     analytics_data[f"{table}.{column}"] = get_range(
-                        f"{table}.{column}", "")
+                        f"{table}.{column}")
                 else:
                     analytics_data[f"{table}.{column}"] = get_counts(
-                        f"{table}.{column}", "")
+                        f"{table}.{column}")
 
-    # Convert all keys to strings
-    # analytics_data_str = convert_keys_to_strings(analytics_data)
-
-    with open(os.path.join(parent, 'front-end/src/sampleData/analytics.json'), 'w') as f:
-        json.dump(analytics_data, f, cls=JSONEncoder)
+    # with open(os.path.join(parent, 'front-end/src/sampleData/analytics.json'), 'w') as f:
+    #     json.dump(analytics_data, f, cls=JSONEncoder)
     return jsonify(analytics_data)
 
-####### overview page ##################################################
+
+@ app.route('/search/<entity>')
+def search(entity):
+    where_clause = get_where_clause('search')
+    assert (entity in ["pi", "project", "submission", "flowcell", "sample"])
+    if entity == "pi" or entity == "project":
+        column_name = "project." + entity
+    else:
+        column_name = entity + "." + entity + "_id"
+    query = f"""
+        SELECT DISTINCT {column_name}
+        FROM sample
+        LEFT JOIN pool ON sample.pool_id = pool.pool_id
+        LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
+        LEFT JOIN submission ON sample.submission_id = submission.submission_id
+        LEFT JOIN project ON submission.project_id = project.project_id
+        LEFT JOIN i5 ON sample.i5_id = i5.i5_id
+        LEFT JOIN i7 ON sample.i7_id = i7.i7_id
+        LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+		{where_clause}
+    """
+    results = fetch(cursor, query, 'all')
+    print(results)
+    return jsonify([row[0] for row in results])
+
+    ####### overview page ##################################################
 
 
-@app.route('/data1/<date>')
+@ app.route('/data1/<date>')
 def data1(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
 
@@ -262,10 +350,10 @@ def data1(date):
     return jsonify(results)
 
 
-@app.route('/data2a/<date>')
+@ app.route('/data2a/<date>')
 def data2a(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
     query = """ SELECT DISTINCT status FROM sample ;"""
@@ -309,10 +397,10 @@ def data2a(date):
     return jsonify(results)
 
 
-@app.route('/data2b/<date>')
+@ app.route('/data2b/<date>')
 def data2b(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
 
@@ -368,10 +456,10 @@ def data2b(date):
     return jsonify(output)
 
 
-@app.route('/data2c/<date>')
+@ app.route('/data2c/<date>')
 def data2c(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
     query = f"""
@@ -406,10 +494,10 @@ def data2c(date):
     return jsonify(results)
 
 
-@app.route('/data3/<date>')
+@ app.route('/data3/<date>')
 def data3(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
 
@@ -434,10 +522,10 @@ def data3(date):
     return jsonify(results)
 
 
-@app.route('/data4/<date>')
+@ app.route('/data4/<date>')
 def data4(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
 
@@ -473,10 +561,10 @@ def data4(date):
     return jsonify(results)
 
 
-@app.route('/data5/<date>')
+@ app.route('/data5/<date>')
 def data5(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
 
@@ -501,10 +589,10 @@ def data5(date):
     return jsonify(results)
 
 
-@app.route('/data6/<date>')
+@ app.route('/data6/<date>')
 def data6(date):
     try:
-        start, end = parseDate(date)
+        start, end = parse_date(date)
     except:
         return "format should be 'yyyymmdd-yyyymmdd'"
     query = f"""
@@ -529,10 +617,9 @@ def data6(date):
     return jsonify(results)
 
 
-@app.route('/plot')
+@ app.route('/plot')
 def plot():
-    # where_clause = getWhereClause(request.args)
-    global where_clause
+    where_clause = get_where_clause()
     data_query = f"""
         SELECT JSON_AGG(result)
         FROM (

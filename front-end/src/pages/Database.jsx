@@ -16,16 +16,11 @@ export default function Database() {
   const {setSelectedItems} = useOutletContext();
   const {selectedColumns} = useOutletContext();
 
-//   console.log("searchKey", searchKey, "searchValue", searchValue)
-  const tableHeaders = Object.keys(schema.table).flatMap((table) =>
-    Object.keys(schema.table[table].entity).map((key) => ({
-      head: key,
-    }))
-  );
-
-
-  
-
+//   const tableHeaders = Object.keys(schema.table).flatMap((table) =>
+//     Object.keys(schema.table[table].entity).map((key) => ({
+//       head: key,
+//     }))
+//   );
 
   const baseURL =
     process.env.NODE_ENV === "production"
@@ -39,11 +34,11 @@ export default function Database() {
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(50);
   const [filterPanelData, setFilterPanelData] = useState(null);
-  const [columns, setColumns] = useState(tableHeaders);
+  const [columns, setColumns] = useState([]);
 
-  const filterColumns = () => {
-    return columns.filter((column, index) => selectedColumns[index] === '1');
-  };
+//   const filterColumns = () => {
+//     return tableHeaders.filter((column, index) => selectedColumns[index] === '1');
+//   };
 
   useEffect(() => {
     if (config.useSampleData) {
@@ -53,7 +48,7 @@ export default function Database() {
       async function fetchDataAndFilterPanelData() {
         try {
           const offset = (page - 1) * limit;
-		  let apiUrl = `${baseURL}/type0?cols=${selectedColumns}limit=${limit}&offset=${offset}`;
+		  let apiUrl = `${baseURL}/type0?cols=${selectedColumns}&limit=${limit}&offset=${offset}`;
 		  if (searchValue !== ""){
 			apiUrl += `&search=(${searchKey},${searchValue})`
 		  }
@@ -79,11 +74,12 @@ export default function Database() {
           } else {
             const dataResult = await dataResponse.json();
             setData(Array.isArray(dataResult.data) ? dataResult.data : []);
+			setColumns(Array.isArray(dataResult.columns) ? dataResult.columns : [])
             setTotalCount(dataResult.total_count);
 			const totalCount = dataResult.total_count;
             setTotalPages(Math.ceil(totalCount / limit));
-			setColumns(filterColumns());
-			console.log(columns);
+			// setColumns(filterColumns());
+			// console.log(columns);
             await delay(5);
 
             const filterPanelResponse = await fetch(`${baseURL}/analytics`);
@@ -130,7 +126,7 @@ export default function Database() {
       />
 	  <DataTable
 	  data={data}
-	  tableHeaders={tableHeaders}
+	  tableHeaders={columns}
 	  handlePrev={handlePrev}
 	  handleNext={handleNext}
 	  totalPages={totalPages}

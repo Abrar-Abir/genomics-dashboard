@@ -42,34 +42,18 @@ process.env.NODE_ENV === "production"
   ? "http://172.32.79.51:5001"
   : "http://127.0.0.1:5001";
 
-// render the path name of a page on the header, based on the URL
-const generateBreadcrumbs = (location) => {
-  const pathname = location.pathname;
-  if (pathname === "/") {
-    return (
-      <Link to="/" className="opacity-60 font-bold hover:text-teal-800/70">
-        Dashboard
-      </Link>
-    );
-  }
-  const pathnames = pathname.split("/").filter((x) => x);
-  return pathnames.map((value, index) => {
-    const to = `/${pathnames.slice(0, index + 1).join("/")}`;
-    return (
-      <Link
-        key={to}
-        to={to}
-        className="opacity-80 font-bold hover:text-teal-800/70"
-      >
-        {value.charAt(0).toUpperCase() + value.slice(1)}
-      </Link>
-    );
-  });
-};
-  
+  const tableHeadersAlias = Object.keys(schema.table).reduce((acc, table) => {
+	Object.keys(schema.table[table].entity).forEach((key) => {
+	  acc[key] = schema.table[table].entity[key].alias; 
+	});
+	return acc;
+  }, {});
+
 const columns = Object.keys(schema.table).flatMap((table) =>
 Object.keys(schema.table[table].entity)
-);
+).sort();
+
+const columnsAlias = columns.map(col => tableHeadersAlias[col]);
 
 
 export default function Header(props) {
@@ -105,7 +89,6 @@ export default function Header(props) {
 		} else {
 		const dataResult = await dataResponse.json();
         setAllSuggestions(dataResult);
-		// console.log("All suggestions:", dataResult);
 	}
 }  
 	return (
@@ -128,7 +111,9 @@ export default function Header(props) {
 	props.setSelectedRanges({});
 	props.setSelectedItems({});
   }
-  
+  const handleExport = (format) => {
+    window.location.href = `${baseURL}/export/${format}`;
+  };
   return (
     <Navbar
       shadow={false}
@@ -150,15 +135,7 @@ export default function Header(props) {
           className="h-9 w-auto ml-2 lg:hidden"
           onClick={props.toggleSideBar}
         />
-
-        {/* {!open && (
-          <div>
-            <Breadcrumbs className="!bg-transparent">
-              {generateBreadcrumbs(location)}
-            </Breadcrumbs>
-          </div>
-        )} */}
-		<Button
+	{location.pathname === "/database" && (<Button
                 color="gray"
                 variant="outlined"
                 className="flex items-center gap-1 py-1 h-8"
@@ -167,6 +144,7 @@ export default function Header(props) {
                 reset
                 <AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
               </Button>
+		)}
 		<div className="flex space-x-4 items-end">
           {location.pathname === "/database" && (
 				<SearchMenu></SearchMenu>
@@ -180,15 +158,32 @@ export default function Header(props) {
         <div className="flex space-x-4 items-end">
           {location.pathname === "/database" && (
             <div className="flex items-center gap-4">
-            <MenuWithCheckbox columns={columns} selectedColumns={props.selectedColumns} setSelectedColumns={props.setSelectedColumns} ></MenuWithCheckbox>
-              <Button
-                color="gray"
-                variant="outlined"
-                className="flex items-center gap-1 py-1 h-8"
-              >
-                <a href={`${baseURL}/export`}> export </a>  
-                <ArrowDownTrayIcon className="w-4 h-4 text-gray-900" />
-              </Button>
+            <MenuWithCheckbox columns={columnsAlias} selectedColumns={props.selectedColumns} setSelectedColumns={props.setSelectedColumns} ></MenuWithCheckbox>
+
+			<Menu>
+      <MenuHandler>
+		
+        <Button
+          color="gray"
+          variant="outlined"
+          className="flex items-center gap-1 py-1 h-8"
+        >
+          Export
+          <ArrowDownTrayIcon className="w-4 h-4 text-gray-900" />
+        </Button>
+      </MenuHandler>
+      <MenuList>
+        <MenuItem onClick={() => handleExport('csv')}>
+          CSV
+        </MenuItem>
+        <MenuItem onClick={() => handleExport('tsv')}>
+            TSV
+        </MenuItem>
+        <MenuItem onClick={() => handleExport('json')}>
+            JSON
+        </MenuItem>
+      </MenuList>
+    </Menu>          
             </div>
           )}
           {location.pathname === "/" && (

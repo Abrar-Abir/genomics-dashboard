@@ -22,12 +22,19 @@ function Layout() {
     setDateRange(newDateRange);
   };
 
+  const tableHeadersView = Object.keys(schema.table).reduce((acc, table) => {
+	Object.keys(schema.table[table].entity).forEach((key) => {
+	  acc[key] = schema.table[table].entity[key].view; 
+	});
+	return acc;
+  }, {});
 
-const binaryString = Object.keys(schema.table).map((table) =>
-  Object.keys(schema.table[table].entity).map((column) =>
-    schema.table[table].entity[column].view === true ? '1' : '0'
-  ).join('')
-).join('');
+  const columns = Object.keys(schema.table).flatMap((table) =>
+Object.keys(schema.table[table].entity)
+).sort();
+// console.log('sortedCols', columns);
+const binaryString = columns.map(col => tableHeadersView[col] ? '1' : '0').join('');
+
 
   const [searchKey, setSearchKey] = useState("Search");
   const [searchValue, setSearchValue] = useState('');

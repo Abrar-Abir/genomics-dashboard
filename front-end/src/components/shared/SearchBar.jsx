@@ -3,7 +3,6 @@ import { Input } from '@material-tailwind/react';
 import { debounce } from 'lodash';
 
 const SearchBar = (props) => {
-//   console.log("search suggestions", allSuggestions)
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState(props.allSuggestions);
   const [showSuggestions, setShowSuggestions] = useState(false);

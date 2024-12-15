@@ -1,7 +1,7 @@
 {
     "database": "sidra",
-    "host": "dpg-csg2raogph6c73dqql4g-a.oregon-postgres.render.com",
-    "password": "36c2maoVRCYoKNqE5hSdPy50fEg0fZHa",
+    "host": "localhost",
+    "password": "mypassword",
     "port": "5432",
-    "user": "admin"
+    "user": "postgres"
 }

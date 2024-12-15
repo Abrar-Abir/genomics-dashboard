@@ -6,11 +6,10 @@ import {
 	DialogFooter,
 	Checkbox,
   } from "@material-tailwind/react";
-  import React, { useState } from 'react'; 
+  import React from 'react'; 
 
   const MenuWithCheckbox = (props) => {
-    // const [selectedColumns, setSelectedColumns] = useState('1'.repeat(props.columns.length));
-	const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
  
 	const handleOpen = () => setOpen(!open);
 	 const flipBit = (binaryStr, idx) => {
