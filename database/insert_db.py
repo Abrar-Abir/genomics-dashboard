@@ -304,6 +304,7 @@ def get_multiqc_data(sample_rows, flowcell_rows):
                 sample_rows[row_no]["yieldQ30"] = multiqc[sample_id]["yieldQ30"]
             else:
                 assert False, f"{multiqc_json_path}, {tool}"
+    flowcell_rows[0]['tool'] = tool
     flowcell_rows[0]['multiqc_version'] = multiqc_data["config_version"]
     flowcell_rows[0]['demultiplex_date'] = datetime.strptime(
         multiqc_data['config_creation_date'].split(',')[0], '%Y-%m-%d').date()
@@ -322,13 +323,14 @@ def validate_runs(dir_name: str, flowcell: str) -> tuple[str, str, str, str, dat
     sequencer = tokens[1]
     run_id = tokens[2]
     position = tokens[3][0]
-    log_error(position in ['A', 'B'], 'position_parse_warning', [
-              position, dir_name, flowcell])
-    # assert tokens[3][0] in ["A", "B"], f"could not extract position from dir_name {dir_name}; expected 'A' or 'B' but got {tokens[3][0]}"
-    # if tokens[3][0] == "A":
-    #     position = True
-    # else:
-    #     position = False
+    # log_error(position in ['A', 'B'], 'position_parse_warning', [
+    #   position, dir_name, flowcell])
+    assert tokens[3][0] in [
+        "A", "B"], f"could not extract position from dir_name {dir_name}; expected 'A' or 'B' but got {tokens[3][0]}"
+    if tokens[3][0] == "A":
+        position = True
+    else:
+        position = False
     return sequencer, run_id, position, raw_info_filename, loading_date
 
 
@@ -418,3 +420,13 @@ def main():
 main()
 cursor.close()
 conn.close()
+
+
+# "tool": {
+# 					"type": "VARCHAR(16)",
+# 					"not_null": true,
+# 					"filter_option": true,
+# 					"view": true,
+# 					"alias": "Tool",
+# 					"group": 2
+# 				},

@@ -19,6 +19,7 @@ import {
 	  };
 	  const handleFlip = (index) => {
 		props.setSelectedColumns(prevBinary => flipBit(prevBinary, index));
+		props.setToggleColumn(index);
 	  };
 	
 

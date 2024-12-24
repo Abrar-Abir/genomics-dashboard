@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FilterPanel from "@components/database/FilterPanel";
 import DataTable from "@components/database/DataTable";
-import config, { sampleData0 } from "@lib/dashboardConfig.cjs";
-import schema from "@lib/schema.json";
 import { useOutletContext } from "react-router-dom";
 
 export default function Database() {
@@ -15,17 +13,15 @@ export default function Database() {
   const {selectedItems} = useOutletContext();
   const {setSelectedItems} = useOutletContext();
   const {selectedColumns} = useOutletContext();
+  const {columnsSorted} = useOutletContext();
+  const {sortedColumns} = useOutletContext();
+  const {setSortedColumns} = useOutletContext();
 
-//   const tableHeaders = Object.keys(schema.table).flatMap((table) =>
-//     Object.keys(schema.table[table].entity).map((key) => ({
-//       head: key,
-//     }))
-//   );
 
   const baseURL =
     process.env.NODE_ENV === "production"
-    //   ? "http://172.32.79.51:5001"
-	  ? "https://genomics-dashboard-flask.onrender.com"
+      ? "http://172.32.79.51:5001"
+	//   ? "https://genomics-dashboard-flask.onrender.com"
       : "http://localhost:5001";
 
   const [data, setData] = useState([]);
@@ -34,21 +30,19 @@ export default function Database() {
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(50);
   const [filterPanelData, setFilterPanelData] = useState(null);
-  const [columns, setColumns] = useState([]);
-
-//   const filterColumns = () => {
-//     return tableHeaders.filter((column, index) => selectedColumns[index] === '1');
-//   };
+  const [columnToSort, setColumnToSort] = useState(-1);
+  
+  const prevState = useRef({'sortedColumns':sortedColumns, 'page':page, 'limit':limit});
 
   useEffect(() => {
-    if (config.useSampleData) {
-      setData(sampleData0);
-    } else {
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      async function fetchDataAndFilterPanelData() {
+      async function fetchData() {
         try {
           const offset = (page - 1) * limit;
-		  let apiUrl = `${baseURL}/type0?cols=${selectedColumns}&limit=${limit}&offset=${offset}`;
+		  let apiUrl = `${baseURL}/type0?limit=${limit}&offset=${offset}`;
+		  if (columnToSort !== -1 && prevState.current.sortedColumns != sortedColumns){
+			apiUrl += `&sort=${columnToSort}`;
+		  }
 		  if (searchValue !== ""){
 			apiUrl += `&search=(${searchKey},${searchValue})`
 		  }
@@ -74,31 +68,30 @@ export default function Database() {
           } else {
             const dataResult = await dataResponse.json();
             setData(Array.isArray(dataResult.data) ? dataResult.data : []);
-			setColumns(Array.isArray(dataResult.columns) ? dataResult.columns : [])
             setTotalCount(dataResult.total_count);
 			const totalCount = dataResult.total_count;
             setTotalPages(Math.ceil(totalCount / limit));
-			// setColumns(filterColumns());
-			// console.log(columns);
             await delay(5);
-
-            const filterPanelResponse = await fetch(`${baseURL}/analytics`);
-            if (!filterPanelResponse.ok) {
-              console.error("Server error:", filterPanelResponse);
-            } else {
-              const filterPanelResult = await filterPanelResponse.json();
-              setFilterPanelData(filterPanelResult);
-            }
+			if ((prevState.current.page === page && prevState.current.limit === limit && prevState.current.sortedColumns === sortedColumns) || filterPanelData === null){
+				prevState.current.sortedColumns = sortedColumns;
+				prevState.current.page = page;
+				prevState.current.limit = limit;
+				const filterPanelResponse = await fetch(`${baseURL}/analytics`);
+				if (!filterPanelResponse.ok) {
+				console.error("Server error:", filterPanelResponse);
+				} else {
+				const filterPanelResult = await filterPanelResponse.json();
+				setFilterPanelData(filterPanelResult);
+				}
+			}
           }
         } catch (error) {
-          console.error("Error fetching data or filter panel data:", error);
+          console.error("Error fetching data:", error);
         }
       }
 
-      fetchDataAndFilterPanelData();
-    }
-  }, [page, limit, config.useSampleData, selectedFilter, selectedRanges, searchValue, selectedColumns]);
-
+      fetchData();
+  }, [page, limit, selectedFilter, selectedRanges, searchValue, sortedColumns]);
 
   const handlePrev = () => {
     setPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -111,7 +104,6 @@ export default function Database() {
   const handleLimit = (number) => {
     setLimit(number);
     setPage(1);
-    console.log(number);
   };
 
 
@@ -126,7 +118,6 @@ export default function Database() {
       />
 	  <DataTable
 	  data={data}
-	  tableHeaders={columns}
 	  handlePrev={handlePrev}
 	  handleNext={handleNext}
 	  totalPages={totalPages}
@@ -134,6 +125,11 @@ export default function Database() {
 	  page={page}
 	  limit={limit}
 	  handleLimit={handleLimit}
+	  selectedColumns={selectedColumns}
+	  columnsSorted={columnsSorted}
+	  sortedColumns={sortedColumns}
+	  setSortedColumns={setSortedColumns}
+	  setColumnToSort={setColumnToSort}
 	/>
     </div>
   );

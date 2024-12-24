@@ -8,7 +8,7 @@ generic_configs = {
 	"preprocess_file" : "preprocess.json",
 	"schema_file" : "schema.json",
 	"runs_file" : "runs.json",
-	"FC_QC_url": "http://172.32.75.26/sapipe"
+	"FC_QC_url": "https://pme.sidra.org/qc/home?path=sapipe"
 }
 # Define the configurations for each developer
 user_configs = {

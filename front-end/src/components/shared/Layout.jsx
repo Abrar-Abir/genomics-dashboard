@@ -29,12 +29,12 @@ function Layout() {
 	return acc;
   }, {});
 
-  const columns = Object.keys(schema.table).flatMap((table) =>
+
+  const columnsSorted = Object.keys(schema.table).flatMap((table) =>
 Object.keys(schema.table[table].entity)
 ).sort();
-// console.log('sortedCols', columns);
-const binaryString = columns.map(col => tableHeadersView[col] ? '1' : '0').join('');
-
+const binaryString = columnsSorted.map(col => tableHeadersView[col] ? '1' : '0').join('');
+const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0').join('');
 
   const [searchKey, setSearchKey] = useState("Search");
   const [searchValue, setSearchValue] = useState('');
@@ -42,6 +42,7 @@ const binaryString = columns.map(col => tableHeadersView[col] ? '1' : '0').join(
   const [selectedRanges, setSelectedRanges] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
   const [selectedColumns, setSelectedColumns] = useState(binaryString);
+  const [sortedColumns, setSortedColumns] = useState(trinaryString);
 
 
   useEffect(() => {
@@ -81,7 +82,11 @@ const binaryString = columns.map(col => tableHeadersView[col] ? '1' : '0').join(
 			  setSelectedRanges,
 			  selectedItems,
 			  setSelectedItems,
-			  selectedColumns
+			  selectedColumns,
+			  setSelectedColumns,
+			  columnsSorted,
+			  sortedColumns,
+			  setSortedColumns
             }}
           />
         </div>

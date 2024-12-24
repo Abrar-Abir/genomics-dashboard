@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Database from "./pages/Database";
 import Plot from "./pages/Plot"
+import Datagrid from "./pages/Datagrid"
 
 function App() {
   const [view, setView] = useState(true);
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Layout setView={setView} />}>
           <Route index element={<Dashboard />} />
           <Route path="database" element={<Database view={view}/>} />
+		  <Route path="datagrid" element={<Datagrid view={view}/>} />
 		  <Route path="plot" element={<Plot />} />
         </Route>
       </Routes>

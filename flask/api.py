@@ -21,37 +21,38 @@ conn, cursor = connect_to_postgres(database, host, user, password, port)
 conn.autocommit = True
 
 filter_dict = {}
-columnString = ''
+sortList = []
 
 with open(os.path.join(parent, "schema.json"), "r") as f:
     schema = json.load(f)
 
 allColumns = []
 for table in schema["table"]:
-    allColumns += [(schema["table"][table]["entity"][column]["group"], table, column)
-                   for column in schema["table"][table]["entity"]]
-columnsSorted = [col[1] + '.' + col[2]
-                 for col in sorted(allColumns, key=lambda x: x[2])]
-columnsGrouped = [col[1] + '.' + col[2]
-                  for col in sorted(allColumns, key=lambda x: x[0])]
-# print("columnsSorted", columnsSorted)
-# print("columnsGrouped", columnsGrouped)
-73
-# def isdigit(obj):
-#     text = str(obj).replace('.', '')
-#     for char in text:
-#         if char not in '0123456789':
-#             return False
-#     return True
+    allColumns += [(table, column) for column in schema["table"][table]["entity"]]
+columnsSorted = [col[0] + '.' + col[1]
+                 for col in sorted(allColumns, key=lambda x: x[1])]
+
+def isdigit(obj):
+    text = str(obj).replace('.', '')
+    for char in text:
+        if char not in '0123456789':
+            return False
+    return True
 
 
-# class JSONEncoder(json.JSONEncoder):
-#     def default(self, obj):
-#         if isdigit(obj):
-#             return str(obj)
-#         if isinstance(obj, date):
-#             return datetime.strftime(obj, '%d-%m-%Y')
-#         return super(JSONEncoder, self).default(obj)
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isdigit(obj):
+            return str(obj)
+        if isinstance(obj, date):
+            return datetime.strftime(obj, '%d-%m-%Y')
+        return super(JSONEncoder, self).default(obj)
+
+def get_id(l,e):
+    try:
+        return l.index(e)
+    except:
+        return -1
 
 
 def parse_date(date):
@@ -91,13 +92,14 @@ def set_filter_dict(request_args):
     return 0
 
 
-def set_column_string(cols):
-    global columnString
-    columnString = ''
-    colsParsed = {columnsSorted[i]: cols[i] for i in range(len(cols))}
-    columns = [column for column in columnsGrouped if colsParsed[column] == '1']
-    columnString = ", ".join(columns)
-    # return 0
+def get_order_clause():
+    global sortList
+    orderString = 'ORDER BY '
+    for id in sortList:
+        col = columnsSorted[abs(id)]
+        order = 'DESC' if id > 0 else 'ASC'
+        orderString += f" {col} {order},"
+    return orderString[:-1]
 
 
 def get_where_clause(filter_key=None):
@@ -111,27 +113,35 @@ def get_where_clause(filter_key=None):
     return where_clause[:-5]
 
 
-def stringify(data):
-    if isinstance(data, list):
-        return [stringify(dataItem) for dataItem in data]
-    if isinstance(data, dict):
-        return {str(key): stringify(value) for key, value in data.items()}
-    return str(data)
+# def stringify(data):
+#     if isinstance(data, list):
+#         return [stringify(dataItem) for dataItem in data]
+#     if isinstance(data, dict):
+#         return {str(key): stringify(value) for key, value in data.items()}
+#     return str(data)
 
+
+sortList.append(get_id(columnsSorted, 'flowcell.loading_date'))
 ######## table page #######################################
 
 
 @ app.route('/type0')
 def type0():
+    global sortList
     limit = request.args.get('limit', default=50, type=int)
     offset = request.args.get('offset', default=0, type=int)
-
-    global columnString
-    columnString = ''
-    cols = request.args.get('cols', default='1'*len(allColumns), type=str)
-    colsParsed = {columnsSorted[i]: cols[i] for i in range(len(cols))}
-    columns = [column for column in columnsGrouped if colsParsed[column] == '1']
-    columnString = ", ".join(columns)
+    col = request.args.get('sort', default=-1, type=int)
+    if col != -1:
+        pos_id = get_id(sortList, col)
+        neg_id = get_id(sortList, col * -1)
+        if pos_id == -1 and neg_id == -1:
+            sortList.append(col)
+        elif neg_id == -1:
+            sortList = sortList[:pos_id] + sortList[pos_id + 1:]
+            sortList.append(col * -1)
+        elif pos_id == -1:
+            sortList = sortList[:neg_id] + sortList[neg_id + 1:]
+    order_clause = get_order_clause()
 
     set_filter_dict(request.args)
 
@@ -153,7 +163,7 @@ def type0():
     data_query = f"""
         SELECT JSON_AGG(result)
         FROM (
-            SELECT {columnString}
+            SELECT *
             FROM sample
             LEFT JOIN pool ON sample.pool_id = pool.pool_id
             LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -163,6 +173,7 @@ def type0():
             LEFT JOIN i7 ON sample.i7_id = i7.i7_id
             LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 			{where_clause}
+            {order_clause}
             LIMIT {limit} OFFSET {offset}
         ) result;
     """
@@ -172,57 +183,68 @@ def type0():
     else:
         results = fetch_result[0][0]
 
-    return jsonify({"data": results, "columns": [column.split('.')[-1] for column in columns], "total_count": total_count})
+    return jsonify({"data": results, "total_count": total_count})
 
 
 @ app.route('/export/<format>')
 def export(format):
-    where_clause = get_where_clause()
-    data_query = f"""
-        SELECT {columnString}
-        FROM sample
-        LEFT JOIN pool ON sample.pool_id = pool.pool_id
-        LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
-        LEFT JOIN submission ON sample.submission_id = submission.submission_id
-        LEFT JOIN project ON submission.project_id = project.project_id
-        LEFT JOIN i5 ON sample.i5_id = i5.i5_id
-        LEFT JOIN i7 ON sample.i7_id = i7.i7_id
-        LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
-		{where_clause}
-    """
-    results = fetch(cursor, data_query, 'all')
-    fieldnames = [desc[0] for desc in cursor.description]
-    df = pd.DataFrame(results, columns=fieldnames)
+	where_clause = get_where_clause()
+	order_clause = get_order_clause()
+	data_query = f"""
+			SELECT *
+			FROM sample
+			LEFT JOIN pool ON sample.pool_id = pool.pool_id
+			LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
+			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+			LEFT JOIN project ON submission.project_id = project.project_id
+			LEFT JOIN i5 ON sample.i5_id = i5.i5_id
+			LEFT JOIN i7 ON sample.i7_id = i7.i7_id
+			LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+			{where_clause}
+			{order_clause}
+		"""
+	results = fetch(cursor, data_query, 'all')
+	fieldnames = [desc[0] for desc in cursor.description]
+	df = pd.DataFrame(results, columns=fieldnames)
 
-    if format == 'csv':
-        csv_buffer = io.StringIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_buffer.seek(0)
-        return send_file(io.BytesIO(csv_buffer.getvalue().encode()),
-                         mimetype='text/csv',
-                         as_attachment=True,
-                         download_name='data.csv')
+	if format == 'csv':
+		csv_buffer = io.StringIO()
+		df.to_csv(csv_buffer, index=False)
+		csv_buffer.seek(0)
+		return send_file(io.BytesIO(csv_buffer.getvalue().encode()),
+							mimetype='text/csv',
+							as_attachment=True,
+							download_name='data.csv')
 
-    elif format == 'tsv':
-        tsv_buffer = io.StringIO()
-        df.to_csv(tsv_buffer, sep='\t', index=False)
-        tsv_buffer.seek(0)
-        return send_file(io.BytesIO(tsv_buffer.getvalue().encode()),
-                         mimetype='text/tab-separated-values',
-                         as_attachment=True,
-                         download_name='data.tsv')
+	elif format == 'tsv':
+		tsv_buffer = io.StringIO()
+		df.to_csv(tsv_buffer, sep='\t', index=False)
+		tsv_buffer.seek(0)
+		return send_file(io.BytesIO(tsv_buffer.getvalue().encode()),
+							mimetype='text/tab-separated-values',
+							as_attachment=True,
+							download_name='data.tsv')
 
-    elif format == 'json':
-        json_buffer = io.StringIO()
-        df.to_json(json_buffer, orient='records', lines=True)
-        json_buffer.seek(0)
-        return send_file(io.BytesIO(json_buffer.getvalue().encode()),
+	elif format == 'json':
+		data = dict()
+		for row in range(len(df)):
+			sample_id = df.loc[row, 'sample_id']
+			flowcell_id = df.loc[row, 'flowcell_id']
+			if sample_id not in data:
+				data[sample_id] = dict()
+			data[sample_id][flowcell_id] = {key : df.loc[row, key] for key in fieldnames if key not in ('sample_id', 'flowcell_id')}
+		# return jsonify(data)
+		json_file_path = "/tmp/data.json"
+		with open(json_file_path, 'w') as json_file:
+			json.dump(data, json_file, indent=4, cls=JSONEncoder)
+
+		# Send the file as a response
+		return send_file(json_file_path,
                          mimetype='application/json',
                          as_attachment=True,
                          download_name='data.json')
-
-    else:
-        return 'Invalid format', 400
+	else:
+		return 'Invalid format', 400
 
 # helper function for analytics
 
@@ -306,6 +328,57 @@ def search(entity):
     results = fetch(cursor, query, 'all')
     print(results)
     return jsonify([row[0] for row in results])
+
+@ app.route('/datagrid')
+def datagrid():
+	limit = request.args.get('limit', default=50, type=int)
+	offset = request.args.get('offset', default=0, type=int)
+	set_filter_dict(request.args)
+	where_clause = get_where_clause()
+
+	query = """ SELECT DISTINCT datatype FROM submission ;"""
+	columns = fetch(cursor, query, 'all')
+
+	case_query = ""
+	for row in columns:
+		assert (len(row) == 1)
+		value = row[0]
+		case_query += f"""SUM(CASE WHEN datatype = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else None}","""
+
+	query = f"""
+        SELECT JSON_AGG(result)
+        FROM (
+          SELECT
+            sample_name,
+            {case_query[:-1]},
+			COUNT(*)
+          FROM
+            submission
+          LEFT JOIN
+            sample ON submission.submission_id = sample.submission_id
+		  {where_clause}
+          GROUP BY
+            sample_name
+		  ORDER BY
+		  	COUNT DESC
+		  LIMIT {limit} OFFSET {offset}
+          )
+        result;"""
+
+	# print(query)
+
+	fetch_result = fetch(cursor, query, 'all')
+	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+		results = None
+	else:
+		results = fetch_result[0][0]
+
+#   with open('./front-end/src/apiData/data2a.json', 'w') as f:
+        # json.dump(results, f, cls=JSONEncoder)
+	return jsonify({"data": results, "columns": ['sample_name'] + columns + ['count']})
+
+
+
 
     ####### overview page ##################################################
 

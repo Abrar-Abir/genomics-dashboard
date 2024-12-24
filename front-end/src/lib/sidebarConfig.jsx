@@ -6,6 +6,7 @@ import {
   InboxIcon,
   PowerIcon,
   TableCellsIcon,
+  ViewColumnsIcon
 } from "@heroicons/react/24/solid";
 
 const iconSize = "h-6 w-6";
@@ -22,6 +23,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     label: "Database",
     path: "/database",
     icon: <TableCellsIcon className={iconSize} /> ,
+  },
+  {
+    key: "datagrid",
+    label: "Datagrid",
+    path: "/datagrid",
+    icon: <ViewColumnsIcon className={iconSize} /> ,
   },
   {
     key: "plot",

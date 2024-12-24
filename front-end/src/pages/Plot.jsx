@@ -14,6 +14,8 @@ export default function Database() {
   const [filterPanelData, setFilterPanelData] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState({});
   const [selectedRanges, setSelectedRanges] = useState({});
+  const {selectedItems} = useOutletContext();
+  const {setSelectedItems} = useOutletContext();
   const [htmlContent, setHtmlContent] = useState('');
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -64,9 +66,10 @@ export default function Database() {
     <div className="flex h-screen-minus-header">
       <FilterPanel
         data={filterPanelData}
-        databaseFilterButton={databaseFilterButton}
 		setSelectedFilter={setSelectedFilter}
 		setSelectedRanges={setSelectedRanges}
+		selectedItems={selectedItems}
+		setSelectedItems={setSelectedItems}
       />
 	<div style={{ flex: 1, overflow: 'auto' }}>
 		<div
