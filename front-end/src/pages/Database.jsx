@@ -10,8 +10,6 @@ export default function Database() {
   const {setSelectedRanges} = useOutletContext();
   const {searchKey} = useOutletContext();
   const {searchValue} = useOutletContext();
-  const {selectedItems} = useOutletContext();
-  const {setSelectedItems} = useOutletContext();
   const {selectedColumns} = useOutletContext();
   const {columnsSorted} = useOutletContext();
   const {sortedColumns} = useOutletContext();
@@ -112,9 +110,9 @@ export default function Database() {
       <FilterPanel
         data={filterPanelData}
 		setSelectedFilter={setSelectedFilter}
+		selectedFilter={selectedFilter}
 		setSelectedRanges={setSelectedRanges}
-		selectedItems={selectedItems}
-		setSelectedItems={setSelectedItems}
+
       />
 	  <DataTable
 	  data={data}

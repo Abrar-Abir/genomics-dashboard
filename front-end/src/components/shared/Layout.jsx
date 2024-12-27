@@ -34,16 +34,23 @@ function Layout() {
 Object.keys(schema.table[table].entity)
 ).sort();
 const binaryString = columnsSorted.map(col => tableHeadersView[col] ? '1' : '0').join('');
+// const viewAll = columnsSorted.map(col => tableHeadersView[col] ? '1' : '1').join('');
 const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0').join('');
 
   const [searchKey, setSearchKey] = useState("Search");
   const [searchValue, setSearchValue] = useState('');
   const [selectedFilter, setSelectedFilter] = useState({});
   const [selectedRanges, setSelectedRanges] = useState({});
-  const [selectedItems, setSelectedItems] = useState({});
   const [selectedColumns, setSelectedColumns] = useState(binaryString);
   const [sortedColumns, setSortedColumns] = useState(trinaryString);
 
+  const reset = () => {
+	setSearchValue("");
+	setSelectedFilter({});
+	setSelectedRanges({});
+	setSelectedColumns(binaryString);
+	setSortedColumns(trinaryString);
+  }
 
   useEffect(() => {
     // Reset dateRange when the route changes
@@ -66,9 +73,9 @@ const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0
 		  setSearchValue={setSearchValue}
 		  setSelectedFilter={setSelectedFilter}
 		  setSelectedRanges={setSelectedRanges}
-		  setSelectedItems={setSelectedItems}
 		  selectedColumns={selectedColumns}
 		  setSelectedColumns={setSelectedColumns}
+		  reset={reset}
         />
         <div className="flex-1 min-h-0 w-full bg-gray-300/80 z-0 overflow-x-hidden">
           <Outlet
@@ -80,8 +87,6 @@ const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0
 			  setSelectedFilter,
 			  selectedRanges,
 			  setSelectedRanges,
-			  selectedItems,
-			  setSelectedItems,
 			  selectedColumns,
 			  setSelectedColumns,
 			  columnsSorted,

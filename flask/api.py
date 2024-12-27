@@ -11,8 +11,22 @@ import tempfile
 import zipfile
 import pygwalker as pyg
 import pandas as pd
+import numpy as np
+
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, np.bool_):
+			return bool(obj)
+		if isdigit(obj):
+			return str(obj)
+		if isinstance(obj, (date, datetime)):
+			return datetime.strftime(obj, '%d-%m-%Y')
+		return super().default(obj)
 
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
 CORS(app)
 dir = os.getcwd()
 parent = os.path.dirname(dir)
@@ -28,10 +42,13 @@ with open(os.path.join(parent, "schema.json"), "r") as f:
 
 allColumns = []
 for table in schema["table"]:
-    allColumns += [(table, column) for column in schema["table"][table]["entity"]]
+    allColumns += [(table, column, schema["table"][table]["entity"][column]["alias"], schema["table"][table]["entity"][column]["order"]) for column in schema["table"][table]["entity"]]
 columnsSorted = [col[0] + '.' + col[1]
                  for col in sorted(allColumns, key=lambda x: x[1])]
-
+column_clause = ', '.join(columnsSorted)
+columnsAliased = [col[0] + '.' + col[1] + ' AS ' + '"' + col[2] + '"'
+                 for col in sorted(allColumns, key=lambda x: x[3])]
+alias_clause = ', '.join(columnsAliased)
 def isdigit(obj):
     text = str(obj).replace('.', '')
     for char in text:
@@ -40,13 +57,8 @@ def isdigit(obj):
     return True
 
 
-class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isdigit(obj):
-            return str(obj)
-        if isinstance(obj, date):
-            return datetime.strftime(obj, '%d-%m-%Y')
-        return super(JSONEncoder, self).default(obj)
+
+
 
 def get_id(l,e):
     try:
@@ -97,7 +109,7 @@ def get_order_clause():
     orderString = 'ORDER BY '
     for id in sortList:
         col = columnsSorted[abs(id)]
-        order = 'DESC' if id > 0 else 'ASC'
+        order = 'ASC' if id > 0 else 'DESC'
         orderString += f" {col} {order},"
     return orderString[:-1]
 
@@ -163,7 +175,7 @@ def type0():
     data_query = f"""
         SELECT JSON_AGG(result)
         FROM (
-            SELECT *
+            SELECT {column_clause}
             FROM sample
             LEFT JOIN pool ON sample.pool_id = pool.pool_id
             LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -185,13 +197,36 @@ def type0():
 
     return jsonify({"data": results, "total_count": total_count})
 
+@ app.route('/raw/<sample_id>')
+def raw(sample_id):
+	data_query = f"""
+			SELECT {alias_clause}
+			FROM sample
+			LEFT JOIN pool ON sample.pool_id = pool.pool_id
+			LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
+			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+			LEFT JOIN project ON submission.project_id = project.project_id
+			LEFT JOIN i5 ON sample.i5_id = i5.i5_id
+			LEFT JOIN i7 ON sample.i7_id = i7.i7_id
+			LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+			WHERE sample.sample_id = '{sample_id}';
+		"""
+	results = fetch(cursor, data_query, 'all')
+	fieldnames = [desc[0] for desc in cursor.description]
+	data = {sample_id : dict()}
+	for row in results:
+		flowcell_id = row[get_id(fieldnames, 'Flowcell ID')] 
+		data[sample_id][flowcell_id] = {fieldnames[id] : row[id] for id in range(len(row)) if id not in (get_id(fieldnames, 'LIMS ID'), get_id(fieldnames, 'Flowcell ID'))}
+		data[sample_id][flowcell_id]['Mean Q Score'] = data[sample_id][flowcell_id]['Mean Q Score'] / ((sum([data[sample_id][flowcell_id][f'Lane {i}'] for i in range(1,9)]))*2)
+	return jsonify(data)
+
 
 @ app.route('/export/<format>')
 def export(format):
 	where_clause = get_where_clause()
 	order_clause = get_order_clause()
 	data_query = f"""
-			SELECT *
+			SELECT {alias_clause}
 			FROM sample
 			LEFT JOIN pool ON sample.pool_id = pool.pool_id
 			LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -206,6 +241,7 @@ def export(format):
 	results = fetch(cursor, data_query, 'all')
 	fieldnames = [desc[0] for desc in cursor.description]
 	df = pd.DataFrame(results, columns=fieldnames)
+	df['Mean Q Score'] = df['Mean Q Score']/(sum([df[f'Lane {i}']  for i in range(1, 9)])*2)
 
 	if format == 'csv':
 		csv_buffer = io.StringIO()
@@ -228,15 +264,14 @@ def export(format):
 	elif format == 'json':
 		data = dict()
 		for row in range(len(df)):
-			sample_id = df.loc[row, 'sample_id']
-			flowcell_id = df.loc[row, 'flowcell_id']
+			sample_id = df.loc[row, 'LIMS ID']
+			flowcell_id = df.at[row, 'Flowcell ID']
 			if sample_id not in data:
 				data[sample_id] = dict()
 			data[sample_id][flowcell_id] = {key : df.loc[row, key] for key in fieldnames if key not in ('sample_id', 'flowcell_id')}
-		# return jsonify(data)
 		json_file_path = "/tmp/data.json"
 		with open(json_file_path, 'w') as json_file:
-			json.dump(data, json_file, indent=4, cls=JSONEncoder)
+			json.dump(data, json_file, indent=4, cls=CustomJSONEncoder)
 
 		# Send the file as a response
 		return send_file(json_file_path,
@@ -326,13 +361,12 @@ def search(entity):
 		{where_clause}
     """
     results = fetch(cursor, query, 'all')
-    print(results)
+    # print(results)
     return jsonify([row[0] for row in results])
 
 @ app.route('/datagrid')
 def datagrid():
-	limit = request.args.get('limit', default=50, type=int)
-	offset = request.args.get('offset', default=0, type=int)
+
 	set_filter_dict(request.args)
 	where_clause = get_where_clause()
 
@@ -349,19 +383,21 @@ def datagrid():
         SELECT JSON_AGG(result)
         FROM (
           SELECT
-            sample_name,
+            sample_name AS "Sample Name",
+			project.pi AS "PI",
+			project.project AS "SDR No.",
             {case_query[:-1]},
-			COUNT(*)
+			COUNT(*) AS "Count"
           FROM
-            submission
-          LEFT JOIN
-            sample ON submission.submission_id = sample.submission_id
-		  {where_clause}
+			sample
+			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+			LEFT JOIN project ON submission.project_id = project.project_id
           GROUP BY
-            sample_name
+            sample_name, project.pi, project.project
+		  HAVING
+		    COUNT(*) > 1
 		  ORDER BY
-		  	COUNT DESC
-		  LIMIT {limit} OFFSET {offset}
+		  	COUNT(*) DESC
           )
         result;"""
 
@@ -372,10 +408,25 @@ def datagrid():
 		results = None
 	else:
 		results = fetch_result[0][0]
-
+	output = dict()
+	for row in results:
+		if row['PI'] not in output:
+			output[row['PI']] = {"header": dict(), "rows": []}
+		# if row['SDR No.'] not in output[row['PI']]:
+		# 	output[row['PI']][row['SDR No.']] = []
+		# output[row['PI']][row['SDR No.']].append({key : row[key] for key in row if key not in ('PI', 'SDR No.')})
+		output[row['PI']]["rows"].append({"Sample Name" : row["Sample Name"]})
+		for key in row:
+			if key not in ('PI', 'SDR No.', 'Sample Name'):
+				output[row['PI']]["header"][key] = output[row['PI']]["header"].get(key, 0) + row[key]
+				output[row['PI']]["rows"][-1][key] = row[key]
+	# data = []
+	# for key in output:
+	# 	data.append({key : output[key]})
 #   with open('./front-end/src/apiData/data2a.json', 'w') as f:
         # json.dump(results, f, cls=JSONEncoder)
-	return jsonify({"data": results, "columns": ['sample_name'] + columns + ['count']})
+	# return jsonify({"data": results, "columns": ['Sample Name', 'PI', 'SDR No.'] + columns + ['Count']})
+	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['Count']})
 
 
 

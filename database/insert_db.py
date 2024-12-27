@@ -408,7 +408,6 @@ def main():
         demultiplexed_flowcells.add(row[0])
     new_flowcells = [
         flowcell for flowcell in all_flowcells if flowcell not in demultiplexed_flowcells]
-    # new_flowcells = ['H7WWJDSX5']
     print("demultiplexed", demultiplexed_flowcells)
 
     for flowcell in new_flowcells:

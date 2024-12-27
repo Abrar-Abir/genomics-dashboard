@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import FilterPanel from "@components/database/FilterPanel";
-// import DataTable from "@components/database/DataTable";
+import AccordionTable from "@components/database/AccordionTable";
 import Grid from "@components/database/Grid"
 import { useOutletContext } from "react-router-dom";
 
@@ -11,12 +11,7 @@ export default function Database() {
   const {setSelectedRanges} = useOutletContext();
   const {searchKey} = useOutletContext();
   const {searchValue} = useOutletContext();
-  const {selectedItems} = useOutletContext();
-  const {setSelectedItems} = useOutletContext();
-//   const {selectedColumns} = useOutletContext();
-//   const {columnsSorted} = useOutletContext();
   const {sortedColumns} = useOutletContext();
-//   const {setSortedColumns} = useOutletContext();
 
 
   const baseURL =
@@ -40,40 +35,37 @@ export default function Database() {
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       async function fetchData() {
         try {
-          const offset = (page - 1) * limit;
-		  let apiUrl = `${baseURL}/datagrid?limit=${limit}&offset=${offset}`;
-		  if (columnToSort !== -1 && prevState.current.sortedColumns != sortedColumns){
-			apiUrl += `&sort=${columnToSort}`;
-		  }
-		  if (searchValue !== ""){
-			apiUrl += `&search=(${searchKey},${searchValue})`
-		  }
+		  let apiUrl = `${baseURL}/datagrid`;
+		//   if (columnToSort !== -1 && prevState.current.sortedColumns != sortedColumns){
+		// 	apiUrl += `&sort=${columnToSort}`;
+		//   }
+		//   if (searchValue !== ""){
+		// 	apiUrl += `&search=(${searchKey},${searchValue})`
+		//   }
 
-          if (Object.keys(selectedFilter).length > 0) {
-            Object.entries(selectedFilter).forEach(([key, values]) => {
-			  if (values.length > 0){
-				apiUrl += `&${key}=${JSON.stringify(values)}`;
-			  }
-		});
-          }
-		  if (Object.keys(selectedRanges).length > 0) {
-			Object.entries(selectedRanges).forEach(([key, [ start, end ]]) => {
-				if (start !== ""){apiUrl += `&${key}>=${start}`;}
-				if (end !== ""){apiUrl += `&${key}<=${end}`;}
-				})
-			;
-		}
+        //   if (Object.keys(selectedFilter).length > 0) {
+        //     Object.entries(selectedFilter).forEach(([key, values]) => {
+		// 	  if (values.length > 0){
+		// 		apiUrl += `&${key}=${JSON.stringify(values)}`;
+		// 	  }
+		// });
+        //   }
+		//   if (Object.keys(selectedRanges).length > 0) {
+		// 	Object.entries(selectedRanges).forEach(([key, [ start, end ]]) => {
+		// 		if (start !== ""){apiUrl += `&${key}>=${start}`;}
+		// 		if (end !== ""){apiUrl += `&${key}<=${end}`;}
+		// 		})
+		// 	;
+		// }
           const dataResponse = await fetch(apiUrl);
 
           if (!dataResponse.ok) {
             console.error("Server error:", dataResponse);
           } else {
             const dataResult = await dataResponse.json();
-            setData(Array.isArray(dataResult.data) ? dataResult.data : []);
+            // setData(Array.isArray(dataResult.data) ? dataResult.data : []);
+			setData(dataResult.data);
 			setTableHeaders(Array.isArray(dataResult.columns) ? dataResult.columns : []);
-            setTotalCount(dataResult.total_count);
-			const totalCount = dataResult.total_count;
-            setTotalPages(Math.ceil(totalCount / limit));
             await delay(5);
 			if ((prevState.current.page === page && prevState.current.limit === limit && prevState.current.sortedColumns === sortedColumns) || filterPanelData === null){
 				prevState.current.sortedColumns = sortedColumns;
@@ -94,21 +86,7 @@ export default function Database() {
       }
 
       fetchData();
-  }, [page, limit, selectedFilter, selectedRanges, searchValue, sortedColumns]);
-
-  const handlePrev = () => {
-    setPage((prevPage) => Math.max(prevPage - 1, 1));
-  };
-
-  const handleNext = () => {
-    setPage((prevPage) => Math.min(prevPage + 1, totalPages));
-  };
-
-  const handleLimit = (number) => {
-    setLimit(number);
-    setPage(1);
-    // console.log(number);
-  };
+  }, [selectedFilter, selectedRanges, searchValue, sortedColumns]);
 
 
   return (
@@ -117,20 +95,15 @@ export default function Database() {
         data={filterPanelData}
 		setSelectedFilter={setSelectedFilter}
 		setSelectedRanges={setSelectedRanges}
-		selectedItems={selectedItems}
-		setSelectedItems={setSelectedItems}
+		selectedFilter={selectedFilter}
       />
-	  <Grid
+	  {/* <Grid
 	  data={data}
-	  handlePrev={handlePrev}
-	  handleNext={handleNext}
-	  totalPages={totalPages}
-	  totalCount={totalCount}
-	  page={page}
-	  limit={limit}
-	  handleLimit={handleLimit}
 	  tableHeaders={tableHeaders}
-	/>
+	/> */}
+	<AccordionTable 
+	data={data}
+	tableHeaders={tableHeaders}/>
     </div>
   );
 }

@@ -4,36 +4,55 @@ import {
   Typography,
   Card,
   CardFooter,
+  Tooltip
 } from "@material-tailwind/react";
 import { ArrowsUpDownIcon, ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/24/solid';
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import schema from "@lib/schema.json";
 import {useState, useEffect } from "react";
+// import { Tooltip} from "@material-tailwind/react";
+import JsonPng from "@assets/json.png";
+// import HtmlPng from "@assets/html.png";
+import MultiQCLogo from "@assets/multiqc_logo_color.png";
 
+const baseURL =
+process.env.NODE_ENV === "production"
+  ? "http://172.32.79.51:5001"
+  : "http://127.0.0.1:5001";
 
+const JsonIcon = ({sample_id}) => (
+	<img
+	src={JsonPng} onClick={() => window.open(`${baseURL}/raw/${sample_id}`, "_blank")} className="ml-2 w-4 h-4 text-blue-500">
+	</img>
+  );
+  const HtmlIcon = ({flowcell_id}) => (
+	<img
+	src={MultiQCLogo} onClick={() => window.open(`https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${flowcell_id}/${flowcell_id}.html`, "_blank")} className="ml-2 h-2 text-blue-500">
+	</img>
+  );
 
-const tableHeadersAlias = Object.keys(schema.table).reduce((acc, table) => {
+  const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
 	Object.keys(schema.table[table].entity).forEach((key) => {
-	  acc[key] = schema.table[table].entity[key].alias; 
-	});
-	return acc;
-  }, {});
+	  if (!acc[key]) {
+		acc[key] = {};
+	  }
   
-const tableHeadersGroups = Object.keys(schema.table).reduce((acc, table) => {
-	Object.keys(schema.table[table].entity).forEach((key) => {
-	  acc[key] = schema.table[table].entity[key].group; 
+	  acc[key].alias = schema.table[table].entity[key].alias;
+	  acc[key].group = schema.table[table].entity[key].group;
+	  acc[key].source = schema.table[table].entity[key].source;
+	  acc[key].order = schema.table[table].entity[key].order;
 	});
 	return acc;
   }, {});
 
-const bgColors = ['bg-blue-','bg-red-', 'bg-blue-'];
+const bgColors = ['bg-blue-','bg-teal-', 'bg-blue-'];
 
 
 function DataTable(props) {
 // handle 'view' functionalities for show/hide-ing columns
 const resetTableHeaders = (binaryStr) => {
 	const columnsSelected = props.columnsSorted.filter((col, index) => binaryStr[index] === '1');
-	return columnsSelected.sort((col1, col2) => tableHeadersGroups[col1] - tableHeadersGroups[col2]);
+	return columnsSelected.sort((col1, col2) => (tableHeadersProperties[col1].group*100 + tableHeadersProperties[col1].order) - (tableHeadersProperties[col2].group*100 + tableHeadersProperties[col2].order));
 }
 
 const [tableHeaders, setTableHeaders] =  useState(() => resetTableHeaders(props.selectedColumns));
@@ -41,7 +60,7 @@ useEffect(() => {
 	setTableHeaders(resetTableHeaders(props.selectedColumns));
 }, [props.selectedColumns]);
 
-
+//   console.log(tableHeaders);
   const data = Array.isArray(props.data) ? props.data : [];
 
 //   lanes for mean_qscore manual processing
@@ -98,6 +117,7 @@ if (props.sortedColumns[id] === '2') {
                 {tableHeaders.map(( head ) => {
 					return (
                   <th key={head} className="border-b border-gray-300 !p-4">
+					<Tooltip content={tableHeadersProperties[head].source}>
 					 <div className="flex items-center space-x-2">
                     <Typography
                       color="blue-gray"
@@ -105,8 +125,9 @@ if (props.sortedColumns[id] === '2') {
                       className="!font-bold"
                     >
                     </Typography>
-					{tableHeadersAlias[head]}  {getArrowIcon(head)} 
+					{tableHeadersProperties[head].alias}  {getArrowIcon(head)} 
 					</div>
+					</Tooltip>
                   </th>
 				  
                 )})}
@@ -117,7 +138,7 @@ if (props.sortedColumns[id] === '2') {
 				<tr key={rowIndex}>
                   {tableHeaders.map(( head ) => {
 					 
-					 const bgColor = bgColors[tableHeadersGroups[head]] + String((1 + rowIndex % 2)*50); 
+					 const bgColor = bgColors[tableHeadersProperties[head].group] + String((1 + rowIndex % 2)*50); 
 					 return (
                     <td key={head} className={`!p-4 ${bgColor}`}>
                       <Typography
@@ -140,12 +161,15 @@ if (props.sortedColumns[id] === '2') {
                             : "False"
                           : head === "yieldq30" ?  (row[head] / Math.pow(10, 9)).toFixed(3)
 						  : head === "mean_qscore" ? (row[head] / (2*countTrueLanes(row))).toFixed(2)
-						  : head === "flowcell_id" ? <a
-							href={`https://pme.sidra.org/qc/home?path=/gpfs/ngsdata/sap_workplace/www/MultiQC/Flowcell/${row[head]}/${row[head]}.html`}
-							target="_blank"
-							className="inline-block px-4 py-2 bg-blue-200 text-black rounded-md hover:bg-blue-600"
-						  >
-							{row[head]} </a>
+						  : head === "flowcell_id" ?
+						  (<><div className="flex items-center space-x-4">{row[head]} <HtmlIcon flowcell_id={row[head]} /></div></>) 
+						//   <a
+						// 	href={`https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${row[head]}/${row[head]}.html`}
+						// 	target="_blank"
+						// 	className="inline-block px-4 py-2 bg-blue-200 text-black rounded-md hover:bg-blue-600"
+						//   >
+						// 	{row[head]} </a>
+						  : head === "sample_id" ?  (<><div className="flex items-center space-x-4">{row[head]} <JsonIcon sample_id={row[head]} /></div></>) 
 						  : row[head] || "N/A"}
                       </Typography>
                     </td>

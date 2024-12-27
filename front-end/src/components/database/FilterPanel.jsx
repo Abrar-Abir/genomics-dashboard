@@ -35,11 +35,9 @@ export default function FilterPanel(props) {
     setOpenAcc(newState);
     setAllExpanded(!allExpanded);
   };
-
-//   const [selectedItems, setSelectedItems] = useState({});
   
   const toggleSelection = (filterKey, item) => {
-    props.setSelectedItems((prevSelectedItems) => {
+    props.setSelectedFilter((prevSelectedItems) => {
       const newSelectedItems = { ...prevSelectedItems };
       if (!newSelectedItems[filterKey]) {
         newSelectedItems[filterKey] = [];
@@ -55,9 +53,7 @@ export default function FilterPanel(props) {
       return newSelectedItems;
     });
   };
-  useEffect(() => {
-	props.setSelectedFilter(props.selectedItems);
-  }, [props.selectedItems]);
+
 
   const handleRangeChange = (key, index, value) => {
     props.setSelectedRanges((prev) => {
@@ -142,7 +138,7 @@ export default function FilterPanel(props) {
               // Check if the item is selected based on the new state
               //   const isSelected = selectedItems[filterKey] === item;
               const isSelected =
-                props.selectedItems[filterKey]?.includes(value) || false;
+                props.selectedFilter[filterKey]?.includes(value) || false;
               return (
                 <div
                   key={index}

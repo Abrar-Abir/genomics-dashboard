@@ -105,12 +105,6 @@ export default function Header(props) {
 	);
   }
 
-  const reset = () => {
-	props.setSearchValue("");
-	props.setSelectedFilter({});
-	props.setSelectedRanges({});
-	props.setSelectedItems({});
-  }
   const handleExport = (format) => {
     window.location.href = `${baseURL}/export/${format}`;
   };
@@ -139,7 +133,7 @@ export default function Header(props) {
                 color="gray"
                 variant="outlined"
                 className="flex items-center gap-1 py-1 h-8"
-				onClick={() => reset()}
+				onClick={() => props.reset()}
               >
                 reset
                 <AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
