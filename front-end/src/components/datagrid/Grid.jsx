@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Accordion, AccordionHeader, AccordionBody, Tooltip, Badge } from '@material-tailwind/react';
+import { Tooltip, Badge } from '@material-tailwind/react';
 
 const AccordionTable = ({ data, tableHeaders }) => {
   const [openPi, setOpenPi] = useState({});
   const handleTogglePi = (pi) => {
+	// console.log(openPi);
     setOpenPi((prevState) => ({
       ...prevState,
       [pi]: !prevState[pi],
@@ -153,7 +154,7 @@ return (
             </tr>
 
             {/* Rows for Projects within PI */}
-            { openPi[pi] &&
+            { openPi[pi] != false &&
 			 Object.keys(piData.projects).map((project) => {
               const projectData = piData.projects[project];
               return (
@@ -180,7 +181,7 @@ return (
                   </tr>
 
                   {/* Rows for Samples within Project */}
-                  {openProject[project] && Object.keys(projectData.samples).map((sample, index) => (
+                  {openProject[project] != false && Object.keys(projectData.samples).map((sample, index) => (
                     <tr key={index} className="bg-white">
                       {tableHeaders.map((key) => (
                         <td
@@ -196,7 +197,16 @@ return (
                           }
                           style={key === "Entity" ? { width: "20rem", border: "0.20rem solid white" } : { width: "5rem", border: "0.20rem solid white" }}
                         >
-                          {key === "Entity" ? sample : projectData.samples[sample][key] || ""}
+                          {key === "Entity" 
+							? 'other' in projectData.samples[sample] 
+								? projectData.samples[sample]?.other // Check if 'other' exists
+								? <Tooltip content={"sample was also sequenced under SDR " + String(projectData.samples[sample].other)}>
+									<Badge color='blue'>{sample}</Badge>
+									</Tooltip>
+								: sample  // fallback to just showing the sample
+								: sample  // if 'other' doesn't exist in the sample, fallback to sample
+							: projectData.samples[sample]?.[key] || ""  // Handle missing key with fallback
+							}
                         </td>
                       ))}
                     </tr>

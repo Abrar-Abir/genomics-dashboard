@@ -325,17 +325,18 @@ def get_range(column_name):
 
 @ app.route('/analytics')
 def analytics():
-    analytics_data = {}
-    for table in schema["table"]:
-        for column in schema["table"][table]["entity"]:
-            if schema["table"][table]["entity"][column]["filter_option"]:
-                if "NUMERIC" in schema["table"][table]["entity"][column]["type"] or "DATE" in schema["table"][table]["entity"][column]["type"]:
-                    analytics_data[f"{table}.{column}"] = get_range(
+	analytics_data = {}
+	for table in schema["table"]:
+		for column in schema["table"][table]["entity"]:
+			if schema["table"][table]["entity"][column]["filter_option"]:
+				if "NUMERIC" in schema["table"][table]["entity"][column]["type"] or "DATE" in schema["table"][table]["entity"][column]["type"]:
+					analytics_data[f"{table}.{column}"] = get_range(
                         f"{table}.{column}")
-                else:
-                    analytics_data[f"{table}.{column}"] = get_counts(
+				else:
+					analytics_data[f"{table}.{column}"] = get_counts(
                         f"{table}.{column}")
-    return jsonify(analytics_data)
+	# print(analytics_data)
+	return jsonify(analytics_data)
 
 
 @ app.route('/search/<entity>')
@@ -398,23 +399,18 @@ def datagrid():
 		  	COUNT(*) DESC
           )
         result;"""
-	# print(query)
 
 	fetch_result = fetch(cursor, query, 'all')
 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
 		results = None
 	else:
 		results = fetch_result[0][0]
-	# return jsonify(results)
 
 	output = dict()
 	for row in results:
 		pi = row['pi']
 		projects = row['project']
 		sample = row['sample_name']
-
-
-
 		if pi not in output:
 			output[pi] = {"header": dict(), "projects": dict()}
 		for i in range(len(projects)):
@@ -438,15 +434,12 @@ def datagrid():
 			if len(other_projects) > 0:
 				output[pi]['projects'][project]['samples'][sample]['other'] = tuple(other_projects)
 
-	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count']})
+	analytics = {'pi.pi' : [], 'submission.datatype': []}
+	analytics['pi.pi'] = sorted([(pi, output[pi]['header']['count']) for pi in output], key= lambda x : x[1], reverse=True)
+	analytics['submission.datatype'] = sorted([(datatype[0], sum([output[pi]['header'].get(datatype[0], 0) for pi in output])) for datatype in columns], key=lambda x : x[1], reverse=True)
+	
+	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count'], 'analytics': analytics})
 
-# @ app.route('/gridAnalytics')
-# def gridAnalytics():
-# 	analytics_data = {}
-# 	for column in schema["table"]["project"]["entity"]:
-# 		analytics_data[f"{table}.{column}"] = get_counts(
-# 					f"{table}.{column}")
-# 	return jsonify(analytics_data)
 
 
 
