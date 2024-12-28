@@ -242,6 +242,7 @@ def export(format):
 	fieldnames = [desc[0] for desc in cursor.description]
 	df = pd.DataFrame(results, columns=fieldnames)
 	df['Mean Q Score'] = df['Mean Q Score']/(sum([df[f'Lane {i}']  for i in range(1, 9)])*2)
+	df['Yeild Q30 (Gb)'] = df['Yeild Q30 (Gb)']/10**9
 
 	if format == 'csv':
 		csv_buffer = io.StringIO()
@@ -334,9 +335,6 @@ def analytics():
                 else:
                     analytics_data[f"{table}.{column}"] = get_counts(
                         f"{table}.{column}")
-
-    # with open(os.path.join(parent, 'front-end/src/sampleData/analytics.json'), 'w') as f:
-    #     json.dump(analytics_data, f, cls=JSONEncoder)
     return jsonify(analytics_data)
 
 
@@ -364,6 +362,13 @@ def search(entity):
     # print(results)
     return jsonify([row[0] for row in results])
 
+def agg_dict(l):
+	r = dict()
+	for d in l:
+		for k in d:
+			r[k] = r.get(k, 0) + d[k]
+	return r
+
 @ app.route('/datagrid')
 def datagrid():
 
@@ -373,34 +378,26 @@ def datagrid():
 	query = """ SELECT DISTINCT datatype FROM submission ;"""
 	columns = fetch(cursor, query, 'all')
 
-	case_query = ""
-	for row in columns:
-		assert (len(row) == 1)
-		value = row[0]
-		case_query += f"""SUM(CASE WHEN datatype = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else None}","""
-
 	query = f"""
         SELECT JSON_AGG(result)
         FROM (
           SELECT
-            sample_name AS "Sample Name",
-			project.pi AS "PI",
-			project.project AS "SDR No.",
-            {case_query[:-1]},
-			COUNT(*) AS "Count"
+            sample_name,
+			pi,
+			ARRAY_AGG(project) AS project,
+			ARRAY_AGG(datatype) AS datatype
           FROM
 			sample
 			LEFT JOIN submission ON sample.submission_id = submission.submission_id
 			LEFT JOIN project ON submission.project_id = project.project_id
           GROUP BY
-            sample_name, project.pi, project.project
+            sample_name, project.pi
 		  HAVING
 		    COUNT(*) > 1
 		  ORDER BY
 		  	COUNT(*) DESC
           )
         result;"""
-
 	# print(query)
 
 	fetch_result = fetch(cursor, query, 'all')
@@ -408,26 +405,48 @@ def datagrid():
 		results = None
 	else:
 		results = fetch_result[0][0]
+	# return jsonify(results)
+
 	output = dict()
 	for row in results:
-		if row['PI'] not in output:
-			output[row['PI']] = {"header": dict(), "rows": []}
-		# if row['SDR No.'] not in output[row['PI']]:
-		# 	output[row['PI']][row['SDR No.']] = []
-		# output[row['PI']][row['SDR No.']].append({key : row[key] for key in row if key not in ('PI', 'SDR No.')})
-		output[row['PI']]["rows"].append({"Sample Name" : row["Sample Name"]})
-		for key in row:
-			if key not in ('PI', 'SDR No.', 'Sample Name'):
-				output[row['PI']]["header"][key] = output[row['PI']]["header"].get(key, 0) + row[key]
-				output[row['PI']]["rows"][-1][key] = row[key]
-	# data = []
-	# for key in output:
-	# 	data.append({key : output[key]})
-#   with open('./front-end/src/apiData/data2a.json', 'w') as f:
-        # json.dump(results, f, cls=JSONEncoder)
-	# return jsonify({"data": results, "columns": ['Sample Name', 'PI', 'SDR No.'] + columns + ['Count']})
-	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['Count']})
+		pi = row['pi']
+		projects = row['project']
+		sample = row['sample_name']
 
+
+
+		if pi not in output:
+			output[pi] = {"header": dict(), "projects": dict()}
+		for i in range(len(projects)):
+			project = projects[i]
+			datatype = row['datatype'][i]
+			if project not in output[pi]["projects"]:
+				output[pi]["projects"][project] = {"header": dict(), "samples":{}}
+			if sample not in output[pi]["projects"][project]['samples']:
+				output[pi]["projects"][project]['samples'][sample] = dict()
+			
+			output[pi]['projects'][project]['samples'][sample][datatype] = output[pi]['projects'][project]['samples'][sample].get(datatype, 0) + 1
+			output[pi]['projects'][project]['samples'][sample]['count'] = output[pi]['projects'][project]['samples'][sample].get('count', 0) + 1
+
+			output[pi]['header'][datatype] = output[pi]['header'].get(datatype, 0) + 1
+			output[pi]['projects'][project]['header'][datatype] = output[pi]['projects'][project]['header'].get(datatype, 0) + 1
+
+			output[pi]['header']['count'] = output[pi]['header'].get('count', 0) + 1
+			output[pi]['projects'][project]['header']['count'] = output[pi]['projects'][project]['header'].get('count', 0) + 1
+
+			other_projects = set([other_project for other_project in projects if other_project != project])
+			if len(other_projects) > 0:
+				output[pi]['projects'][project]['samples'][sample]['other'] = tuple(other_projects)
+
+	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count']})
+
+# @ app.route('/gridAnalytics')
+# def gridAnalytics():
+# 	analytics_data = {}
+# 	for column in schema["table"]["project"]["entity"]:
+# 		analytics_data[f"{table}.{column}"] = get_counts(
+# 					f"{table}.{column}")
+# 	return jsonify(analytics_data)
 
 
 

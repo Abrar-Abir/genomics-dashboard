@@ -10,9 +10,7 @@ import { ArrowsUpDownIcon, ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/24
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import schema from "@lib/schema.json";
 import {useState, useEffect } from "react";
-// import { Tooltip} from "@material-tailwind/react";
 import JsonPng from "@assets/json.png";
-// import HtmlPng from "@assets/html.png";
 import MultiQCLogo from "@assets/multiqc_logo_color.png";
 
 const baseURL =
@@ -60,7 +58,6 @@ useEffect(() => {
 	setTableHeaders(resetTableHeaders(props.selectedColumns));
 }, [props.selectedColumns]);
 
-//   console.log(tableHeaders);
   const data = Array.isArray(props.data) ? props.data : [];
 
 //   lanes for mean_qscore manual processing
@@ -162,13 +159,9 @@ if (props.sortedColumns[id] === '2') {
                           : head === "yieldq30" ?  (row[head] / Math.pow(10, 9)).toFixed(3)
 						  : head === "mean_qscore" ? (row[head] / (2*countTrueLanes(row))).toFixed(2)
 						  : head === "flowcell_id" ?
+						  (<><div className="flex items-center space-x-4">{row[head]} <HtmlIcon flowcell_id={row[head]} /></div></>)
+						  : head === "submission_id" ?
 						  (<><div className="flex items-center space-x-4">{row[head]} <HtmlIcon flowcell_id={row[head]} /></div></>) 
-						//   <a
-						// 	href={`https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${row[head]}/${row[head]}.html`}
-						// 	target="_blank"
-						// 	className="inline-block px-4 py-2 bg-blue-200 text-black rounded-md hover:bg-blue-600"
-						//   >
-						// 	{row[head]} </a>
 						  : head === "sample_id" ?  (<><div className="flex items-center space-x-4">{row[head]} <JsonIcon sample_id={row[head]} /></div></>) 
 						  : row[head] || "N/A"}
                       </Typography>

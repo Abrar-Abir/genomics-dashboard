@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import FilterPanel from "@components/database/FilterPanel";
 import AccordionTable from "@components/database/AccordionTable";
-import Grid from "@components/database/Grid"
+// import Grid from "@components/database/Grid"
 import { useOutletContext } from "react-router-dom";
 
 export default function Database() {
@@ -21,15 +21,10 @@ export default function Database() {
       : "http://localhost:5001";
 
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [limit, setLimit] = useState(50);
   const [filterPanelData, setFilterPanelData] = useState(null);
-  const [columnToSort, setColumnToSort] = useState(-1);
   const [tableHeaders, setTableHeaders] = useState([]);
   
-  const prevState = useRef({'sortedColumns':sortedColumns, 'page':page, 'limit':limit});
+
 
   useEffect(() => {
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,13 +45,6 @@ export default function Database() {
 		// 	  }
 		// });
         //   }
-		//   if (Object.keys(selectedRanges).length > 0) {
-		// 	Object.entries(selectedRanges).forEach(([key, [ start, end ]]) => {
-		// 		if (start !== ""){apiUrl += `&${key}>=${start}`;}
-		// 		if (end !== ""){apiUrl += `&${key}<=${end}`;}
-		// 		})
-		// 	;
-		// }
           const dataResponse = await fetch(apiUrl);
 
           if (!dataResponse.ok) {
@@ -67,17 +55,12 @@ export default function Database() {
 			setData(dataResult.data);
 			setTableHeaders(Array.isArray(dataResult.columns) ? dataResult.columns : []);
             await delay(5);
-			if ((prevState.current.page === page && prevState.current.limit === limit && prevState.current.sortedColumns === sortedColumns) || filterPanelData === null){
-				prevState.current.sortedColumns = sortedColumns;
-				prevState.current.page = page;
-				prevState.current.limit = limit;
-				const filterPanelResponse = await fetch(`${baseURL}/analytics`);
-				if (!filterPanelResponse.ok) {
-				console.error("Server error:", filterPanelResponse);
-				} else {
-				const filterPanelResult = await filterPanelResponse.json();
-				setFilterPanelData(filterPanelResult);
-				}
+			const filterPanelResponse = await fetch(`${baseURL}/analytics`);
+			if (!filterPanelResponse.ok) {
+			console.error("Server error:", filterPanelResponse);
+			} else {
+			const filterPanelResult = await filterPanelResponse.json();
+			setFilterPanelData(filterPanelResult);
 			}
           }
         } catch (error) {

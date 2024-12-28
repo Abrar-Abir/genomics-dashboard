@@ -640,7 +640,7 @@
 					"view": true,
 					"alias": "Mean Q Score",
 					"group": 2,
-					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'mean_qscore'/'mean quality'",
+					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'mean_qscore'/'mean quality' -> devide by 2*number of lanes",
 					"order": 7
 				},
 				"yieldq30": {
@@ -650,7 +650,7 @@
 					"view": true,
 					"alias": "Yeild Q30 (Gb)",
 					"group": 2,
-					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'yield'/'yieldQ30'",
+					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'yield'/'yieldQ30' -> devide by 10^9",
 					"order": 8
 				},
 				"release_date": {

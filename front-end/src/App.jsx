@@ -8,15 +8,15 @@ import Plot from "./pages/Plot"
 import Datagrid from "./pages/Datagrid"
 
 function App() {
-  const [view, setView] = useState(true);
+//   const [view, setView] = useState(true);
   return (
     <Router>
       <Routes>
         <Route path="login" element={<Login />} />
-        <Route path="/" element={<Layout setView={setView} />}>
+        <Route path="/" element={<Layout/>}>
           <Route index element={<Dashboard />} />
-          <Route path="database" element={<Database view={view}/>} />
-		  <Route path="datagrid" element={<Datagrid view={view}/>} />
+          <Route path="database" element={<Database/>} />
+		  <Route path="datagrid" element={<Datagrid/>} />
 		  <Route path="plot" element={<Plot />} />
         </Route>
       </Routes>

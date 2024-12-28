@@ -44,12 +44,15 @@ const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0
   const [selectedColumns, setSelectedColumns] = useState(binaryString);
   const [sortedColumns, setSortedColumns] = useState(trinaryString);
 
+  const [selectedFilterGrid, setSelectedFilterGrid] = useState({});
+
   const reset = () => {
 	setSearchValue("");
 	setSelectedFilter({});
 	setSelectedRanges({});
 	setSelectedColumns(binaryString);
 	setSortedColumns(trinaryString);
+	setSelectedFilterGrid({});
   }
 
   useEffect(() => {
@@ -71,8 +74,6 @@ const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0
 		  searchKey={searchKey}
 		  setSearchKey={setSearchKey}
 		  setSearchValue={setSearchValue}
-		  setSelectedFilter={setSelectedFilter}
-		  setSelectedRanges={setSelectedRanges}
 		  selectedColumns={selectedColumns}
 		  setSelectedColumns={setSelectedColumns}
 		  reset={reset}
@@ -91,7 +92,9 @@ const trinaryString = columnsSorted.map(col => col === 'loading_date' ? '1' : '0
 			  setSelectedColumns,
 			  columnsSorted,
 			  sortedColumns,
-			  setSortedColumns
+			  setSortedColumns,
+			  selectedFilterGrid,
+			  setSelectedFilterGrid
             }}
           />
         </div>
