@@ -1,33 +1,51 @@
-import psycopg2
-import os
-import datetime
+from psycopg2 import extras
 import json
+import csv
+import os
+from datetime import date, datetime
+from log import execution_logger, app_logger
+from library import connect_to_postgres, fetch, get_database_info, enforce_logging, list_nested_paths
 
-paths_json = open("./paths.json", 'r')
-paths = json.load(paths_json)
-paths_json.close()
 
-dir = paths["Staging"]
+# @enforce_logging(main=False)
+# def log_error(expr: bool, error: str, args: list[str, int, list[str], tuple[str], date]):
+#     # database operation as well
+#     if expr == False:
+#         if error.endswith('error'):
+#             app_logger.error(f'"{error}"\t' +
+#                              ' '.join([str(arg) for arg in args]))
+#             if error.startswith('path'):
+#                 raise AssertionError
+#         elif error.endswith('warning'):
+#             app_logger.warning(
+#                 f'"{error}"\t' + ' '.join([str(arg) for arg in args]))
+#     return 0
 
 
-conn = psycopg2.connect(database="sidra",
-                        host="localhost",
-                        user="postgres",
-                        password="mypassword",
-                        port="5432")
-# conn.autocommit = True
-conn.set_session(autocommit=True)
-cursor = conn.cursor()
+# @enforce_logging(main=True)
+# def path_join(base_dir: str, suffixes: list[str], isdir: bool) -> str:
+#     for suffix in suffixes:
+#         log_error(os.path.exists(base_dir), 'path_not_found_error', [base_dir])
+#         log_error(os.path.isdir(base_dir),
+#                   'path_not_directory_error', [base_dir])
+#         base_dir = os.path.join(base_dir, suffix)
+#     if isdir == True:
+#         log_error(os.path.isdir(base_dir),
+#                   'path_not_directory_error', [base_dir])
+#     else:
+#         log_error(os.path.isfile(base_dir), 'path_not_file_error', [base_dir])
+#     return base_dir
 
-def sql(command):
-    try:
-        cursor.execute(command)
-    except Exception as e:
-        print("Failed to Execute\n")
-        print(command)
-        print("For the Exception\n")
-        print(e)
-    return 0
+
+
+with open("./active_config.json", 'r') as paths_json:
+    paths = json.load(paths_json)
+    staging_directory = paths["staging"]
+
+database, host, user, password, port = get_database_info(
+    "./active_config.json")
+conn, cursor = connect_to_postgres(database, host, user, password, port)
+conn.autocommit = False
 
 
 # Function to list files in the 'jobs' subfolder
@@ -54,7 +72,7 @@ def list_files(directory):
 def main():
 
     # Get a list of all subdirectories in the base directory 
-    subdirectories = [entry.name for entry in os.scandir(dir) if entry.is_dir()]
+    subdirectories = [entry.name for entry in os.scandir(staging_directory) if entry.is_dir()]
 
     # Traverse through each subdirectory and list files in the 'jobs' subfolder
     for subdirectory in subdirectories:
@@ -74,12 +92,12 @@ def main():
                 filepath = subdirectory_path + "/jobs/" + file
 
                 if os.path.getsize(filepath) > 0:
-                    sql("UPDATE samples SET error = '%s', stage_date = '%s' WHERE sample_id = '%s' AND stage_date != NULL;"%(subdirectory + '/jobs/' + file, date, sample))
+                    # sql("UPDATE samples SET error = '%s', stage_date = '%s' WHERE sample_id = '%s' AND stage_date != NULL;"%(subdirectory + '/jobs/' + file, date, sample))
                     # print(filepath)
-                    # print(f" - Error in {subdirectory + '/jobs/' + file} ")
+                    print(f" - Error in {subdirectory + '/jobs/' + file}, {date}, {sample} ")
                 else:
-                    sql("UPDATE samples SET stage_date = '%s' WHERE sample_id = '%s' AND stage_date != NULL;"%(date, sample))
-                    # print(f" - No Error in {subdirectory + '/jobs/' + file} ")
+                    # sql("UPDATE samples SET stage_date = '%s' WHERE sample_id = '%s' AND stage_date != NULL;"%(date, sample))
+                    print(f" - Empty in {subdirectory + '/jobs/' + file}, {date}, {sample}  ")
         else:
             print(datetime.datetime.now().slice(".")[0], f" : No files found in '{subdirectory}/jobs'.")
 

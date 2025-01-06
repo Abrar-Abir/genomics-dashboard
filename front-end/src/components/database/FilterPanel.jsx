@@ -150,7 +150,9 @@ export default function FilterPanel(props) {
 										toggleSelection(filterKey, value)
 									}
 								>
-									<span className="text-black">{value}</span>
+									<span className="text-black">
+										{value || "N/A"}
+									</span>
 									<span className="text-gray-800 mr-2">
 										{count}
 									</span>
@@ -187,7 +189,7 @@ export default function FilterPanel(props) {
 								: "bg-white text-black"
 						}`}
 					>
-						<span>{innerKey}</span>
+						<span>{value[innerKey].alias}</span>
 					</AccordionHeader>
 					<AccordionBody>
 						{value[innerKey].type.includes("NUMERIC") ||

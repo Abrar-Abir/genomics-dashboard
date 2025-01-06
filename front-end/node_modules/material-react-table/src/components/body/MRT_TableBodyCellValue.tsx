@@ -43,6 +43,8 @@ export const MRT_TableBodyCellValue = <TData extends MRT_RowData>({
           column,
           row,
           table,
+          staticColumnIndex,
+          staticRowIndex,
         })
       : row.getIsGrouped() && !cell.getIsGrouped()
         ? null
@@ -52,6 +54,8 @@ export const MRT_TableBodyCellValue = <TData extends MRT_RowData>({
               column,
               row,
               table,
+              staticColumnIndex,
+              staticRowIndex,
             })
           : undefined;
 

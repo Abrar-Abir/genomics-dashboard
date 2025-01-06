@@ -1,15 +1,6 @@
-import {
-	Menu,
-	MenuHandler,
-	MenuList,
-	MenuItem,
-	Button,
-} from "@material-tailwind/react";
+import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
 import { useState } from "react";
-import {
-	AdjustmentsVerticalIcon,
-	ArrowDownTrayIcon,
-} from "@heroicons/react/24/solid";
+import { AdjustmentsVerticalIcon, ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 
 import MenuWithCheckbox from "../shared/Menu";
 import SearchBar from "../shared/SearchBar";
@@ -59,10 +50,7 @@ const DatabaseHeader = (props) => {
 				</MenuHandler>
 				<MenuList>
 					{allKeys.map((entity, index) => (
-						<MenuItem
-							key={index}
-							onMouseDown={() => handleMenuClick(entity)}
-						>
+						<MenuItem key={index} onMouseDown={() => handleMenuClick(entity)}>
 							{entity}
 						</MenuItem>
 					))}
@@ -71,7 +59,7 @@ const DatabaseHeader = (props) => {
 		);
 	};
 	return (
-		<div className="flex justify-between items-center w-full bg-white">
+		<div className="flex justify-between items-center w-full bg-white z-20 sticky">
 			{/* Reset button on the left */}
 			<div className="flex ml-6">
 				<Button
@@ -88,10 +76,7 @@ const DatabaseHeader = (props) => {
 			{/* SearchMenu and SearchBar in the center */}
 			<div className="flex space-x-4 items-center">
 				<SearchMenu />
-				<SearchBar
-					allSuggestions={allSuggestions}
-					setSearchValue={props.setSearchValue}
-				/>
+				<SearchBar allSuggestions={allSuggestions} setSearchValue={props.setSearchValue} />
 			</div>
 
 			{/* MenuWithCheckbox and Menu on the right */}
@@ -103,25 +88,15 @@ const DatabaseHeader = (props) => {
 				/>
 				<Menu>
 					<MenuHandler>
-						<Button
-							color="gray"
-							variant="outlined"
-							className="flex items-center gap-1 py-1 h-8"
-						>
+						<Button color="gray" variant="outlined" className="flex items-center gap-1 py-1 h-8">
 							Export
 							<ArrowDownTrayIcon className="w-4 h-4 text-gray-900" />
 						</Button>
 					</MenuHandler>
 					<MenuList>
-						<MenuItem onClick={() => handleExport("csv")}>
-							CSV
-						</MenuItem>
-						<MenuItem onClick={() => handleExport("tsv")}>
-							TSV
-						</MenuItem>
-						<MenuItem onClick={() => handleExport("json")}>
-							JSON
-						</MenuItem>
+						<MenuItem onClick={() => props.handleExport("csv")}>CSV</MenuItem>
+						<MenuItem onClick={() => props.handleExport("tsv")}>TSV</MenuItem>
+						<MenuItem onClick={() => props.handleExport("json")}>JSON</MenuItem>
 					</MenuList>
 				</Menu>
 			</div>

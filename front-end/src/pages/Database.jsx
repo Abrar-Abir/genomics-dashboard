@@ -4,8 +4,10 @@ import DataTable from "@components/database/DataTable";
 import DatabaseHeader from "../components/database/DatabaseHeader";
 import { useOutletContext } from "react-router-dom";
 import schema from "@lib/schema.json";
+import { useLocation } from "react-router-dom";
 
 export default function Database() {
+	const location = useLocation().pathname;
 	const tableHeadersView = Object.keys(schema.table).reduce((acc, table) => {
 		Object.keys(schema.table[table].entity).forEach((key) => {
 			acc[key] = schema.table[table].entity[key].view;
@@ -40,6 +42,11 @@ export default function Database() {
 	const [limit, setLimit] = useState(50);
 	const [filterPanelData, setFilterPanelData] = useState(null);
 	const [columnToSort, setColumnToSort] = useState(-1);
+	const [htmlContent, setHtmlContent] = useState("");
+
+	const handleExport = (format) => {
+		window.location.href = `${baseURL}/export/database/${format}`;
+	};
 
 	const reset = () => {
 		setSearchValue("");
@@ -60,7 +67,10 @@ export default function Database() {
 		async function fetchData() {
 			try {
 				const offset = (page - 1) * limit;
-				let apiUrl = `${baseURL}/type0?limit=${limit}&offset=${offset}`;
+				let apiUrl =
+					location === "/database"
+						? `${baseURL}/type0?limit=${limit}&offset=${offset}`
+						: `${baseURL}/plot?`;
 				if (
 					columnToSort !== -1 &&
 					prevState.current.sortedColumns != sortedColumns
@@ -96,12 +106,18 @@ export default function Database() {
 					console.error("Server error:", dataResponse);
 				} else {
 					const dataResult = await dataResponse.json();
-					setData(
-						Array.isArray(dataResult.data) ? dataResult.data : []
-					);
-					setTotalCount(dataResult.total_count);
-					const totalCount = dataResult.total_count;
-					setTotalPages(Math.ceil(totalCount / limit));
+					if (location === "/database") {
+						setData(
+							Array.isArray(dataResult.data)
+								? dataResult.data
+								: []
+						);
+						setTotalCount(dataResult.total_count);
+						const totalCount = dataResult.total_count;
+						setTotalPages(Math.ceil(totalCount / limit));
+					} else {
+						setHtmlContent(dataResult.html);
+					}
 					await delay(5);
 					if (
 						(prevState.current.page === page &&
@@ -114,7 +130,7 @@ export default function Database() {
 						prevState.current.page = page;
 						prevState.current.limit = limit;
 						const filterPanelResponse = await fetch(
-							`${baseURL}/analytics`
+							`${baseURL}/analytics/database`
 						);
 						if (!filterPanelResponse.ok) {
 							console.error("Server error:", filterPanelResponse);
@@ -138,6 +154,7 @@ export default function Database() {
 		selectedRanges,
 		searchValue,
 		sortedColumns,
+		location,
 	]);
 
 	const handlePrev = () => {
@@ -154,7 +171,7 @@ export default function Database() {
 	};
 
 	return (
-		<div className="flex flex-col h-screen">
+		<div className="flex flex-col h-screen overflow-y-hidden">
 			<div className="flex-shrink-0">
 				<DatabaseHeader
 					reset={reset}
@@ -164,6 +181,7 @@ export default function Database() {
 					searchKey={searchKey}
 					setSelectedColumns={setSelectedColumns}
 					baseURL={baseURL}
+					handleExport={handleExport}
 				/>
 			</div>
 			<div className="flex flex-grow overflow-y-hidden overflow-x-auto">
@@ -172,22 +190,39 @@ export default function Database() {
 					setSelectedFilter={setSelectedFilter}
 					selectedFilter={selectedFilter}
 					setSelectedRanges={setSelectedRanges}
+					baseURL={baseURL}
 				/>
-				<DataTable
-					data={data}
-					handlePrev={handlePrev}
-					handleNext={handleNext}
-					totalPages={totalPages}
-					totalCount={totalCount}
-					page={page}
-					limit={limit}
-					handleLimit={handleLimit}
-					selectedColumns={selectedColumns}
-					columnsSorted={columnsSorted}
-					sortedColumns={sortedColumns}
-					setSortedColumns={setSortedColumns}
-					setColumnToSort={setColumnToSort}
-				/>
+				{location === "/database" && (
+					<DataTable
+						data={data}
+						handlePrev={handlePrev}
+						handleNext={handleNext}
+						totalPages={totalPages}
+						totalCount={totalCount}
+						page={page}
+						limit={limit}
+						handleLimit={handleLimit}
+						selectedColumns={selectedColumns}
+						columnsSorted={columnsSorted}
+						sortedColumns={sortedColumns}
+						setSortedColumns={setSortedColumns}
+						setColumnToSort={setColumnToSort}
+						baseURL={baseURL}
+						location={location}
+					/>
+				)}
+				{location === "/plot" && (
+					<div style={{ flex: 1, overflow: "auto" }}>
+						<div
+							style={{
+								width: "100%",
+								height: "100%",
+								overflow: "auto",
+							}}
+							dangerouslySetInnerHTML={{ __html: htmlContent }}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

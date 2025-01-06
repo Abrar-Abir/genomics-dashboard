@@ -5,6 +5,7 @@ import psycopg2
 from flask_cors import CORS
 import json
 import os
+os.environ["PYGWALKER_SKIP_UPDATE_CHECK"] = "True"
 import io
 import csv
 import tempfile
@@ -34,7 +35,8 @@ database, host, user, password, port = get_database_info()
 conn, cursor = connect_to_postgres(database, host, user, password, port)
 conn.autocommit = True
 
-filter_dict = {}
+database_filter = {}
+datagrid_filter = {}
 sortList = []
 
 with open(os.path.join(parent, "schema.json"), "r") as f:
@@ -56,10 +58,6 @@ def isdigit(obj):
             return False
     return True
 
-
-
-
-
 def get_id(l,e):
     try:
         return l.index(e)
@@ -74,21 +72,21 @@ def parse_date(date):
     return start, end
 
 
-def set_filter_dict(request_args):
-    global filter_dict
-    filter_dict = {}
+def set_database_filter(request_args):
+    global database_filter
+    database_filter = {}
     for key in request_args.keys():
         if key not in ('limit', 'offset', 'search'):
             if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
                 values = request_args.get(key)[1:-1].split(',')
                 filter_str = str([value.replace('"', '') for value in values])
-                filter_dict[key] = f" {key} IN ({str(filter_str[1:-1])})"
+                database_filter[key] = f" {key} IN ({str(filter_str[1:-1])})"
             elif key[-1] == '>' or key[-1] == '<':
                 value = request_args.get(key)
                 if 'date' in key:
-                    filter_dict[key] = f" {key}= '{value}'"
+                    database_filter[key] = f" {key}= '{value}'"
                 else:
-                    filter_dict[key] = f" {key}= {value}"
+                    database_filter[key] = f" {key}= {value}"
 
         if 'search' in request_args.keys():
             search_key, search_value = request_args.get('search')[
@@ -99,7 +97,7 @@ def set_filter_dict(request_args):
                 filter_key = 'project.' + search_key
             else:
                 filter_key = search_key + '.' + search_key + '_id'
-            filter_dict['search'] = f" {filter_key} IN ('{search_value}')"
+            database_filter['search'] = f" {filter_key} IN ('{search_value}')"
 
     return 0
 
@@ -114,8 +112,8 @@ def get_order_clause():
     return orderString[:-1]
 
 
-def get_where_clause(filter_key=None):
-    global filter_dict
+def get_where_clause(filter_dict, filter_key=None):
+    # global filter_dict
     if len(filter_dict) == 0:
         return ""
     where_clause = "WHERE"
@@ -139,7 +137,7 @@ sortList.append(get_id(columnsSorted, 'flowcell.loading_date'))
 
 @ app.route('/type0')
 def type0():
-    global sortList
+    global sortList, database_filter
     limit = request.args.get('limit', default=50, type=int)
     offset = request.args.get('offset', default=0, type=int)
     col = request.args.get('sort', default=-1, type=int)
@@ -155,9 +153,9 @@ def type0():
             sortList = sortList[:neg_id] + sortList[neg_id + 1:]
     order_clause = get_order_clause()
 
-    set_filter_dict(request.args)
+    set_database_filter(request.args)
+    where_clause = get_where_clause(database_filter)
 
-    where_clause = get_where_clause()
     count_query = f"""
         SELECT COUNT(*)
         FROM sample
@@ -221,9 +219,10 @@ def raw(sample_id):
 	return jsonify(data)
 
 
-@ app.route('/export/<format>')
-def export(format):
-	where_clause = get_where_clause()
+@ app.route('/export/database/<format>')
+def export_database(format):
+	global database_filter
+	where_clause = get_where_clause(database_filter)
 	order_clause = get_order_clause()
 	data_query = f"""
 			SELECT {alias_clause}
@@ -286,8 +285,9 @@ def export(format):
 
 
 def get_counts(column_name):
-    where_clause = get_where_clause(column_name)
-    query = f"""
+	global database_filter
+	where_clause = get_where_clause(database_filter, column_name)
+	query = f"""
         SELECT {column_name}, COUNT(*) AS frequency
         FROM sample
         LEFT JOIN pool ON sample.pool_id = pool.pool_id
@@ -301,13 +301,14 @@ def get_counts(column_name):
         GROUP BY {column_name}
 		ORDER BY frequency DESC
     """
-    results = fetch(cursor, query, 'all')
-    return [(str(row[0]), row[1]) for row in results]
+	results = fetch(cursor, query, 'all')
+	return [(str(row[0]), row[1]) for row in results]
 
 
 def get_range(column_name):
-    where_clause = get_where_clause()
-    query = f"""
+	global database_filter
+	where_clause = get_where_clause(database_filter)
+	query = f"""
         SELECT MIN({column_name}), MAX({column_name})
         FROM sample
         LEFT JOIN pool ON sample.pool_id = pool.pool_id
@@ -319,12 +320,12 @@ def get_range(column_name):
         LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 		{where_clause}
     """
-    results = fetch(cursor, query, 'one')
-    return (str(results[0]), str(results[1]))
+	results = fetch(cursor, query, 'one')
+	return (str(results[0]), str(results[1]))
 
 
-@ app.route('/analytics')
-def analytics():
+@ app.route('/analytics/database')
+def analytics_database():
 	analytics_data = {}
 	for table in schema["table"]:
 		for column in schema["table"][table]["entity"]:
@@ -338,16 +339,16 @@ def analytics():
 	# print(analytics_data)
 	return jsonify(analytics_data)
 
-
 @ app.route('/search/<entity>')
 def search(entity):
-    where_clause = get_where_clause('search')
-    assert (entity in ["pi", "project", "submission", "flowcell", "sample"])
-    if entity == "pi" or entity == "project":
-        column_name = "project." + entity
-    else:
-        column_name = entity + "." + entity + "_id"
-    query = f"""
+	global database_filter
+	where_clause = get_where_clause(database_filter, 'search')
+	assert (entity in ["pi", "project", "submission", "flowcell", "sample"])
+	if entity == "pi" or entity == "project":
+		column_name = "project." + entity
+	else:
+		column_name = entity + "." + entity + "_id"
+	query = f"""
         SELECT DISTINCT {column_name}
         FROM sample
         LEFT JOIN pool ON sample.pool_id = pool.pool_id
@@ -359,10 +360,12 @@ def search(entity):
         LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 		{where_clause}
     """
-    results = fetch(cursor, query, 'all')
+	results = fetch(cursor, query, 'all')
     # print(results)
-    return jsonify([row[0] for row in results])
+	return jsonify([row[0] for row in results])
 
+
+# ################ Datagrid Page #####################
 def agg_dict(l):
 	r = dict()
 	for d in l:
@@ -370,15 +373,70 @@ def agg_dict(l):
 			r[k] = r.get(k, 0) + d[k]
 	return r
 
+def set_datagrid_filter(request_args):
+	global datagrid_filter
+	datagrid_filter = {}
+	for key in request_args.keys():
+		if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
+			if key == 'show':
+				values = request_args.get(key)[1:-1].split(',')
+				filter_str = str([value.replace('"', '') for value in values])
+				datagrid_filter[key] = f" project IN ({str(filter_str[1:-1])})"
+			elif key == 'submission.datatype':
+				values = [value.replace('"', '') for value in request_args.get(key)[1:-1].split(',')]
+				filter_str = ' AND '.join([f" {key} = '{value}'" for value in values])
+				datagrid_filter[key] = filter_str
+			else:
+				values = request_args.get(key)[1:-1].split(',')
+				filter_str = str([value.replace('"', '') for value in values])
+				datagrid_filter[key] = f" {key} IN ({str(filter_str[1:-1])})"
+	return 0
+
+def get_distinct(entity):
+	query = f""" SELECT DISTINCT {entity.split('.')[1]} FROM {entity.split('.')[0]} ;"""
+	columns = fetch(cursor, query, 'all')
+	return [row[0] for row in columns]
+@ app.route('/analytics/datagrid')
+def analytics_datagrid():
+	analytics_data = {}
+	columns = ['project.pi', 'project.project', 'submission.datatype']
+	for column in columns:
+		analytics_data[column] = get_distinct(column)
+	# print(analytics_data)
+	return jsonify(analytics_data)
+
+
 @ app.route('/datagrid')
 def datagrid():
+	global datagrid_filter
+	# print(datagrid_filter, request.args)
+	set_datagrid_filter(request.args)
+	# print(datagrid_filter)
 
-	set_filter_dict(request.args)
-	where_clause = get_where_clause()
-
-	query = """ SELECT DISTINCT datatype FROM submission ;"""
-	columns = fetch(cursor, query, 'all')
-
+	where_clause = get_where_clause({k : v for k in datagrid_filter if k != 'show'})
+	# print(datagrid_filter, where_clause)
+	# show_clause = "('SDR100043')"
+	if 'show' in datagrid_filter:
+		# show_clause = get_where_clause({'show': datagrid_filter['show']})	
+		show_query = f"""
+		  UNION ALL
+		  SELECT
+            sample_name,
+			pi,
+			ARRAY_AGG(project) AS project,
+			ARRAY_AGG(datatype) AS datatype,
+			1 AS count
+          FROM
+			sample
+			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+			LEFT JOIN project ON submission.project_id = project.project_id
+		  WHERE {datagrid_filter['show']}
+          GROUP BY
+            sample_name, project.pi
+		  HAVING
+		    COUNT(*) = 1"""
+	else:
+		show_query = ''
 	query = f"""
         SELECT JSON_AGG(result)
         FROM (
@@ -386,26 +444,46 @@ def datagrid():
             sample_name,
 			pi,
 			ARRAY_AGG(project) AS project,
-			ARRAY_AGG(datatype) AS datatype
+			ARRAY_AGG(datatype) AS datatype,
+			COUNT(*) AS count
           FROM
 			sample
 			LEFT JOIN submission ON sample.submission_id = submission.submission_id
 			LEFT JOIN project ON submission.project_id = project.project_id
+		  {where_clause}
           GROUP BY
             sample_name, project.pi
 		  HAVING
 		    COUNT(*) > 1
+		  UNION ALL
+		  SELECT 'null' AS sample_name, pi, project, datatype, COUNT(*) AS count
+			FROM (
+				SELECT 
+					ARRAY_AGG(project) AS project,
+					ARRAY_AGG(datatype) AS datatype,
+					pi, 
+					sample_name
+				FROM sample
+					LEFT JOIN submission ON sample.submission_id = submission.submission_id
+					LEFT JOIN project ON submission.project_id = project.project_id
+				GROUP BY pi, sample_name
+				HAVING COUNT(*) = 1
+			) AS single_row_samples
+			GROUP BY pi, project, datatype
+			{show_query}
+		  
 		  ORDER BY
-		  	COUNT(*) DESC
+		  	count DESC
           )
-        result;"""
+        result;""" 
 
+	# print(query)
 	fetch_result = fetch(cursor, query, 'all')
 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
 		results = None
 	else:
 		results = fetch_result[0][0]
-
+	# return jsonify(results)
 	output = dict()
 	for row in results:
 		pi = row['pi']
@@ -417,33 +495,142 @@ def datagrid():
 			project = projects[i]
 			datatype = row['datatype'][i]
 			if project not in output[pi]["projects"]:
-				output[pi]["projects"][project] = {"header": dict(), "samples":{}}
-			if sample not in output[pi]["projects"][project]['samples']:
-				output[pi]["projects"][project]['samples'][sample] = dict()
+				output[pi]["projects"][project] = {"header": dict(), "samples":[]}
+			if len(output[pi]["projects"][project]['samples']) == 0 or sample != output[pi]["projects"][project]['samples'][-1]['Entity']:
+				output[pi]["projects"][project]['samples'].append({'Entity': sample})
 			
-			output[pi]['projects'][project]['samples'][sample][datatype] = output[pi]['projects'][project]['samples'][sample].get(datatype, 0) + 1
-			output[pi]['projects'][project]['samples'][sample]['count'] = output[pi]['projects'][project]['samples'][sample].get('count', 0) + 1
+			if sample == "null":
+				output[pi]['projects'][project]['samples'][-1][datatype] = row['count']
+				output[pi]['projects'][project]['samples'][-1]['count'] = output[pi]['projects'][project]['samples'][-1].get('count', 0) + row['count']
 
-			output[pi]['header'][datatype] = output[pi]['header'].get(datatype, 0) + 1
-			output[pi]['projects'][project]['header'][datatype] = output[pi]['projects'][project]['header'].get(datatype, 0) + 1
+				output[pi]['header'][datatype] = output[pi]['header'].get(datatype, 0) + row['count']
+				output[pi]['projects'][project]['header'][datatype] = output[pi]['projects'][project]['header'].get(datatype, 0) + row['count']
 
-			output[pi]['header']['count'] = output[pi]['header'].get('count', 0) + 1
-			output[pi]['projects'][project]['header']['count'] = output[pi]['projects'][project]['header'].get('count', 0) + 1
+				output[pi]['header']['count'] = output[pi]['header'].get('count', 0) + row['count']
+				output[pi]['projects'][project]['header']['count'] = output[pi]['projects'][project]['header'].get('count', 0) + row['count']
 
-			other_projects = set([other_project for other_project in projects if other_project != project])
-			if len(other_projects) > 0:
-				output[pi]['projects'][project]['samples'][sample]['other'] = tuple(other_projects)
+			else:
+				output[pi]['projects'][project]['samples'][-1][datatype] = output[pi]['projects'][project]['samples'][-1].get(datatype, 0) + 1
+				output[pi]['projects'][project]['samples'][-1]['count'] = output[pi]['projects'][project]['samples'][-1].get('count', 0) + 1
 
-	analytics = {'pi.pi' : [], 'submission.datatype': []}
-	analytics['pi.pi'] = sorted([(pi, output[pi]['header']['count']) for pi in output], key= lambda x : x[1], reverse=True)
-	analytics['submission.datatype'] = sorted([(datatype[0], sum([output[pi]['header'].get(datatype[0], 0) for pi in output])) for datatype in columns], key=lambda x : x[1], reverse=True)
+				if len(projects) > 1:
+					output[pi]['header'][datatype] = output[pi]['header'].get(datatype, 0) + 1
+					output[pi]['projects'][project]['header'][datatype] = output[pi]['projects'][project]['header'].get(datatype, 0) + 1
+
+					output[pi]['header']['count'] = output[pi]['header'].get('count', 0) + 1
+					output[pi]['projects'][project]['header']['count'] = output[pi]['projects'][project]['header'].get('count', 0) + 1
+
+					other_projects = set([other_project for other_project in projects if other_project != project])
+					if len(other_projects) > 0:
+						output[pi]['projects'][project]['samples'][-1]['other'] = tuple(other_projects)
+
+	# analytics = {'project.pi' : [], 'project.project' : [], 'submission.datatype': []}
+	# analytics['project.pi'] = sorted([(pi, output[pi]['header']['count']) for pi in output], key= lambda x : x[1], reverse=True)
+	# analytics['project.project'] = sorted([(project, output[pi]['projects'][project]['header']['count']) for pi in output for project in output[pi]['projects']], key= lambda x : x[1], reverse=True)
+	# analytics['submission.datatype'] = sorted([(datatype[0], sum([output[pi]['header'].get(datatype[0], 0) for pi in output])) for datatype in columns], key=lambda x : x[1], reverse=True)
+
+	columns = ['WGS30N', 'WGS90N', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA-20', 'mRNA-50', 'totRNA-50', 'totRNAGlob-50', '10XscRNA']
 	
-	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count'], 'analytics': analytics})
+	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count']})
 
 
+# @ app.route('/export/datagrid/<format>')
+# def export_datagrid(format):
+# 	global datagrid_filter
+# 	where_clause = get_where_clause(datagrid_filter)
+
+# 	query = """ SELECT DISTINCT datatype FROM submission ;"""
+# 	columns = fetch(cursor, query, 'all')
+
+# 	query = f"""
+#         SELECT JSON_AGG(result)
+#         FROM (
+#           SELECT
+#             sample_name,
+# 			pi,
+# 			ARRAY_AGG(project) AS project,
+# 			ARRAY_AGG(datatype) AS datatype
+#           FROM
+# 			sample
+# 			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+# 			LEFT JOIN project ON submission.project_id = project.project_id
+#           GROUP BY
+#             sample_name, project.pi
+# 		  HAVING
+# 		    COUNT(*) > 1
+# 		  ORDER BY
+# 		  	COUNT(*) DESC
+#           )
+#         result;"""
+
+# 	fetch_result = fetch(cursor, query, 'all')
+# 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+# 		results = None
+# 	else:
+# 		results = fetch_result[0][0]
+
+# 	output = dict()
+# 	for row in results:
+# 		pi = row['pi']
+# 		projects = row['project']
+# 		sample = row['sample_name']
+# 		if pi not in output:
+# 			output[pi] = {"header": dict(), "projects": dict()}
+# 		for i in range(len(projects)):
+# 			project = projects[i]
+# 			datatype = row['datatype'][i]
+# 			if project not in output[pi]["projects"]:
+# 				output[pi]["projects"][project] = {"header": dict(), "samples":{}}
+# 			if sample not in output[pi]["projects"][project]['samples']:
+# 				output[pi]["projects"][project]['samples'][sample] = dict()
+			
+# 			output[pi]['projects'][project]['samples'][sample][datatype] = output[pi]['projects'][project]['samples'][sample].get(datatype, 0) + 1
+# 			output[pi]['projects'][project]['samples'][sample]['count'] = output[pi]['projects'][project]['samples'][sample].get('count', 0) + 1
+
+# 			output[pi]['header'][datatype] = output[pi]['header'].get(datatype, 0) + 1
+# 			output[pi]['projects'][project]['header'][datatype] = output[pi]['projects'][project]['header'].get(datatype, 0) + 1
+
+# 			output[pi]['header']['count'] = output[pi]['header'].get('count', 0) + 1
+# 			output[pi]['projects'][project]['header']['count'] = output[pi]['projects'][project]['header'].get('count', 0) + 1
+
+# 			other_projects = set([other_project for other_project in projects if other_project != project])
+# 			if len(other_projects) > 0:
+# 				output[pi]['projects'][project]['samples'][sample]['other'] = tuple(other_projects)
+
+	
+# 	# if format == 'csv':
+# 	# 	csv_buffer = io.StringIO()
+# 	# 	df.to_csv(csv_buffer, index=False)
+# 	# 	csv_buffer.seek(0)
+# 	# 	return send_file(io.BytesIO(csv_buffer.getvalue().encode()),
+# 	# 						mimetype='text/csv',
+# 	# 						as_attachment=True,
+# 	# 						download_name='data.csv')
+
+# 	# elif format == 'tsv':
+# 	# 	tsv_buffer = io.StringIO()
+# 	# 	df.to_csv(tsv_buffer, sep='\t', index=False)
+# 	# 	tsv_buffer.seek(0)
+# 	# 	return send_file(io.BytesIO(tsv_buffer.getvalue().encode()),
+# 	# 						mimetype='text/tab-separated-values',
+# 	# 						as_attachment=True,
+# 	# 						download_name='data.tsv')
+
+# 	if format == 'json':
+# 		json_file_path = "/tmp/data.json"
+# 		with open(json_file_path, 'w') as json_file:
+# 			json.dump(output, json_file, indent=4, cls=CustomJSONEncoder)
+
+# 		# Send the file as a response
+# 		return send_file(json_file_path,
+#                          mimetype='application/json',
+#                          as_attachment=True,
+#                          download_name='data.json')
+# 	else:
+# 		return 'Invalid format', 400
 
 
-    ####### overview page ##################################################
+####### overview page ##################################################
 
 
 @ app.route('/data1/<date>')
@@ -488,20 +675,21 @@ def data1(date):
 
 @ app.route('/data2a/<date>')
 def data2a(date):
-    try:
-        start, end = parse_date(date)
-    except:
-        return "format should be 'yyyymmdd-yyyymmdd'"
-    query = """ SELECT DISTINCT status FROM sample ;"""
-    results = fetch(cursor, query, 'all')
+	try:
+		start, end = parse_date(date)
+	except:
+		return "format should be 'yyyymmdd-yyyymmdd'"
 
-    case_query = ""
-    for row in results:
-        assert (len(row) == 1)
-        value = row[0]
-        case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else None}","""
+	results = get_distinct('sample.status')
 
-    query = f"""
+	case_query = ""
+	print(results)
+	for row in results:
+		assert (len(row) == 1)
+		value = row[0]
+		case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else None}","""
+
+	query = f"""
         SELECT JSON_AGG(result)
         FROM (
           SELECT
@@ -522,15 +710,15 @@ def data2a(date):
           )
         result;"""
 
-    fetch_result = fetch(cursor, query, 'all')
-    if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-        results = None
-    else:
-        results = fetch_result[0][0]
+	fetch_result = fetch(cursor, query, 'all')
+	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+		results = None
+	else:
+		results = fetch_result[0][0]
 
 #   with open('./front-end/src/apiData/data2a.json', 'w') as f:
         # json.dump(results, f, cls=JSONEncoder)
-    return jsonify(results)
+	return jsonify(results)
 
 
 @ app.route('/data2b/<date>')
@@ -755,11 +943,13 @@ def data6(date):
 
 @ app.route('/plot')
 def plot():
-    where_clause = get_where_clause()
-    data_query = f"""
+	global database_filter
+	set_database_filter(request.args)
+	where_clause = get_where_clause(database_filter)
+	data_query = f"""
         SELECT JSON_AGG(result)
         FROM (
-            SELECT *
+            SELECT {alias_clause}
             FROM sample
             LEFT JOIN pool ON sample.pool_id = pool.pool_id
             LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
@@ -771,14 +961,14 @@ def plot():
 			{where_clause}
         ) result;
     """
-    fetch_result = fetch(cursor, data_query, 'all')
-    if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-        results = None
-    else:
-        results = fetch_result[0][0]
-        df = pd.DataFrame(results)
-        walker = pyg.walk(df, return_html=True).to_html()
-        return jsonify({'html': walker})
+	fetch_result = fetch(cursor, data_query, 'all')
+	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+		results = None
+	else:
+		results = fetch_result[0][0]
+		df = pd.DataFrame(results)
+		walker = pyg.walk(df, return_html=True).to_html()
+		return jsonify({'html': walker})
 
 
 if __name__ == '__main__':

@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-// import schema from "@lib/schema.json";
-function Layout() {
-	// const location = useLocation();
 
+function Layout() {
 	// for toggling expand/collapse the main sidebar on the left
 	const [openSideBar, setOpenSideBar] = useState(false);
 	const toggleSideBar = () => {
@@ -20,15 +18,6 @@ function Layout() {
 
 	const [selectedFilterGrid, setSelectedFilterGrid] = useState({});
 
-	// const reset = () => {
-	// 	setSearchValue("");
-	// 	setSelectedFilter({});
-	// 	setSelectedRanges({});
-	// 	setSelectedColumns(binaryString);
-	// 	setSortedColumns(trinaryString);
-	// 	setSelectedFilterGrid({});
-	// };
-
 	return (
 		<div className="h-screen w-screen overflow-hidden flex">
 			<Sidebar openSideBar={openSideBar} toggleSideBar={toggleSideBar} />
@@ -37,7 +26,7 @@ function Layout() {
 					openSideBar={openSideBar}
 					toggleSideBar={toggleSideBar}
 				/>
-				<div className="flex-1 min-h-0 max-h-full w-full bg-gray-300/80 z-0 overflow-x-hidden overflow-y-hidden">
+				<div className="flex-1 min-h-0 max-h-full w-full bg-gray-300/80 z-0 overflow-x-hidden ">
 					<Outlet
 						context={{
 							baseURL,

@@ -117,8 +117,11 @@ export const MRT_FilterTextField = <TData extends MRT_RowData>({
     : '';
 
   const filterPlaceholder = !isRangeFilter
-    ? textFieldProps?.placeholder ??
-      localization.filterByColumn?.replace('{column}', String(columnDef.header))
+    ? (textFieldProps?.placeholder ??
+      localization.filterByColumn?.replace(
+        '{column}',
+        String(columnDef.header),
+      ))
     : rangeFilterIndex === 0
       ? localization.min
       : rangeFilterIndex === 1
@@ -141,7 +144,7 @@ export const MRT_FilterTextField = <TData extends MRT_RowData>({
         ? (column.getFilterValue() as [string, string])?.[
             rangeFilterIndex as number
           ] || ''
-        : (column.getFilterValue() as string) ?? '',
+        : ((column.getFilterValue() as string) ?? ''),
   );
   const [autocompleteValue, setAutocompleteValue] =
     useState<DropdownOption | null>(

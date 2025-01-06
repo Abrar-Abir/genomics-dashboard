@@ -9,7 +9,7 @@ import Card1 from "@components/dashboard/Card-1";
 import Card2 from "@components/dashboard/Card-2";
 import CustomDonutChart from "@components/dashboard/CustomDonutChart";
 
-export default function Dashboard(props) {
+export default function Dashboard() {
 	const [dateRange, setDateRange] = useState({
 		startDate: new Date("2000-01-01"),
 		endDate: new Date(),
@@ -31,12 +31,12 @@ export default function Dashboard(props) {
 		data5: null,
 		data6: null,
 	});
-
-	const baseURL =
-		process.env.NODE_ENV === "production"
-			? //   ? "http://172.32.79.51:5001"
-			  "https://genomics-dashboard-flask.onrender.com"
-			: "http://localhost:5001";
+	const { baseURL } = useOutletContext();
+	// const baseURL =
+	// 	process.env.NODE_ENV === "production"
+	// 		? //   ? "http://172.32.79.51:5001"
+	// 		  "https://genomics-dashboard-flask.onrender.com"
+	// 		: "http://localhost:5001";
 
 	// Function to asynchronously fetch data for all the cards in the dashboard page
 	useEffect(() => {

@@ -1,226 +1,247 @@
-import React, { useState } from 'react';
-import { Tooltip, Badge } from '@material-tailwind/react';
+import React, { useState } from "react";
+import { Tooltip, Badge } from "@material-tailwind/react";
 
-const AccordionTable = ({ data, tableHeaders }) => {
-  const [openPi, setOpenPi] = useState({});
-  const handleTogglePi = (pi) => {
-	// console.log(openPi);
-    setOpenPi((prevState) => ({
-      ...prevState,
-      [pi]: !prevState[pi],
-    }));
-  };
-  const [openProject, setOpenProject] = useState({});
-  const handleToggleProject = (project) => {
-    setOpenProject((prevState) => ({
-      ...prevState,
-      [project]: !prevState[project],
-    }));
-  };
+const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
+	const [openPi, setOpenPi] = useState({});
+	const handleTogglePi = (pi) => {
+		setOpenPi((prevState) => ({
+			...prevState,
+			[pi]: !prevState[pi],
+		}));
+	};
+	const [openProject, setOpenProject] = useState({});
+	const handleToggleProject = (project) => {
+		setOpenProject((prevState) => ({
+			...prevState,
+			[project]: !prevState[project],
+		}));
+	};
 
-//   return (
-// 	<div className=" overflow-x-auto  h-full">
-// 		 <table className=" table-fixed" >
-// 			<thead className="bg-white sticky top-0 z-10 ">
-//                     <tr >
-//                       {tableHeaders.map((key) => (
-//                         <th key={key} className="px-4 py-2 text-center " style={ key === "Entity" ? {width: '20rem'} : { writingMode: 'vertical-rl', transform: 'rotate(180deg)', width: '5rem'}}>{key === 'count' ? 'Count' : key}</th>
-//                       ))}
-//                     </tr>
-//                   </thead>
-// 				  {/* </table> */}
-//       {Object.keys(data).map((pi) => {
-//         const piData = data[pi];
-//         return (
-//           <div key={pi}>
-//             <Accordion open={openPi[pi]} className='rounded-lg border border-white bg-indigo-300'>
-//               <AccordionHeader onClick={() => handleTogglePi(pi)} className='!py-0 border-white'>
-// 				<table>
-//                   <thead >
-//                     <tr >
-//                       {tableHeaders.map((key) => (
-//                         <th key={key} className= { key === "Entity" ? "px-4 text-right text-white font-normal" 
-// 												: key === 'count' ? "px-4 text-center bg-blue-300 text-white font-normal" 
-// 												: piData.header[key] > 0 ? "px-4 text-center bg-teal-300 text-white font-normal" 
-// 												: "px-4 text-center text-white"} 
-// 										style={ key === "Entity" ? {width: '20rem', borderLeft: '0.20rem solid white'} : { width: '5rem', borderLeft: '0.20rem solid white'}}>
-// 						{ key === 'Entity' ? pi : piData.header[key] || ''}
-// 						</th>
-//                       ))}
-//                     </tr>
-//                   </thead>
-// 				  </table>
-//               </AccordionHeader>
-//               <AccordionBody>
-// 				{Object.keys(piData.projects).map((project) => {
-// 				const projectData = piData.projects[project];
-// 				return (
-// 			  <Accordion open={openProject[project]} className=' bg-blue-gray-300'>
-//               <AccordionHeader onClick={() => handleToggleProject(project)} className='!py-0'>
-// 				<table>
-//                   <thead>
-//                     <tr>
-//                       {tableHeaders.map((key) => (
-//                         <th key={key} className= { key === "Entity" ? "px-4 text-right text-white" 
-// 												 : key === 'count' ? "px-4 text-center bg-blue-300 text-white" 
-// 												 : projectData.header[key] > 0 ? "px-4 text-center bg-teal-300 text-white" 
-// 												 : "px-4 text-center"} 
-// 									style={ key === "Entity" ? {width: '20rem', border: '0.20rem solid white'} : { width: '5rem', border: '0.20rem solid white'}}>
-// 						{ key === 'Entity' ? project : projectData.header[key] || ''}
-// 						</th>
-//                       ))}
-//                     </tr>
-//                   </thead>
-// 				  </table>
-//               </AccordionHeader>
-// 			  <AccordionBody>
-// 				<table>
-//                   <tbody className=''>
-//                     {Object.keys(projectData.samples).map((sample, index) => (
-//                       <tr key={index} className="bg-white ">
-//                         {tableHeaders.map((key) => (
-//                           <td key={key} className={ key === "Entity" ? "px-4 py-2 text-right font-bold text-black " 
-// 													: key === "count" ? "px-4 py-2 text-center bg-blue-300  text-white"
-// 						  							: projectData.samples[sample][key] > 0 ? "px-4 py-2 text-center bg-teal-300  text-white"
-// 													: "px-4 py-2 text-center bg-teal-50"} 
-// 										style={ key === "Entity" ? {width: '20rem', border: '0.20rem solid white'} : { width: '5rem', border: '0.20rem solid white'}}>
-//                             {key === 'Entity' ? sample : projectData.samples[sample][key] || ''}
-//                           </td>
-//                         ))}
-//                       </tr>
-//                     ))}
-//                   </tbody>
-// 				  </table>
-// 				  </AccordionBody>
-// 				  </Accordion>
-// 	  )})}
-//               </AccordionBody>
-//             </Accordion>
-// 			{/* </table> */}
-//           </div>
-//         );
-//       })}
-// 	  </table>
-// 	</div>
-//   );
-// };
-return (
-<div className="overflow-x-auto h-full">
-  <table className="table-fixed">
-    {/* Table Header */}
-    <thead className="bg-white sticky top-0 z-10">
-      <tr>
-        {tableHeaders.map((key) => (
-          <th
-            key={key}
-            className="px-4 py-2 text-center"
-            style={
-              key === "Entity"
-                ? { width: "20rem" }
-                : { writingMode: "vertical-rl", transform: "rotate(180deg)", width: "5rem" }
-            }
-          >
-            {key === "count" ? "Count" : key}
-          </th>
-        ))}
-      </tr>
-    </thead>
+	const handleToggleShow = (project) => {
+		setShowProject((prevState) => {
+			if (prevState.includes(project)) {
+				return prevState.filter((p) => p !== project);
+			}
+			return [...prevState, project];
+		});
+	};
 
-    {/* Table Body */}
-    <tbody>
-      {Object.keys(data).map((pi) => {
-        const piData = data[pi];
-        return (
-          <>
-            {/* Row for PI Accordion Header */}
-            <tr key={pi} className="bg-indigo-300" onClick={() => handleTogglePi(pi)}>
-              {tableHeaders.map((key) => (
-                <td
-                  key={key}
-                  className={
-                    key === "Entity"
-                      ? "px-4 text-right text-white font-normal"
-                      : key === "count"
-                      ? "px-4 text-center bg-blue-300 text-white font-normal"
-                      : piData.header[key] > 0
-                      ? "px-4 text-center bg-teal-300 text-white font-normal"
-                      : "px-4 text-center text-white"
-                  }
-                  style={key === "Entity" ? { width: "20rem", border: "0.20rem solid white" } : { width: "5rem", border: "0.20rem solid white" }}
-                >
-                  {key === "Entity" ? pi : piData.header[key] || ""}
-                </td>
-              ))}
-            </tr>
+	return (
+		<div className="overflow-x-hidden h-full bg-white">
+			<table className="table-fixed border-collapse">
+				<thead className=" sticky top-0 z-30 bg-white">
+					<tr>
+						<td></td>
+						<td></td>
+						{tableHeaders.map((key) => (
+							<th
+								key={key}
+								className=" text-center font-semibold"
+								style={
+									key === "Entity"
+										? { width: "14rem", border: "0.20rem solid white" }
+										: {
+												writingMode: "vertical-rl",
+												transform: "rotate(180deg)",
+												width: "5rem",
+												height: "9rem",
+												border: "0.20rem solid white",
+										  }
+								}
+							>
+								{key === "count" ? "Count" : key}
+							</th>
+						))}
+					</tr>
+				</thead>
 
-            {/* Rows for Projects within PI */}
-            { openPi[pi] != false &&
-			 Object.keys(piData.projects).map((project) => {
-              const projectData = piData.projects[project];
-              return (
-                <>
-                  {/* Row for Project Accordion Header */}
-                  <tr key={project} className="bg-blue-gray-300" onClick={() => handleToggleProject(project)}>
-                    {tableHeaders.map((key) => (
-                      <td
-                        key={key}
-                        className={
-                          key === "Entity"
-                            ? "px-4 text-right text-white"
-                            : key === "count"
-                            ? "px-4 text-center bg-blue-300 text-white"
-                            : projectData.header[key] > 0
-                            ? "px-4 text-center bg-teal-300 text-white"
-                            : "px-4 text-center"
-                        }
-                        style={key === "Entity" ? { width: "20rem", border: "0.20rem solid white" } : { width: "5rem", border: "0.20rem solid white" }}
-                      >
-                        {key === "Entity" ? project : projectData.header[key] || ""}
-                      </td>
-                    ))}
-                  </tr>
+				<tbody className="overflow-y-auto">
+					{Object.keys(data).map((pi) => {
+						const piData = data[pi];
+						return (
+							<>
+								<tr key={pi} className="bg-indigo-400 sticky z-20 top-[9rem]">
+									{tableHeaders.map((key) => (
+										<td
+											key={key}
+											onClick={key === "Entity" ? () => handleTogglePi(pi) : () => {}}
+											className={
+												key === "Entity"
+													? "px-4 text-right text-white font-normal  hover:bg-indigo-300 hover:cursor-pointer"
+													: key === "count"
+													? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white font-normal hover:cursor-pointer"
+													: piData.header[key] > 0
+													? "px-4 text-center bg-teal-400 hover:bg-teal-300 text-white font-normal hover:cursor-pointer"
+													: "px-4 text-center text-white"
+											}
+											style={
+												key === "Entity"
+													? {
+															width: "20rem",
+															height: "1rem",
+															border: "0.20rem solid white",
+													  }
+													: {
+															width: "5rem",
+															height: "1rem",
+															border: "0.20rem solid white",
+													  }
+											}
+											colSpan={key === "Entity" ? "3" : "1"}
+										>
+											{key === "Entity" ? pi : piData.header[key] || ""}
+										</td>
+									))}
+								</tr>
 
-                  {/* Rows for Samples within Project */}
-                  {openProject[project] != false && Object.keys(projectData.samples).map((sample, index) => (
-                    <tr key={index} className="bg-white">
-                      {tableHeaders.map((key) => (
-                        <td
-                          key={key}
-                          className={
-                            key === "Entity"
-                              ? "px-4 py-2 text-right font-bold text-black"
-                              : key === "count"
-                              ? "px-4 py-2 text-center bg-blue-300 text-white"
-                              : projectData.samples[sample][key] > 0
-                              ? "px-4 py-2 text-center bg-teal-300 text-white"
-                              : "px-4 py-2 text-center bg-teal-50"
-                          }
-                          style={key === "Entity" ? { width: "20rem", border: "0.20rem solid white" } : { width: "5rem", border: "0.20rem solid white" }}
-                        >
-                          {key === "Entity" 
-							? 'other' in projectData.samples[sample] 
-								? projectData.samples[sample]?.other // Check if 'other' exists
-								? <Tooltip content={"sample was also sequenced under SDR " + String(projectData.samples[sample].other)}>
-									<Badge color='blue'>{sample}</Badge>
-									</Tooltip>
-								: sample  // fallback to just showing the sample
-								: sample  // if 'other' doesn't exist in the sample, fallback to sample
-							: projectData.samples[sample]?.[key] || ""  // Handle missing key with fallback
-							}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </>
-              );
-            })}
-          </>
-        );
-      })}
-    </tbody>
-  </table>
-</div>
-)
-}
+								{openPi[pi] &&
+									Object.keys(piData.projects).map((project) => {
+										const projectData = piData.projects[project];
+										return (
+											<>
+												<tr key={project} className="bg-blue-gray-400 sticky z-10 top-[10.75rem]">
+													<td style={{ width: "3rem" }} className="bg-white"></td>
+													{tableHeaders.map((key) => (
+														<td
+															key={key}
+															onClick={
+																key === "Entity" ? () => handleToggleProject(project) : () => {}
+															}
+															className={
+																key === "Entity"
+																	? "px-4 text-right text-white hover:bg-blue-gray-300 hover:cursor-pointer"
+																	: key === "count"
+																	? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																	: projectData.header[key] > 0
+																	? "px-4 text-center bg-teal-400 hover:bg-teal-300 text-white hover:cursor-pointer"
+																	: "px-4 text-center"
+															}
+															style={
+																key === "Entity"
+																	? {
+																			width: "17rem",
+																			height: "1rem",
+																			border: "0.20rem solid white",
+																	  }
+																	: {
+																			width: "5rem",
+																			height: "1rem",
+																			border: "0.20rem solid white",
+																	  }
+															}
+															colSpan={key === "Entity" ? "2" : "1"}
+														>
+															{key === "Entity" ? project : projectData.header[key] || ""}
+														</td>
+													))}
+												</tr>
+
+												{openProject[project] &&
+													projectData.samples.map((sampleDict, index) =>
+														sampleDict["Entity"] === "null" ? (
+															<tr
+																key={index}
+																className="bg-light-green-700  sticky z-5 top-[12.5rem]"
+															>
+																<td style={{ width: "3rem" }} className="bg-white"></td>
+																<td style={{ width: "3rem" }} className="bg-white"></td>
+																{tableHeaders.map((key) => (
+																	<td
+																		key={key}
+																		onClick={
+																			key === "Entity" ? () => handleToggleShow(project) : () => {}
+																		}
+																		className={
+																			key === "Entity"
+																				? "px-4 py-2 text-right text-white hover:bg-light-green-500 font-medianbold hover:cursor-pointer"
+																				: key === "count"
+																				? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																				: sampleDict[key] > 0
+																				? "px-4 py-2 text-center bg-teal-300 hover:bg-teal-300 text-white hover:cursor-pointer"
+																				: "px-4 py-2 text-center "
+																		}
+																		style={
+																			key === "Entity"
+																				? {
+																						width: "14rem",
+																						border: "0.20rem solid white",
+																				  }
+																				: {
+																						width: "5rem",
+																						border: "0.20rem solid white",
+																				  }
+																		}
+																	>
+																		{key === "Entity"
+																			? "single entry samples"
+																			: sampleDict?.[key] || ""}
+																	</td>
+																))}
+															</tr>
+														) : (
+															<tr key={index} className="bg-white">
+																<td style={{ width: "3rem" }} className="bg-white"></td>
+																<td style={{ width: "3rem" }} className="bg-white"></td>
+																{tableHeaders.map((key) => (
+																	<td
+																		key={key}
+																		className={
+																			key === "Entity"
+																				? "px-4 py-2 text-right text-black bg-blue-gray-50 hover:bg-blue-gray-100 font-semibold hover:cursor-pointer"
+																				: key === "count"
+																				? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																				: sampleDict[key] > 0
+																				? "px-4 py-2 text-center bg-teal-300 hover:bg-teal-300 text-white hover:cursor-pointer"
+																				: "px-4 py-2 text-center "
+																		}
+																		style={
+																			key === "Entity"
+																				? {
+																						width: "14rem",
+																						border: "0.20rem solid white",
+																				  }
+																				: {
+																						width: "5rem",
+																						border: "0.20rem solid white",
+																				  }
+																		}
+																	>
+																		{key === "Entity" ? (
+																			"other" in sampleDict ? (
+																				sampleDict?.other ? (
+																					<Tooltip
+																						content={
+																							"sample was also sequenced under SDR " +
+																							String(sampleDict.other)
+																						}
+																					>
+																						<Badge color="blue">{sample}</Badge>
+																					</Tooltip>
+																				) : (
+																					sampleDict?.[key]
+																				)
+																			) : (
+																				sampleDict?.[key]
+																			)
+																		) : (
+																			sampleDict?.[key] || ""
+																		)}
+																	</td>
+																))}
+															</tr>
+														)
+													)}
+											</>
+										);
+									})}
+							</>
+						);
+					})}
+				</tbody>
+				{/* </div> */}
+			</table>
+		</div>
+	);
+};
 
 export default AccordionTable;
