@@ -4,26 +4,30 @@ import Grid from "@components/datagrid/Grid";
 import { useOutletContext } from "react-router-dom";
 import DatagridHeader from "../components/datagrid/DatagridHeader";
 
-export default function Database() {
-	const [selectedFilter, setSelectedFilter] = useState({});
-	const [showProject, setShowProject] = useState([]);
+export default function Datagrid({
+	selectedFilter,
+	setSelectedFilter,
+	filterPanelData,
+	setFilterPanelData,
+	showProject,
+	setShowProject,
+	data,
+	setData,
+	tableHeaders,
+	setTableHeaders,
+	reset,
+}) {
 	const { baseURL } = useOutletContext();
-	const [data, setData] = useState([]);
-	const [filterPanelData, setFilterPanelData] = useState(null);
-	const [tableHeaders, setTableHeaders] = useState([]);
-
-	const reset = () => {
-		setSelectedFilter({});
-	};
 
 	const handleExport = (format) => {
 		window.location.href = `${baseURL}/export/datagrid/${format}`;
 	};
 
 	useEffect(() => {
-		console.log(showProject);
+		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 		async function fetchData() {
 			try {
+				console.log("fetching data");
 				let apiUrl = `${baseURL}/datagrid?`;
 				if (showProject.length > 0) {
 					apiUrl += `show=${JSON.stringify(showProject)}&`;
@@ -40,20 +44,17 @@ export default function Database() {
 				if (!dataResponse.ok) {
 					console.error("Server error:", dataResponse);
 				} else {
+					await delay(15);
 					const dataResult = await dataResponse.json();
 					setData(dataResult.data);
 					setTableHeaders(Array.isArray(dataResult.columns) ? dataResult.columns : []);
-					if (filterPanelData === null) {
-						const filterPanelResponse = await fetch(`${baseURL}/analytics/datagrid`);
-						if (!filterPanelResponse.ok) {
-							console.error("Server error:", filterPanelResponse);
-						} else {
-							const filterPanelResult = await filterPanelResponse.json();
-							setFilterPanelData(filterPanelResult);
-						}
+					const filterPanelResponse = await fetch(`${baseURL}/analytics/datagrid`);
+					if (!filterPanelResponse.ok) {
+						console.error("Server error:", filterPanelResponse);
+					} else {
+						const filterPanelResult = await filterPanelResponse.json();
+						setFilterPanelData(filterPanelResult);
 					}
-					// setFilterPanelData(dataResult.analytics);
-					// console.log(dataResult.analytics);
 				}
 			} catch (error) {
 				console.error("Error fetching data:", error);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
 	Accordion,
 	AccordionHeader,
@@ -12,9 +12,7 @@ import schema from "@lib/schema.json";
 function Icon({ open }) {
 	return (
 		<ChevronDownIcon
-			className={`${
-				open ? "rotate-180" : ""
-			} transition-transform duration-200 h-5`}
+			className={`${open ? "rotate-180" : ""} transition-transform duration-200 h-5`}
 		/>
 	);
 }
@@ -132,30 +130,17 @@ export default function FilterPanel(props) {
 				{items.length > 0 ? (
 					<div className="max-h-32 overflow-y-auto py-2">
 						{items.map(([value, count], index) => {
-							// Check if the item is selected based on the new state
-							//   const isSelected = selectedItems[filterKey] === item;
-							const isSelected =
-								props.selectedFilter[filterKey]?.includes(
-									value
-								) || false;
+							const isSelected = props.selectedFilter[filterKey]?.includes(value) || false;
 							return (
 								<div
 									key={index}
 									className={`flex justify-between py-1 px-2 text-xs cursor-pointer ${
-										isSelected
-											? "bg-blue-500/60"
-											: "hover:bg-red-500/10"
+										isSelected ? "bg-blue-500/60" : "hover:bg-red-500/10"
 									}`}
-									onClick={() =>
-										toggleSelection(filterKey, value)
-									}
+									onClick={() => toggleSelection(filterKey, value)}
 								>
-									<span className="text-black">
-										{value || "N/A"}
-									</span>
-									<span className="text-gray-800 mr-2">
-										{count}
-									</span>
+									<span className="text-black">{value || "N/A"}</span>
+									<span className="text-gray-800 mr-2">{count}</span>
 								</div>
 							);
 						})}
@@ -177,8 +162,8 @@ export default function FilterPanel(props) {
 				<Accordion
 					id={key + "." + innerKey}
 					key={innerKey}
-					open={!!openAcc[`${key}.${innerKey}`]}
-					icon={<Icon open={!!openAcc[`${key}.${innerKey}`]} />}
+					open={openAcc[`${key}.${innerKey}`]}
+					icon={<Icon open={openAcc[`${key}.${innerKey}`]} />}
 					className="border-b border-gray-400 w-full"
 				>
 					<AccordionHeader
@@ -192,14 +177,9 @@ export default function FilterPanel(props) {
 						<span>{value[innerKey].alias}</span>
 					</AccordionHeader>
 					<AccordionBody>
-						{value[innerKey].type.includes("NUMERIC") ||
-						value[innerKey].type.includes("DATE")
+						{value[innerKey].type.includes("NUMERIC") || value[innerKey].type.includes("DATE")
 							? renderRangeControl(key, innerKey)
-							: renderAccordionBody(
-									key,
-									innerKey,
-									props.data?.[`${key}.${innerKey}`]
-							  )}
+							: renderAccordionBody(key, innerKey, props.data?.[`${key}.${innerKey}`])}
 					</AccordionBody>
 				</Accordion>
 			);
@@ -210,16 +190,14 @@ export default function FilterPanel(props) {
 			<Accordion
 				id={key}
 				key={key}
-				open={!!openAcc[key]}
-				icon={<Icon open={!!openAcc[key]} />}
+				open={openAcc[key]}
+				icon={<Icon open={openAcc[key]} />}
 				className="border-b border-gray-200 w-full"
 			>
 				<AccordionHeader
 					onClick={() => handleOpenAcc(key)}
 					className={`flex justify-between items-center text-base font-semibold w-full m-0 py-0 px-1 hover:bg-teal-300/40 capitalize ${
-						!!openAcc[key]
-							? "bg-teal-600 text-white"
-							: "bg-gray-300 text-black"
+						openAcc[key] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
 					}`}
 				>
 					<span>{key}</span>
@@ -232,30 +210,18 @@ export default function FilterPanel(props) {
 	};
 	return (
 		<div className="bg-gray-100 p-2 h-screen-minus-header overflow-scroll w-80">
-			<Typography
-				variant="h6"
-				color="blue-gray"
-				className="mb-2 flex justify-between"
-			>
+			<Typography variant="h6" color="blue-gray" className="mb-2 flex justify-between">
 				Filters
 				<span
 					onClick={handleToggleAll}
-					className={`text-sm cursor-pointer ${
-						allExpanded ? "text-red-500" : "text-green-500"
-					}`}
+					className={`text-sm cursor-pointer ${allExpanded ? "text-red-500" : "text-green-500"}`}
 				>
 					{allExpanded ? "Collapse All [-]" : "Expand All [+]"}
 				</span>
 			</Typography>
 			{props.data &&
-				Object.keys(schema.table).map((key) =>
-					renderAccordion(`${key}`, schema.table[key])
-				)}
-			{!props.data && (
-				<div className="flex justify-center items-center w-full">
-					No data
-				</div>
-			)}
+				Object.keys(schema.table).map((key) => renderAccordion(`${key}`, schema.table[key]))}
+			{!props.data && <div className="flex justify-center items-center w-full">No data</div>}
 		</div>
 	);
 }

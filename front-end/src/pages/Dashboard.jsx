@@ -9,36 +9,30 @@ import Card1 from "@components/dashboard/Card-1";
 import Card2 from "@components/dashboard/Card-2";
 import CustomDonutChart from "@components/dashboard/CustomDonutChart";
 
-export default function Dashboard() {
-	const [dateRange, setDateRange] = useState({
-		startDate: new Date("2000-01-01"),
-		endDate: new Date(),
-	});
+export default function Dashboard({ reset, dateRange, setDateRange, data, setData }) {
+	// const [dateRange, setDateRange] = useState({
+	// 	startDate: new Date("2000-01-01"),
+	// 	endDate: new Date(),
+	// });
 
-	const reset = () =>
-		setDateRange({
-			startDate: new Date("2000-01-01"),
-			endDate: new Date(),
-		});
+	// const reset = () =>
+	// 	setDateRange({
+	// 		startDate: new Date("2000-01-01"),
+	// 		endDate: new Date(),
+	// 	});
 
-	const [data, setData] = useState({
-		data1: null,
-		data2a: null,
-		data2b: null,
-		data2c: null,
-		data3: null,
-		data4: null,
-		data5: null,
-		data6: null,
-	});
+	// const [data, setData] = useState({
+	// 	data1: null,
+	// 	data2a: null,
+	// 	data2b: null,
+	// 	data2c: null,
+	// 	data3: null,
+	// 	data4: null,
+	// 	data5: null,
+	// 	data6: null,
+	// });
 	const { baseURL } = useOutletContext();
-	// const baseURL =
-	// 	process.env.NODE_ENV === "production"
-	// 		? //   ? "http://172.32.79.51:5001"
-	// 		  "https://genomics-dashboard-flask.onrender.com"
-	// 		: "http://localhost:5001";
 
-	// Function to asynchronously fetch data for all the cards in the dashboard page
 	useEffect(() => {
 		if (config.useSampleData) {
 			setData({
@@ -46,21 +40,15 @@ export default function Dashboard() {
 			});
 		} else {
 			async function fetchData() {
-				const delay = (ms) =>
-					new Promise((resolve) => setTimeout(resolve, ms));
+				const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 				// Check if startDate and endDate are not null
 				if (dateRange.startDate && dateRange.endDate) {
-					const startDate = formatJsDate(
-						dateRange.startDate,
-						"YYYYMMDD"
-					);
+					const startDate = formatJsDate(dateRange.startDate, "YYYYMMDD");
 					const endDate = formatJsDate(dateRange.endDate, "YYYYMMDD");
 
 					// for card 1
 					await delay(5);
-					const response1 = await fetch(
-						`${baseURL}/data1/${startDate}-${endDate}`
-					);
+					const response1 = await fetch(`${baseURL}/data1/${startDate}-${endDate}`);
 					if (!response1.ok) {
 						// Handle error
 						console.error("Server error:", response1);
@@ -74,9 +62,7 @@ export default function Dashboard() {
 
 					// for card 2, DataSampleStatus chart
 					await delay(5);
-					const response2a = await fetch(
-						`${baseURL}/data2a/${startDate}-${endDate}`
-					);
+					const response2a = await fetch(`${baseURL}/data2a/${startDate}-${endDate}`);
 					if (!response2a.ok) {
 						// Handle error
 						console.error("Server error:", response2a);
@@ -91,9 +77,7 @@ export default function Dashboard() {
 
 					// for card 2, Projects chart
 					await delay(5);
-					const response2b = await fetch(
-						`${baseURL}/data2b/${startDate}-${endDate}`
-					);
+					const response2b = await fetch(`${baseURL}/data2b/${startDate}-${endDate}`);
 					if (!response2b.ok) {
 						// Handle error
 						console.error("Server error:", response2b);
@@ -107,9 +91,7 @@ export default function Dashboard() {
 					}
 
 					await delay(5);
-					const response2c = await fetch(
-						`${baseURL}/data2c/${startDate}-${endDate}`
-					);
+					const response2c = await fetch(`${baseURL}/data2c/${startDate}-${endDate}`);
 					if (!response2c.ok) {
 						// Handle error
 						console.error("Server error:", response2c);
@@ -124,9 +106,7 @@ export default function Dashboard() {
 
 					// for card 3
 					await delay(5);
-					const response3 = await fetch(
-						`${baseURL}/data3/${startDate}-${endDate}`
-					);
+					const response3 = await fetch(`${baseURL}/data3/${startDate}-${endDate}`);
 					if (!response3.ok) {
 						// Handle error
 						console.error("Server error:", response3);
@@ -141,9 +121,7 @@ export default function Dashboard() {
 
 					// for card 4
 					await delay(5);
-					const response4 = await fetch(
-						`${baseURL}/data4/${startDate}-${endDate}`
-					);
+					const response4 = await fetch(`${baseURL}/data4/${startDate}-${endDate}`);
 					if (!response4.ok) {
 						// Handle error
 						console.error("Server error:", response4);
@@ -158,9 +136,7 @@ export default function Dashboard() {
 
 					// for card 5
 					await delay(5);
-					const response5 = await fetch(
-						`${baseURL}/data5/${startDate}-${endDate}`
-					);
+					const response5 = await fetch(`${baseURL}/data5/${startDate}-${endDate}`);
 					if (!response5.ok) {
 						// Handle error
 						console.error("Server error:", response5);
@@ -175,9 +151,7 @@ export default function Dashboard() {
 
 					// for card 6
 					await delay(5);
-					const response6 = await fetch(
-						`${baseURL}/data6/${startDate}-${endDate}`
-					);
+					const response6 = await fetch(`${baseURL}/data6/${startDate}-${endDate}`);
 					if (!response6.ok) {
 						// Handle error
 						console.error("Server error:", response6);
@@ -199,11 +173,7 @@ export default function Dashboard() {
 
 	return (
 		<>
-			<DashboardHeader
-				dateRange={dateRange}
-				handleDateRangeChange={setDateRange}
-				reset={reset}
-			/>
+			<DashboardHeader dateRange={dateRange} handleDateRangeChange={setDateRange} reset={reset} />
 			<section className="flex w-full flex-col items-center lg:items-start px-8 pb-8">
 				<div className="grid w-full grid-cols-1 gap-4 md:grid-cols-10 md:grid-rows-2 mt-3 h-full">
 					<div className="md:col-span-7 md:row-span-2">
@@ -216,12 +186,7 @@ export default function Dashboard() {
 							showLegend={true}
 							xAxisLabel="Demultiplex Date"
 							yAxisWidth={56}
-							kpis={[
-								"Samples",
-								"Flowcells",
-								"SamplesTotal",
-								"FlowcellsTotal",
-							]}
+							kpis={["Samples", "Flowcells", "SamplesTotal", "FlowcellsTotal"]}
 						/>
 					</div>
 					<div className="md:col-span-3 md:row-span-2 grid grid-rows-2 gap-4">

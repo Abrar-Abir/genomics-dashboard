@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Accordion, AccordionHeader, AccordionBody, Typography } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-// import schema from "@lib/schema.json";
 
 function Icon({ open }) {
 	return (
@@ -11,36 +10,31 @@ function Icon({ open }) {
 	);
 }
 
-export default function FilterGrid(props) {
+export default function FilterGrid({ data, selectedFilter, setSelectedFilter }) {
 	const [openAcc, setOpenAcc] = useState({});
-	// const [allExpanded, setAllExpanded] = useState(false);
-
 	const handleOpenAcc = (key) => {
 		setOpenAcc((prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
-	// const handleToggleAll = () => {
-	// 	const newState = {};
-	// 	["project", "submission"].forEach((key) => {
-	// 		newState[key] = !allExpanded;
-	// 	});
-	// 	setOpenAcc(newState);
-	// 	setAllExpanded(!allExpanded);
-	// };
-
 	const toggleSelection = (filterKey, item) => {
-		props.setSelectedFilter((prevSelectedItems) => {
+		// console.log("toggleselection", filterKey, item);
+		setSelectedFilter((prevSelectedItems) => {
+			// console.log("setselectedfiletr");
+			// console.log("prev", prevSelectedItems);
 			const newSelectedItems = { ...prevSelectedItems };
 			if (!newSelectedItems[filterKey]) {
 				newSelectedItems[filterKey] = [];
+				// console.log("array initialized", filterKey);
 			}
-
 			const index = newSelectedItems[filterKey].indexOf(item);
 			if (index > -1) {
-				newSelectedItems[filterKey].splice(index, 1);
+				newSelectedItems[filterKey] = newSelectedItems[filterKey].filter((val) => val !== item);
+				// console.log("item removed", item);
 			} else {
-				newSelectedItems[filterKey].push(item);
+				newSelectedItems[filterKey] = [...newSelectedItems[filterKey], item];
+				// console.log("item added", item);
 			}
+			// console.log("new", newSelectedItems);
 			return newSelectedItems;
 		});
 	};
@@ -59,22 +53,21 @@ export default function FilterGrid(props) {
 			<AccordionBody className="py-2 px-1 bg-white max-h-40 overflow-y-auto">
 				{items.length > 0 ? (
 					<div className="max-h-32 overflow-y-auto py-2">
-						{items.map((value, index) => {
-							// Check if the item is selected based on the new state
-							//   const isSelected = selectedItems[filterKey] === item;
-							const isSelected = props.selectedFilter[filterKey]?.includes(value) || false;
+						{items.map(([value, count], index) => {
+							const isSelected = selectedFilter[filterKey]?.includes(value) || false;
 							return (
 								<div
 									key={index}
 									className={`flex justify-between py-1 px-2 text-xs cursor-pointer ${
 										isSelected ? "bg-blue-500/60" : "hover:bg-blue-gray-500/10"
 									}`}
-									onClick={() => toggleSelection(filterKey, value)}
+									onClick={(e) => {
+										// e.stopPropagation();
+										toggleSelection(filterKey, value);
+									}}
 								>
 									<span className="text-black">{value}</span>
-									{/* <span className="text-gray-800 mr-2">
-										{count}
-									</span> */}
+									<span className="text-gray-800 mr-2">{count}</span>
 								</div>
 							);
 						})}
@@ -92,8 +85,7 @@ export default function FilterGrid(props) {
 				id={key + "." + innerKey}
 				key={innerKey}
 				open={!openAcc[`${key}.${innerKey}`]}
-				// open={true}
-				icon={<Icon open={!!openAcc[`${key}.${innerKey}`]} />}
+				icon={<Icon open={openAcc[`${key}.${innerKey}`]} />}
 				className="border-b border-gray-400 w-full"
 			>
 				<AccordionHeader
@@ -105,7 +97,7 @@ export default function FilterGrid(props) {
 					<span>{innerKey}</span>
 				</AccordionHeader>
 				<AccordionBody>
-					{renderAccordionBody(key, innerKey, props.data?.[`${key}.${innerKey}`])}
+					{renderAccordionBody(key, innerKey, data?.[`${key}.${innerKey}`])}
 				</AccordionBody>
 			</Accordion>
 		));
@@ -115,15 +107,14 @@ export default function FilterGrid(props) {
 			<Accordion
 				id={key}
 				key={key}
-				open={!openAcc[key]}
-				// open={true}
-				icon={<Icon open={!!openAcc[key]} />}
+				open={true}
+				icon={<Icon open={openAcc[key]} />}
 				className="border-b border-gray-200 w-full"
 			>
 				<AccordionHeader
 					onClick={() => handleOpenAcc(key)}
 					className={`flex justify-between items-center text-base font-semibold w-full m-0 py-0 px-1 hover:bg-teal-300/40 capitalize ${
-						!!openAcc[key] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
+						openAcc[key] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
 					}`}
 				>
 					<span>{key}</span>
@@ -136,22 +127,14 @@ export default function FilterGrid(props) {
 		<div className="bg-gray-100 p-2 h-full overflow-y-auto w-80">
 			<Typography variant="h6" color="blue-gray" className="mb-2 flex justify-between">
 				Filters
-				{/* <span
-					onClick={handleToggleAll}
-					className={`text-sm cursor-pointer ${
-						allExpanded ? "text-red-500" : "text-green-500"
-					}`}
-				>
-					{allExpanded ? "Collapse All [-]" : "Expand All [+]"}
-				</span> */}
 			</Typography>
-			{props.data && (
+			{data && (
 				<>
 					{renderAccordion("project", ["pi", "project"])}
 					{renderAccordion("submission", ["datatype"])}
 				</>
 			)}
-			{!props.data && <div className="flex justify-center items-center w-full">No data</div>}
+			{!data && <div className="flex justify-center items-center w-full">No data</div>}
 		</div>
 	);
 }

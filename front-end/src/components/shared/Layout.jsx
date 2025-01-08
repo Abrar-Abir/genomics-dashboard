@@ -4,7 +4,6 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 function Layout() {
-	// for toggling expand/collapse the main sidebar on the left
 	const [openSideBar, setOpenSideBar] = useState(false);
 	const toggleSideBar = () => {
 		setOpenSideBar(!openSideBar);
@@ -16,22 +15,15 @@ function Layout() {
 			: //   ? "https://genomics-dashboard-flask.onrender.com"
 			  "http://localhost:5001";
 
-	const [selectedFilterGrid, setSelectedFilterGrid] = useState({});
-
 	return (
 		<div className="h-screen w-screen overflow-hidden flex">
 			<Sidebar openSideBar={openSideBar} toggleSideBar={toggleSideBar} />
 			<div className="flex flex-col flex-1 overflow-auto">
-				<Header
-					openSideBar={openSideBar}
-					toggleSideBar={toggleSideBar}
-				/>
+				<Header openSideBar={openSideBar} toggleSideBar={toggleSideBar} />
 				<div className="flex-1 min-h-0 max-h-full w-full bg-gray-300/80 z-0 overflow-x-hidden ">
 					<Outlet
 						context={{
 							baseURL,
-							selectedFilterGrid,
-							setSelectedFilterGrid,
 						}}
 					/>
 				</div>

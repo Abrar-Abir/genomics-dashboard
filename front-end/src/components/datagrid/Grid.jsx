@@ -39,7 +39,7 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 								className=" text-center font-semibold"
 								style={
 									key === "Entity"
-										? { width: "14rem", border: "0.20rem solid white" }
+										? { width: "17rem", border: "0.20rem solid white" }
 										: {
 												writingMode: "vertical-rl",
 												transform: "rotate(180deg)",
@@ -60,30 +60,28 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 						const piData = data[pi];
 						return (
 							<>
-								<tr key={pi} className="bg-indigo-400 sticky z-20 top-[9rem]">
+								<tr key={pi} className="bg-teal-400 sticky z-20 top-[9rem]">
 									{tableHeaders.map((key) => (
 										<td
 											key={key}
 											onClick={key === "Entity" ? () => handleTogglePi(pi) : () => {}}
 											className={
 												key === "Entity"
-													? "px-4 text-right text-white font-normal  hover:bg-indigo-300 hover:cursor-pointer"
-													: key === "count"
-													? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white font-normal hover:cursor-pointer"
-													: piData.header[key] > 0
-													? "px-4 text-center bg-teal-400 hover:bg-teal-300 text-white font-normal hover:cursor-pointer"
+													? "px-4 text-right text-white font-normal  hover:bg-teal-300 hover:cursor-pointer"
+													: // : key === "count"
+													// ? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white font-normal hover:cursor-pointer"
+													piData.header[key] > 0
+													? "px-4 text-center bg-teal-600 hover:bg-teal-400 text-white font-normal hover:cursor-pointer"
 													: "px-4 text-center text-white"
 											}
 											style={
 												key === "Entity"
 													? {
-															width: "20rem",
-															height: "1rem",
+															width: "23rem",
 															border: "0.20rem solid white",
 													  }
 													: {
 															width: "5rem",
-															height: "1rem",
 															border: "0.20rem solid white",
 													  }
 											}
@@ -99,7 +97,7 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 										const projectData = piData.projects[project];
 										return (
 											<>
-												<tr key={project} className="bg-blue-gray-400 sticky z-10 top-[10.75rem]">
+												<tr key={project} className="bg-light-blue-700 sticky z-10 top-[10.75rem]">
 													<td style={{ width: "3rem" }} className="bg-white"></td>
 													{tableHeaders.map((key) => (
 														<td
@@ -109,23 +107,21 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 															}
 															className={
 																key === "Entity"
-																	? "px-4 text-right text-white hover:bg-blue-gray-300 hover:cursor-pointer"
-																	: key === "count"
-																	? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
-																	: projectData.header[key] > 0
-																	? "px-4 text-center bg-teal-400 hover:bg-teal-300 text-white hover:cursor-pointer"
+																	? "px-4 text-right text-white hover:bg-light-blue-500 hover:cursor-pointer"
+																	: // : key === "count"
+																	// ? "px-4 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																	projectData.header[key] > 0
+																	? "px-4 text-center bg-light-blue-900 hover:bg-light-blue-700 text-white hover:cursor-pointer"
 																	: "px-4 text-center"
 															}
 															style={
 																key === "Entity"
 																	? {
-																			width: "17rem",
-																			height: "1rem",
+																			width: "20rem",
 																			border: "0.20rem solid white",
 																	  }
 																	: {
 																			width: "5rem",
-																			height: "1rem",
 																			border: "0.20rem solid white",
 																	  }
 															}
@@ -141,7 +137,7 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 														sampleDict["Entity"] === "null" ? (
 															<tr
 																key={index}
-																className="bg-light-green-700  sticky z-5 top-[12.5rem]"
+																className="bg-blue-gray-400  sticky z-5 top-[12.5rem]"
 															>
 																<td style={{ width: "3rem" }} className="bg-white"></td>
 																<td style={{ width: "3rem" }} className="bg-white"></td>
@@ -153,17 +149,17 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 																		}
 																		className={
 																			key === "Entity"
-																				? "px-4 py-2 text-right text-white hover:bg-light-green-500 font-medianbold hover:cursor-pointer"
-																				: key === "count"
-																				? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
-																				: sampleDict[key] > 0
-																				? "px-4 py-2 text-center bg-teal-300 hover:bg-teal-300 text-white hover:cursor-pointer"
+																				? "px-4 py-2 text-right text-white hover:bg-blue-gray-300 font-medianbold hover:cursor-pointer"
+																				: // : key === "count"
+																				// ? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																				sampleDict[key] > 0
+																				? "px-4 py-2 text-center bg-blue-gray-600 hover:bg-blue-gray-400 text-white hover:cursor-pointer"
 																				: "px-4 py-2 text-center "
 																		}
 																		style={
 																			key === "Entity"
 																				? {
-																						width: "14rem",
+																						width: "17rem",
 																						border: "0.20rem solid white",
 																				  }
 																				: {
@@ -187,17 +183,17 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 																		key={key}
 																		className={
 																			key === "Entity"
-																				? "px-4 py-2 text-right text-black bg-blue-gray-50 hover:bg-blue-gray-100 font-semibold hover:cursor-pointer"
-																				: key === "count"
-																				? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
-																				: sampleDict[key] > 0
-																				? "px-4 py-2 text-center bg-teal-300 hover:bg-teal-300 text-white hover:cursor-pointer"
+																				? "px-4 py-2 text-right text-black bg-green-50 hover:bg-green-100 font-semibold hover:cursor-pointer"
+																				: // : key === "count"
+																				// ? "px-4 py-2 text-center bg-blue-400 hover:bg-blue-300 text-white hover:cursor-pointer"
+																				sampleDict[key] > 0
+																				? "px-4 py-2 text-center bg-green-400 hover:bg-green-300 text-white hover:cursor-pointer"
 																				: "px-4 py-2 text-center "
 																		}
 																		style={
 																			key === "Entity"
 																				? {
-																						width: "14rem",
+																						width: "17rem",
 																						border: "0.20rem solid white",
 																				  }
 																				: {
@@ -215,7 +211,7 @@ const AccordionTable = ({ data, tableHeaders, setShowProject }) => {
 																							String(sampleDict.other)
 																						}
 																					>
-																						<Badge color="blue">{sample}</Badge>
+																						<Badge color="blue">{sampleDict?.[key]}</Badge>
 																					</Tooltip>
 																				) : (
 																					sampleDict?.[key]

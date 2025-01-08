@@ -133,10 +133,8 @@ def get_where_clause(filter_dict, filter_key=None):
 
 sortList.append(get_id(columnsSorted, 'flowcell.loading_date'))
 ######## table page #######################################
-
-
-@ app.route('/type0')
-def type0():
+@ app.route('/database')
+def database():
     global sortList, database_filter
     limit = request.args.get('limit', default=50, type=int)
     offset = request.args.get('offset', default=0, type=int)
@@ -152,7 +150,7 @@ def type0():
         elif pos_id == -1:
             sortList = sortList[:neg_id] + sortList[neg_id + 1:]
     order_clause = get_order_clause()
-
+    print(order_clause)
     set_database_filter(request.args)
     where_clause = get_where_clause(database_filter)
 
@@ -195,8 +193,8 @@ def type0():
 
     return jsonify({"data": results, "total_count": total_count})
 
-@ app.route('/raw/<sample_id>')
-def raw(sample_id):
+@ app.route('/raw/database/<sample_id>')
+def raw_database(sample_id):
 	data_query = f"""
 			SELECT {alias_clause}
 			FROM sample
@@ -284,19 +282,13 @@ def export_database(format):
 # helper function for analytics
 
 
-def get_counts(column_name):
-	global database_filter
-	where_clause = get_where_clause(database_filter, column_name)
+def get_counts(column_name, join_clause, filter_dict):
+	# global database_filter
+	where_clause = get_where_clause(filter_dict, column_name)
 	query = f"""
         SELECT {column_name}, COUNT(*) AS frequency
         FROM sample
-        LEFT JOIN pool ON sample.pool_id = pool.pool_id
-        LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
-        LEFT JOIN submission ON sample.submission_id = submission.submission_id
-        LEFT JOIN project ON submission.project_id = project.project_id
-        LEFT JOIN i5 ON sample.i5_id = i5.i5_id
-        LEFT JOIN i7 ON sample.i7_id = i7.i7_id
-        LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+		{join_clause}
 		{where_clause}
         GROUP BY {column_name}
 		ORDER BY frequency DESC
@@ -305,19 +297,13 @@ def get_counts(column_name):
 	return [(str(row[0]), row[1]) for row in results]
 
 
-def get_range(column_name):
-	global database_filter
-	where_clause = get_where_clause(database_filter)
+def get_range(column_name, join_clause, filter_dict):
+	# global database_filter
+	where_clause = get_where_clause(filter_dict)
 	query = f"""
         SELECT MIN({column_name}), MAX({column_name})
         FROM sample
-        LEFT JOIN pool ON sample.pool_id = pool.pool_id
-        LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
-        LEFT JOIN submission ON sample.submission_id = submission.submission_id
-        LEFT JOIN project ON submission.project_id = project.project_id
-        LEFT JOIN i5 ON sample.i5_id = i5.i5_id
-        LEFT JOIN i7 ON sample.i7_id = i7.i7_id
-        LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
+		{join_clause}
 		{where_clause}
     """
 	results = fetch(cursor, query, 'one')
@@ -327,15 +313,23 @@ def get_range(column_name):
 @ app.route('/analytics/database')
 def analytics_database():
 	analytics_data = {}
+	global database_filter
+	join_clause = """LEFT JOIN pool ON sample.pool_id = pool.pool_id
+        LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
+        LEFT JOIN submission ON sample.submission_id = submission.submission_id
+        LEFT JOIN project ON submission.project_id = project.project_id
+        LEFT JOIN i5 ON sample.i5_id = i5.i5_id
+        LEFT JOIN i7 ON sample.i7_id = i7.i7_id
+        LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id"""
 	for table in schema["table"]:
 		for column in schema["table"][table]["entity"]:
 			if schema["table"][table]["entity"][column]["filter_option"]:
 				if "NUMERIC" in schema["table"][table]["entity"][column]["type"] or "DATE" in schema["table"][table]["entity"][column]["type"]:
 					analytics_data[f"{table}.{column}"] = get_range(
-                        f"{table}.{column}")
+                        f"{table}.{column}", join_clause, database_filter)
 				else:
 					analytics_data[f"{table}.{column}"] = get_counts(
-                        f"{table}.{column}")
+                        f"{table}.{column}", join_clause, database_filter)
 	# print(analytics_data)
 	return jsonify(analytics_data)
 
@@ -366,12 +360,12 @@ def search(entity):
 
 
 # ################ Datagrid Page #####################
-def agg_dict(l):
-	r = dict()
-	for d in l:
-		for k in d:
-			r[k] = r.get(k, 0) + d[k]
-	return r
+# def agg_dict(l):
+# 	r = dict()
+# 	for d in l:
+# 		for k in d:
+# 			r[k] = r.get(k, 0) + d[k]
+# 	return r
 
 def set_datagrid_filter(request_args):
 	global datagrid_filter
@@ -392,32 +386,28 @@ def set_datagrid_filter(request_args):
 				datagrid_filter[key] = f" {key} IN ({str(filter_str[1:-1])})"
 	return 0
 
-def get_distinct(entity):
-	query = f""" SELECT DISTINCT {entity.split('.')[1]} FROM {entity.split('.')[0]} ;"""
-	columns = fetch(cursor, query, 'all')
-	return [row[0] for row in columns]
 @ app.route('/analytics/datagrid')
 def analytics_datagrid():
 	analytics_data = {}
+	global datagrid_filter
+	join_clause = """LEFT JOIN submission ON sample.submission_id = submission.submission_id
+        LEFT JOIN project ON submission.project_id = project.project_id"""
 	columns = ['project.pi', 'project.project', 'submission.datatype']
 	for column in columns:
-		analytics_data[column] = get_distinct(column)
-	# print(analytics_data)
+		analytics_data[column] = get_counts(column, join_clause, datagrid_filter)
 	return jsonify(analytics_data)
 
 
 @ app.route('/datagrid')
 def datagrid():
 	global datagrid_filter
-	# print(datagrid_filter, request.args)
 	set_datagrid_filter(request.args)
-	# print(datagrid_filter)
-
-	where_clause = get_where_clause({k : v for k in datagrid_filter if k != 'show'})
-	# print(datagrid_filter, where_clause)
-	# show_clause = "('SDR100043')"
+	
+	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k != 'show'})
 	if 'show' in datagrid_filter:
-		# show_clause = get_where_clause({'show': datagrid_filter['show']})	
+		show_clause = f"""WHERE {datagrid_filter['show']}"""
+		if len(where_clause) != 0:
+			show_clause += f""" AND {where_clause[5:]}"""
 		show_query = f"""
 		  UNION ALL
 		  SELECT
@@ -425,7 +415,8 @@ def datagrid():
 			pi,
 			ARRAY_AGG(project) AS project,
 			ARRAY_AGG(datatype) AS datatype,
-			1 AS count
+			1 AS count,
+			0 AS category
           FROM
 			sample
 			LEFT JOIN submission ON sample.submission_id = submission.submission_id
@@ -445,7 +436,8 @@ def datagrid():
 			pi,
 			ARRAY_AGG(project) AS project,
 			ARRAY_AGG(datatype) AS datatype,
-			COUNT(*) AS count
+			COUNT(*) AS count,
+			2 AS category
           FROM
 			sample
 			LEFT JOIN submission ON sample.submission_id = submission.submission_id
@@ -456,7 +448,7 @@ def datagrid():
 		  HAVING
 		    COUNT(*) > 1
 		  UNION ALL
-		  SELECT 'null' AS sample_name, pi, project, datatype, COUNT(*) AS count
+		  SELECT 'null' AS sample_name, pi, project, datatype, COUNT(*) AS count, 1 AS category
 			FROM (
 				SELECT 
 					ARRAY_AGG(project) AS project,
@@ -466,6 +458,7 @@ def datagrid():
 				FROM sample
 					LEFT JOIN submission ON sample.submission_id = submission.submission_id
 					LEFT JOIN project ON submission.project_id = project.project_id
+				{where_clause}
 				GROUP BY pi, sample_name
 				HAVING COUNT(*) = 1
 			) AS single_row_samples
@@ -473,7 +466,7 @@ def datagrid():
 			{show_query}
 		  
 		  ORDER BY
-		  	count DESC
+		  	category DESC, count DESC
           )
         result;""" 
 
@@ -483,6 +476,8 @@ def datagrid():
 		results = None
 	else:
 		results = fetch_result[0][0]
+	if results == None:
+		return None
 	# return jsonify(results)
 	output = dict()
 	for row in results:
@@ -532,6 +527,9 @@ def datagrid():
 	columns = ['WGS30N', 'WGS90N', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA-20', 'mRNA-50', 'totRNA-50', 'totRNAGlob-50', '10XscRNA']
 	
 	return jsonify({"data": output, 'columns': ['Entity'] + columns + ['count']})
+
+# @app.route('/raw/datagrid')
+# def raw_datagrid():
 
 
 # @ app.route('/export/datagrid/<format>')
@@ -631,6 +629,10 @@ def datagrid():
 
 
 ####### overview page ##################################################
+def get_distinct(entity):
+	query = f""" SELECT DISTINCT {entity.split('.')[1]} FROM {entity.split('.')[0]} ORDER BY {entity.split('.')[1]} ASC;"""
+	columns = fetch(cursor, query, 'all')
+	return [row[0] for row in columns]
 
 
 @ app.route('/data1/<date>')
@@ -683,10 +685,8 @@ def data2a(date):
 	results = get_distinct('sample.status')
 
 	case_query = ""
-	print(results)
-	for row in results:
-		assert (len(row) == 1)
-		value = row[0]
+	# print(results)
+	for value in results:
 		case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else None}","""
 
 	query = f"""
