@@ -15,6 +15,12 @@ export default function Datagrid({
 	setData,
 	tableHeaders,
 	setTableHeaders,
+	openPi,
+	setOpenPi,
+	openProject,
+	setOpenProject,
+	hideSingleEntries,
+	setHideSingleEntries,
 	reset,
 }) {
 	const { baseURL } = useOutletContext();
@@ -27,24 +33,23 @@ export default function Datagrid({
 		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 		async function fetchData() {
 			try {
-				console.log("fetching data");
-				let apiUrl = `${baseURL}/datagrid?`;
+				let apiUrl = `${baseURL}/datagrid?hide=${hideSingleEntries ? "1" : "0"}`;
 				if (showProject.length > 0) {
-					apiUrl += `show=${JSON.stringify(showProject)}&`;
+					apiUrl += `&show=${JSON.stringify(showProject)}`;
 				}
 				if (Object.keys(selectedFilter).length > 0) {
 					Object.entries(selectedFilter).forEach(([key, values]) => {
 						if (values.length > 0) {
-							apiUrl += `${key}=${JSON.stringify(values)}&`;
+							apiUrl += `&${key}=${JSON.stringify(values)}`;
 						}
 					});
 				}
-				const dataResponse = await fetch(apiUrl.slice(0, -1));
+				const dataResponse = await fetch(apiUrl);
 
 				if (!dataResponse.ok) {
 					console.error("Server error:", dataResponse);
 				} else {
-					await delay(15);
+					await delay(5);
 					const dataResult = await dataResponse.json();
 					setData(dataResult.data);
 					setTableHeaders(Array.isArray(dataResult.columns) ? dataResult.columns : []);
@@ -62,7 +67,7 @@ export default function Datagrid({
 		}
 
 		fetchData();
-	}, [selectedFilter, showProject]);
+	}, [selectedFilter, showProject, hideSingleEntries]);
 
 	return (
 		<div className="flex flex-col h-screen">
@@ -74,8 +79,18 @@ export default function Datagrid({
 					data={filterPanelData}
 					setSelectedFilter={setSelectedFilter}
 					selectedFilter={selectedFilter}
+					hideSingleEntries={hideSingleEntries}
+					setHideSingleEntries={setHideSingleEntries}
 				/>
-				<Grid data={data} tableHeaders={tableHeaders} setShowProject={setShowProject} />
+				<Grid
+					data={data}
+					tableHeaders={tableHeaders}
+					setShowProject={setShowProject}
+					openPi={openPi}
+					setOpenPi={setOpenPi}
+					openProject={openProject}
+					setOpenProject={setOpenProject}
+				/>
 			</div>
 		</div>
 	);

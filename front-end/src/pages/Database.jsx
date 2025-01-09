@@ -33,6 +33,8 @@ export default function Database({
 	limit,
 	setLimit,
 	reset,
+	openAcc,
+	setOpenAcc,
 }) {
 	const { baseURL } = useOutletContext();
 
@@ -50,7 +52,7 @@ export default function Database({
 		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 		async function fetchData() {
 			try {
-				console.log(sortedColumns);
+				// console.log(sortedColumns);
 				const offset = (page - 1) * limit;
 				let apiUrl = `${baseURL}/database?limit=${limit}&offset=${offset}`;
 				if (columnToSort !== -1 && prevState.current.sortedColumns != sortedColumns) {
@@ -93,9 +95,6 @@ export default function Database({
 							prevState.current.sortedColumns === sortedColumns) ||
 						filterPanelData === null
 					) {
-						prevState.current.sortedColumns = sortedColumns;
-						prevState.current.page = page;
-						prevState.current.limit = limit;
 						const filterPanelResponse = await fetch(`${baseURL}/analytics/database`);
 						if (!filterPanelResponse.ok) {
 							console.error("Server error:", filterPanelResponse);
@@ -104,6 +103,9 @@ export default function Database({
 							setFilterPanelData(filterPanelResult);
 						}
 					}
+					prevState.current.sortedColumns = sortedColumns;
+					prevState.current.page = page;
+					prevState.current.limit = limit;
 				}
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -146,6 +148,8 @@ export default function Database({
 					setSelectedFilter={setSelectedFilter}
 					selectedFilter={selectedFilter}
 					setSelectedRanges={setSelectedRanges}
+					openAcc={openAcc}
+					setOpenAcc={setOpenAcc}
 					baseURL={baseURL}
 				/>
 

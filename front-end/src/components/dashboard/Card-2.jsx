@@ -19,9 +19,7 @@ export default function Card2(props) {
 		showLegend: true,
 		yAxisWidth: 56,
 		xAxisLabel: "PI",
-		categories: props.data2a
-			? Object.keys(props.data2a[0]).filter((key) => key !== "pi")
-			: [],
+		categories: props.data2a ? Object.keys(props.data2a[0]).filter((key) => key !== "pi") : [],
 	};
 
 	// Arguments to be passed to CustomBarChart2
@@ -41,11 +39,7 @@ export default function Card2(props) {
 
 	// console.log(props.data2a, props.data2b, props.data2c);
 	return (
-		<Card
-			decoration="top"
-			decorationColor="teal"
-			className="flex flex-col space-y-2 h-full"
-		>
+		<Card decoration="top" decorationColor="teal" className="flex flex-col space-y-2 h-full">
 			<div className="flex items-center space-x-0.5 font-cabin">
 				<Title> {props.title} </Title>
 				<Icon
@@ -56,26 +50,39 @@ export default function Card2(props) {
 				/>
 			</div>
 			<div className="flex justify-between items-center select-none">
-				<TabGroup
-					className="flex justify-start"
-					index={selectedTab}
-					onIndexChange={setSelectedTab}
-				>
+				<TabGroup className="flex justify-start" index={selectedTab} onIndexChange={setSelectedTab}>
 					<TabList color={"green"} variant="line">
-						<Tab key={0}>Data Sample Status</Tab>
-						<Tab key={1}>Projects</Tab>
-						<Tab key={2}>Reference Genome</Tab>
+						<Tab
+							key={0}
+							className={`${
+								selectedTab === 0 ? "bg-blue-gray-50 font-semibold" : ""
+							} px-4 py-2 rounded`}
+						>
+							Data Sample Status
+						</Tab>
+						<Tab
+							key={1}
+							className={`${
+								selectedTab === 1 ? "bg-blue-gray-50 font-semibold" : ""
+							} px-4 py-2 rounded`}
+						>
+							Projects
+						</Tab>
+						<Tab
+							key={2}
+							className={`${
+								selectedTab === 2 ? "bg-blue-gray-50 font-semibold" : ""
+							} px-4 py-2 rounded`}
+						>
+							Reference Genome
+						</Tab>
 					</TabList>
 				</TabGroup>
 			</div>
 			<div className="mt-4">
 				{selectedTab === 0 && <DataSampleStatusChart {...props1} />}
-				{selectedTab === 1 && props.data2b && (
-					<CustomBarChart2 {...props2} />
-				)}
-				{selectedTab === 2 && props.data2c && (
-					<CustomBarChart3 {...props3} />
-				)}
+				{selectedTab === 1 && props.data2b && <CustomBarChart2 {...props2} />}
+				{selectedTab === 2 && props.data2c && <CustomBarChart3 {...props3} />}
 			</div>
 		</Card>
 	);

@@ -7,11 +7,6 @@ import SearchBar from "../shared/SearchBar";
 
 import schema from "@lib/schema.json";
 
-// const baseURL =
-// 	process.env.NODE_ENV === "production"
-// 		? "http://172.32.79.51:5001"
-// 		: "http://127.0.0.1:5001";
-
 const tableHeadersAlias = Object.keys(schema.table).reduce((acc, table) => {
 	Object.keys(schema.table[table].entity).forEach((key) => {
 		acc[key] = schema.table[table].entity[key].alias;
@@ -28,9 +23,16 @@ const DatabaseHeader = (props) => {
 	// console.log(props);
 	const [allSuggestions, setAllSuggestions] = useState([]);
 	const SearchMenu = () => {
-		const allKeys = ["pi", "project", "submission", "flowcell", "sample"];
+		const allKeys = [
+			"project.pi",
+			"project.project",
+			"submission.submission_id",
+			"flowcell.flowcell_id",
+			"sample.sample_id",
+			"sample.sample_name",
+		];
 		const handleMenuClick = async (key) => {
-			props.setSearchKey(key);
+			props.setSearchKey(tableHeadersAlias[key.split(".")[1]]);
 			props.setSearchValue("");
 			const apiUrl = `${props.baseURL}/search/${key}`;
 			const dataResponse = await fetch(apiUrl);
@@ -51,7 +53,7 @@ const DatabaseHeader = (props) => {
 				<MenuList>
 					{allKeys.map((entity, index) => (
 						<MenuItem key={index} onMouseDown={() => handleMenuClick(entity)}>
-							{entity}
+							{tableHeadersAlias[entity.split(".")[1]]}
 						</MenuItem>
 					))}
 				</MenuList>
@@ -76,7 +78,11 @@ const DatabaseHeader = (props) => {
 			{/* SearchMenu and SearchBar in the center */}
 			<div className="flex space-x-4 items-center">
 				<SearchMenu />
-				<SearchBar allSuggestions={allSuggestions} setSearchValue={props.setSearchValue} />
+				<SearchBar
+					allSuggestions={allSuggestions}
+					setSearchValue={props.setSearchValue}
+					searchKey={props.searchKey}
+				/>
 			</div>
 
 			{/* MenuWithCheckbox and Menu on the right */}

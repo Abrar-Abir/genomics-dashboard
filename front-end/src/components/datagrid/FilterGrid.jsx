@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Accordion, AccordionHeader, AccordionBody, Typography } from "@material-tailwind/react";
+import {
+	Accordion,
+	AccordionHeader,
+	AccordionBody,
+	Typography,
+	Checkbox,
+} from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 function Icon({ open }) {
@@ -10,31 +16,30 @@ function Icon({ open }) {
 	);
 }
 
-export default function FilterGrid({ data, selectedFilter, setSelectedFilter }) {
+export default function FilterGrid({
+	data,
+	selectedFilter,
+	setSelectedFilter,
+	hideSingleEntries,
+	setHideSingleEntries,
+}) {
 	const [openAcc, setOpenAcc] = useState({});
 	const handleOpenAcc = (key) => {
 		setOpenAcc((prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
 	const toggleSelection = (filterKey, item) => {
-		// console.log("toggleselection", filterKey, item);
 		setSelectedFilter((prevSelectedItems) => {
-			// console.log("setselectedfiletr");
-			// console.log("prev", prevSelectedItems);
 			const newSelectedItems = { ...prevSelectedItems };
 			if (!newSelectedItems[filterKey]) {
 				newSelectedItems[filterKey] = [];
-				// console.log("array initialized", filterKey);
 			}
 			const index = newSelectedItems[filterKey].indexOf(item);
 			if (index > -1) {
 				newSelectedItems[filterKey] = newSelectedItems[filterKey].filter((val) => val !== item);
-				// console.log("item removed", item);
 			} else {
 				newSelectedItems[filterKey] = [...newSelectedItems[filterKey], item];
-				// console.log("item added", item);
 			}
-			// console.log("new", newSelectedItems);
 			return newSelectedItems;
 		});
 	};
@@ -53,7 +58,7 @@ export default function FilterGrid({ data, selectedFilter, setSelectedFilter }) 
 			<AccordionBody className="py-2 px-1 bg-white max-h-40 overflow-y-auto">
 				{items.length > 0 ? (
 					<div className="max-h-32 overflow-y-auto py-2">
-						{items.map(([value, count], index) => {
+						{items.map((value, index) => {
 							const isSelected = selectedFilter[filterKey]?.includes(value) || false;
 							return (
 								<div
@@ -62,12 +67,11 @@ export default function FilterGrid({ data, selectedFilter, setSelectedFilter }) 
 										isSelected ? "bg-blue-500/60" : "hover:bg-blue-gray-500/10"
 									}`}
 									onClick={(e) => {
-										// e.stopPropagation();
 										toggleSelection(filterKey, value);
 									}}
 								>
 									<span className="text-black">{value}</span>
-									<span className="text-gray-800 mr-2">{count}</span>
+									{/* <span className="text-gray-800 mr-2">{count}</span> */}
 								</div>
 							);
 						})}
@@ -128,6 +132,11 @@ export default function FilterGrid({ data, selectedFilter, setSelectedFilter }) 
 			<Typography variant="h6" color="blue-gray" className="mb-2 flex justify-between">
 				Filters
 			</Typography>
+			<Checkbox
+				checked={hideSingleEntries}
+				onClick={() => setHideSingleEntries(!hideSingleEntries)}
+				label={<Typography className="text-sm"> Hide Single Entry Samples </Typography>}
+			/>
 			{data && (
 				<>
 					{renderAccordion("project", ["pi", "project"])}

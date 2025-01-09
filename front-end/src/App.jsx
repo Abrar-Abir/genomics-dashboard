@@ -49,7 +49,7 @@ function App() {
 		.map((col) => (tableHeadersView[col] ? "1" : "0"))
 		.join("");
 	const trinaryString = tableHeadersDatabase
-		.map((col) => (col === "loading_date" ? "1" : "0"))
+		.map((col) => (col === "loading_date" ? "1" : col === "submission_id" ? "1" : "0"))
 		.join("");
 
 	const [selectedFilterDatabase, setSelectedFilterDatabase] = useState({});
@@ -66,12 +66,17 @@ function App() {
 	const [limitDatabase, setLimitDatabase] = useState(50);
 	const [filterPanelDataDatabase, setFilterPanelDataDatabase] = useState(null);
 
+	const [openAccDatabase, setOpenAccDatabase] = useState({});
+
 	const resetDatabase = () => {
+		setSearchKeyDatabase("Search");
 		setSearchValueDatabase("");
 		setSelectedFilterDatabase({});
 		setSelectedRangesDatabase({});
 		setSelectedColumnsDatabase(binaryString);
 		setSortedColumnsDatabase(trinaryString);
+		setColumnToSortDatabase(-1);
+		setOpenAccDatabase({});
 	};
 
 	// Datagrid Props
@@ -80,9 +85,15 @@ function App() {
 	const [dataDatagrid, setDataDatagrid] = useState([]);
 	const [filterPanelDataDatagrid, setFilterPanelDataDatagrid] = useState(null);
 	const [tableHeadersDatagrid, setTableHeadersDatagrid] = useState([]);
-
+	const [openPiDatagrid, setOpenPiDatagrid] = useState({});
+	const [openProjectDatagrid, setOpenProjectDatagrid] = useState({});
+	const [hideSingleEntriesDatagrid, setHideSingleEntriesDatagrid] = useState(false);
 	const resetDatagrid = () => {
 		setSelectedFilterDatagrid({});
+		setShowProjectDatagrid([]);
+		setOpenPiDatagrid({});
+		setOpenProjectDatagrid({});
+		setHideSingleEntriesDatagrid(false);
 	};
 
 	// Plot Page Props
@@ -135,6 +146,8 @@ function App() {
 								limit={limitDatabase}
 								setLimit={setLimitDatabase}
 								reset={resetDatabase}
+								openAcc={openAccDatabase}
+								setOpenAcc={setOpenAccDatabase}
 							/>
 						}
 					/>
@@ -152,6 +165,12 @@ function App() {
 								setData={setDataDatagrid}
 								tableHeaders={tableHeadersDatagrid}
 								setTableHeaders={setTableHeadersDatagrid}
+								openPi={openPiDatagrid}
+								setOpenPi={setOpenPiDatagrid}
+								openProject={openProjectDatagrid}
+								setOpenProject={setOpenProjectDatagrid}
+								hideSingleEntries={hideSingleEntriesDatagrid}
+								setHideSingleEntries={setHideSingleEntriesDatagrid}
 								reset={resetDatagrid}
 							/>
 						}

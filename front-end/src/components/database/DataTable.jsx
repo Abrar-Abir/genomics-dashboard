@@ -18,7 +18,7 @@ const JsonIcon = ({ baseURL, sample_id }) => (
 	<img
 		src={JsonPng}
 		onClick={() => window.open(`${baseURL}/raw/database/${sample_id}`, "_blank")}
-		className="ml-2 w-4 h-4 text-blue-500"
+		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
 	></img>
 );
 const HtmlIcon = ({ col, id }) => (
@@ -34,7 +34,7 @@ const HtmlIcon = ({ col, id }) => (
 				"_blank"
 			)
 		}
-		className="ml-2 h-2 text-blue-500"
+		className="ml-2 h-2.5 cursor-pointer hover:bg-blue-300 rounded"
 	></img>
 );
 
@@ -52,7 +52,7 @@ const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => 
 	return acc;
 }, {});
 
-const bgColors = ["bg-blue-", "bg-red-", "bg-blue-"];
+const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
 
 function DataTable(props) {
 	// handle 'view' functionalities for show/hide-ing columns
@@ -72,8 +72,7 @@ function DataTable(props) {
 	}, [props.selectedColumns]);
 
 	const data = Array.isArray(props.data) ? props.data : [];
-	// console.log("table", data);
-	//   lanes for mean_qscore manual processing
+
 	const countTrueLanes = (row) => {
 		return Object.keys(row).filter((key) => key.startsWith("lane_") && row[key] === true).length;
 	};
@@ -97,7 +96,8 @@ function DataTable(props) {
 	const handleSort = (index) => {
 		props.setSortedColumns((prevTrinary) => sortBit(prevTrinary, index));
 		props.setColumnToSort(index);
-		console.log("setcoltosort", index);
+		// console.log("setcoltosort", index);
+		// console.log(props.sortedColumns);
 	};
 
 	const getArrowIcon = (head) => {
@@ -173,13 +173,14 @@ function DataTable(props) {
 														) : head === "flowcell_id" ? (
 															<>
 																<div className="flex items-center space-x-4">
-																	{row[head]} <HtmlIcon col="flowcell" id={row[head]} />
+																	{row[head]} <HtmlIcon id={row[head]} />
 																</div>
 															</>
 														) : head === "submission_id" ? (
 															<>
-																<div className="flex items-center space-x-4">
-																	{row[head]} <HtmlIcon col="submission" id={row[head]} />
+																<div className="flex items-center justify-between">
+																	<div>{row[head]}</div>
+																	<HtmlIcon id={row[head]} />
 																</div>
 															</>
 														) : head === "sample_id" ? (

@@ -19,7 +19,7 @@ const MenuWithCheckbox = (props) => {
 	};
 	const handleFlip = (index) => {
 		props.setSelectedColumns((prevBinary) => flipBit(prevBinary, index));
-		// props.setToggleColumn(index);
+		// props.setToggleColumn(index)
 	};
 
 	return (
@@ -32,18 +32,13 @@ const MenuWithCheckbox = (props) => {
 				<DialogBody>
 					<div className="grid grid-cols-3 gap-4">
 						{props.columns.map((column, index) => (
-							<div
-								key={index}
-								className="flex items-center space-x-2"
-							>
+							<div key={index} className="flex items-center space-x-2">
 								<Checkbox
 									ripple={false}
 									id={index}
 									containerProps={{ className: "p-0" }}
 									className="hover:before:content-none"
-									checked={
-										props.selectedColumns[index] === "1"
-									}
+									checked={props.selectedColumns[index] === "1"}
 									onChange={() => handleFlip(index)}
 								/>
 								<span>{column}</span>
@@ -52,11 +47,7 @@ const MenuWithCheckbox = (props) => {
 					</div>
 				</DialogBody>
 				<DialogFooter>
-					<Button
-						variant="gradient"
-						color="green"
-						onClick={handleOpen}
-					>
+					<Button variant="gradient" color="green" onClick={handleOpen}>
 						<span>Confirm</span>
 					</Button>
 				</DialogFooter>

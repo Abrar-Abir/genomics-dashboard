@@ -17,8 +17,16 @@ function Icon({ open }) {
 	);
 }
 
-export default function FilterPanel(props) {
-	const [openAcc, setOpenAcc] = useState({});
+export default function FilterPanel({
+	data,
+	setSelectedFilter,
+	selectedFilter,
+	setSelectedRanges,
+	openAcc,
+	setOpenAcc,
+	baseURL,
+}) {
+	// const [openAcc, setOpenAcc] = useState({});
 	const [allExpanded, setAllExpanded] = useState(false);
 
 	const handleOpenAcc = (key) => {
@@ -35,7 +43,7 @@ export default function FilterPanel(props) {
 	};
 
 	const toggleSelection = (filterKey, item) => {
-		props.setSelectedFilter((prevSelectedItems) => {
+		setSelectedFilter((prevSelectedItems) => {
 			const newSelectedItems = { ...prevSelectedItems };
 			if (!newSelectedItems[filterKey]) {
 				newSelectedItems[filterKey] = [];
@@ -53,7 +61,7 @@ export default function FilterPanel(props) {
 	};
 
 	const handleRangeChange = (key, index, value) => {
-		props.setSelectedRanges((prev) => {
+		setSelectedRanges((prev) => {
 			const updatedRanges = {
 				...prev,
 				[key]: prev[key] || ["", ""],
@@ -70,7 +78,7 @@ export default function FilterPanel(props) {
 	const start = (key, innerKey) => (
 		<Input
 			variant="standard"
-			label={props.data?.[`${key}.${innerKey}`][0]}
+			label={data?.[`${key}.${innerKey}`][0]}
 			placeholder={innerKey.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") {
@@ -82,7 +90,7 @@ export default function FilterPanel(props) {
 	const end = (key, innerKey) => (
 		<Input
 			variant="standard"
-			label={props.data?.[`${key}.${innerKey}`][1]}
+			label={data?.[`${key}.${innerKey}`][1]}
 			placeholder={innerKey.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") {
@@ -130,7 +138,7 @@ export default function FilterPanel(props) {
 				{items.length > 0 ? (
 					<div className="max-h-32 overflow-y-auto py-2">
 						{items.map(([value, count], index) => {
-							const isSelected = props.selectedFilter[filterKey]?.includes(value) || false;
+							const isSelected = selectedFilter[filterKey]?.includes(value) || false;
 							return (
 								<div
 									key={index}
@@ -179,7 +187,7 @@ export default function FilterPanel(props) {
 					<AccordionBody>
 						{value[innerKey].type.includes("NUMERIC") || value[innerKey].type.includes("DATE")
 							? renderRangeControl(key, innerKey)
-							: renderAccordionBody(key, innerKey, props.data?.[`${key}.${innerKey}`])}
+							: renderAccordionBody(key, innerKey, data?.[`${key}.${innerKey}`])}
 					</AccordionBody>
 				</Accordion>
 			);
@@ -219,9 +227,8 @@ export default function FilterPanel(props) {
 					{allExpanded ? "Collapse All [-]" : "Expand All [+]"}
 				</span>
 			</Typography>
-			{props.data &&
-				Object.keys(schema.table).map((key) => renderAccordion(`${key}`, schema.table[key]))}
-			{!props.data && <div className="flex justify-center items-center w-full">No data</div>}
+			{data && Object.keys(schema.table).map((key) => renderAccordion(`${key}`, schema.table[key]))}
+			{!data && <div className="flex justify-center items-center w-full">No data</div>}
 		</div>
 	);
 }

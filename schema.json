@@ -107,7 +107,7 @@
 					"alias": "Sequencer ID",
 					"group": 1,
 					"source": "runs directory -> 2nd substring separated by '_'",
-					"order": 22
+					"order": 21
 				}
 			},
 			"primary_key": [
@@ -136,7 +136,7 @@
 					"alias": "Submission Date",
 					"group": 0,
 					"source": "raw.info -> infix of 'project name' column",
-					"order": 6
+					"order": 7
 				},
 				"datatype": {
 					"type": "VARCHAR(16)",
@@ -146,7 +146,7 @@
 					"alias": "Datatype",
 					"group": 0,
 					"source": "raw.info -> infix of 'project name' column",
-					"order": 7
+					"order": 8
 				},
 				"requirement": {
 					"type": "VARCHAR(32)",
@@ -166,7 +166,7 @@
 					"alias": "Coverage",
 					"group": 0,
 					"source": "raw.info -> 'Comments' column -> COV value",
-					"order": 11
+					"order": 12
 				},
 				"srv": {
 					"type": "VARCHAR(16)",
@@ -186,7 +186,7 @@
 					"alias": "Analysis",
 					"group": 0,
 					"source": "raw.info -> 'Comments' column -> ANL value",
-					"order": 12
+					"order": 13
 				},
 				"rg": {
 					"type": "VARCHAR(16)",
@@ -196,7 +196,7 @@
 					"alias": "Ref. Genome",
 					"group": 0,
 					"source": "raw.info -> 'Comments' column -> RG value",
-					"order": 10
+					"order": 11
 				},
 				"comment": {
 					"type": "VARCHAR(100)",
@@ -206,7 +206,7 @@
 					"alias": "Comment",
 					"group": 0,
 					"source": "raw.info -> 'Comments' column",
-					"order": 8
+					"order": 10
 				}
 			},
 			"primary_key": [
@@ -225,9 +225,9 @@
 					"filter_option": true,
 					"view": true,
 					"alias": "Flowcell ID",
-					"group": 1,
+					"group": 0,
 					"source": "fcqc directory -> html file path",
-					"order": 11
+					"order": 6
 				},
 				"flowcell_type": {
 					"type": "VARCHAR(16)",
@@ -237,7 +237,7 @@
 					"alias": "Flowcell Type",
 					"group": 1,
 					"source": "raw.info -> 'FC Type' column",
-					"order": 12
+					"order": 11
 				},
 				"loaded_by": {
 					"type": "VARCHAR(16)",
@@ -247,7 +247,7 @@
 					"alias": "Loaded By",
 					"group": 1,
 					"source": "raw.info -> 'Loaded By' column",
-					"order": 30
+					"order": 29
 				},
 				"loading_date": {
 					"type": "DATE",
@@ -257,7 +257,7 @@
 					"alias": "Loading Date",
 					"group": 1,
 					"source": "runs directory -> 1st substring separated by '_' -> parsed as yymmdd",
-					"order": 28
+					"order": 27
 				},
 				"completion_date": {
 					"type": "DATE",
@@ -267,7 +267,7 @@
 					"alias": "Completion Date",
 					"group": 1,
 					"source": "raw.info -> 'Completion Date' column",
-					"order": 29
+					"order": 28
 				},
 				"demultiplex_date": {
 					"type": "DATE",
@@ -297,7 +297,7 @@
 					"alias": "Order No",
 					"group": 1,
 					"source": "raw.info -> 'Order No' column",
-					"order": 24
+					"order": 23
 				},
 				"position": {
 					"type": "VARCHAR(08)",
@@ -307,7 +307,7 @@
 					"alias": "Flowcell Position",
 					"group": 1,
 					"source": "runs directory -> 1st char of last substring separated by '_'",
-					"order": 23
+					"order": 22
 				},
 				"run_id": {
 					"type": "VARCHAR(08)",
@@ -317,7 +317,7 @@
 					"alias": "Run ID",
 					"group": 1,
 					"source": "runs directory -> 3rd substring separated by '_'",
-					"order": 25
+					"order": 24
 				},
 				"multiqc_version": {
 					"type": "VARCHAR(04)",
@@ -358,7 +358,7 @@
 					"alias": "PF Reads (B)",
 					"group": 1,
 					"source": "raw.info -> 'PF Reads' / 'Reads PF(B)' column",
-					"order": 27
+					"order": 26
 				},
 				"loading_conc": {
 					"type": "NUMERIC(7,2)",
@@ -368,7 +368,7 @@
 					"alias": "Loading Conc.(nM)",
 					"group": 1,
 					"source": "raw.info -> 'LabChip/Bioanalyzer Conc. (nM)' / 'LabChip/Bioanalyzer Conc. (pM)' column",
-					"order": 26
+					"order": 25
 				},
 				"q30": {
 					"type": "NUMERIC(5,2)",
@@ -388,7 +388,7 @@
 					"alias": "Lane 1",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L1",
-					"order": 14
+					"order": 13
 				},
 				"lane_2": {
 					"type": "BOOLEAN",
@@ -398,7 +398,7 @@
 					"alias": "Lane 2",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L2",
-					"order": 15
+					"order": 14
 				},
 				"lane_3": {
 					"type": "BOOLEAN",
@@ -408,7 +408,7 @@
 					"alias": "Lane 3",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L3",
-					"order": 16
+					"order": 15
 				},
 				"lane_4": {
 					"type": "BOOLEAN",
@@ -418,7 +418,7 @@
 					"alias": "Lane 4",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L4",
-					"order": 17
+					"order": 16
 				},
 				"lane_5": {
 					"type": "BOOLEAN",
@@ -428,7 +428,7 @@
 					"alias": "Lane 5",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L5",
-					"order": 18
+					"order": 17
 				},
 				"lane_6": {
 					"type": "BOOLEAN",
@@ -438,7 +438,7 @@
 					"alias": "Lane 6",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L6",
-					"order": 19
+					"order": 18
 				},
 				"lane_7": {
 					"type": "BOOLEAN",
@@ -448,7 +448,7 @@
 					"alias": "Lane 7",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L7",
-					"order": 20
+					"order": 19
 				},
 				"lane_8": {
 					"type": "BOOLEAN",
@@ -458,7 +458,7 @@
 					"alias": "Lane 8",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> True if value = L8",
-					"order": 21
+					"order": 20
 				},
 				"lane": {
 					"type": "VARCHAR(32)",
@@ -468,7 +468,7 @@
 					"alias": "Lanes",
 					"group": 1,
 					"source": "raw.info -> 'Lane' column -> Concatenated for each Sample ID",
-					"order": 13
+					"order": 12
 				}
 			},
 			"primary_key": [
@@ -581,7 +581,7 @@
 					"alias": "Remark",
 					"group": 1,
 					"source": "raw.info -> 'Remark' column",
-					"order": 31
+					"order": 30
 				},
 				"lib_received": {
 					"type": "VARCHAR(17)",
@@ -591,7 +591,7 @@
 					"alias": "Libraries & Info Received Date",
 					"group": 1,
 					"source": "raw.info -> 'Libraries & Info Received Date' / 'Libraries & Info Received & Due Date' column",
-					"order": 32
+					"order": 31
 				},
 				"sample_qc": {
 					"type": "VARCHAR(08)",
