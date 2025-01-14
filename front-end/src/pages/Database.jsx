@@ -26,6 +26,7 @@ export default function Database({
 	data,
 	setData,
 	tableHeaders,
+	tableHeadersProperties,
 	totalCount,
 	setTotalCount,
 	page,
@@ -37,10 +38,7 @@ export default function Database({
 	setOpenAcc,
 }) {
 	const { baseURL } = useOutletContext();
-
-	const handleExport = (format) => {
-		window.location.href = `${baseURL}/export/database/${format}`;
-	};
+	// console.log("bin str", selectedColumns);
 
 	const prevState = useRef({
 		sortedColumns: sortedColumns,
@@ -132,14 +130,14 @@ export default function Database({
 		<div className="flex flex-col h-screen overflow-y-hidden">
 			<div className="flex-shrink-0">
 				<DatabaseHeader
-					reset={reset}
+					baseURL={baseURL}
+					tableHeaders={tableHeaders}
+					searchKey={searchKey}
+					setSearchKey={setSearchKey}
 					setSearchValue={setSearchValue}
 					selectedColumns={selectedColumns}
-					setSearchKey={setSearchKey}
-					searchKey={searchKey}
 					setSelectedColumns={setSelectedColumns}
-					baseURL={baseURL}
-					handleExport={handleExport}
+					reset={reset}
 				/>
 			</div>
 			<div className="flex flex-grow overflow-y-hidden overflow-x-auto">
@@ -163,6 +161,7 @@ export default function Database({
 					handleLimit={handleLimit}
 					selectedColumns={selectedColumns}
 					tableHeaders={tableHeaders}
+					tableHeadersProperties={tableHeadersProperties}
 					sortedColumns={sortedColumns}
 					setSortedColumns={setSortedColumns}
 					setColumnToSort={setColumnToSort}

@@ -37,20 +37,44 @@ function App() {
 
 	const tableHeadersView = Object.keys(schema.table).reduce((acc, table) => {
 		Object.keys(schema.table[table].entity).forEach((key) => {
-			acc[key] = schema.table[table].entity[key].view;
+			acc[schema.table[table].entity[key].alias] = schema.table[table].entity[key].view;
 		});
 		return acc;
 	}, {});
 
 	const tableHeadersDatabase = Object.keys(schema.table)
-		.flatMap((table) => Object.keys(schema.table[table].entity))
+		.flatMap((table) => Object.values(schema.table[table].entity).map((entity) => entity.alias))
 		.sort();
+
+	// console.log("headers", tableHeadersDatabase);
 	const binaryString = tableHeadersDatabase
 		.map((col) => (tableHeadersView[col] ? "1" : "0"))
 		.join("");
+	// console.log("bin str", binaryString);
 	const trinaryString = tableHeadersDatabase
 		.map((col) => (col === "loading_date" ? "1" : col === "submission_id" ? "1" : "0"))
 		.join("");
+
+	const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
+		Object.keys(schema.table[table].entity).forEach((key) => {
+			if (!acc[schema.table[table].entity[key].alias]) {
+				acc[schema.table[table].entity[key].alias] = {};
+			}
+
+			// acc[key].alias = schema.table[table].entity[key].alias;
+			acc[schema.table[table].entity[key].alias].group = schema.table[table].entity[key].group;
+			acc[schema.table[table].entity[key].alias].source = schema.table[table].entity[key].source;
+			acc[schema.table[table].entity[key].alias].order = schema.table[table].entity[key].order;
+		});
+		return acc;
+	}, {});
+
+	const sampleTableHeaders = tableHeadersDatabase.sort(
+		(col1, col2) =>
+			tableHeadersProperties[col1].group * 100 +
+			tableHeadersProperties[col1].order -
+			(tableHeadersProperties[col2].group * 100 + tableHeadersProperties[col2].order)
+	);
 
 	const [selectedFilterDatabase, setSelectedFilterDatabase] = useState({});
 	const [selectedRangesDatabase, setSelectedRangesDatabase] = useState({});
@@ -78,6 +102,7 @@ function App() {
 		setColumnToSortDatabase(-1);
 		setOpenAccDatabase({});
 	};
+	// console.log("selectcol", selectedColumnsDatabase);
 
 	// Datagrid Props
 	const [selectedFilterDatagrid, setSelectedFilterDatagrid] = useState({});
@@ -139,6 +164,7 @@ function App() {
 								data={dataDatabase}
 								setData={setDataDatabase}
 								tableHeaders={tableHeadersDatabase}
+								tableHeadersProperties={tableHeadersProperties}
 								totalCount={totalCountDatabase}
 								setTotalCount={setTotalCountDatabase}
 								page={pageDatabase}
@@ -171,6 +197,8 @@ function App() {
 								setOpenProject={setOpenProjectDatagrid}
 								hideSingleEntries={hideSingleEntriesDatagrid}
 								setHideSingleEntries={setHideSingleEntriesDatagrid}
+								sampleTableHeaders={sampleTableHeaders}
+								sampleTableHeadersProperties={tableHeadersProperties}
 								reset={resetDatagrid}
 							/>
 						}

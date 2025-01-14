@@ -9,7 +9,7 @@ import {
 
 import { ArrowsUpDownIcon, ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import schema from "@lib/schema.json";
+// import schema from "@lib/schema.json";
 import { useState, useEffect } from "react";
 import JsonPng from "@assets/json.png";
 import MultiQCLogo from "@assets/multiqc_logo_color.png";
@@ -17,7 +17,7 @@ import MultiQCLogo from "@assets/multiqc_logo_color.png";
 const JsonIcon = ({ baseURL, sample_id }) => (
 	<img
 		src={JsonPng}
-		onClick={() => window.open(`${baseURL}/raw/database/${sample_id}`, "_blank")}
+		onClick={() => window.open(`${baseURL}/export/database/raw?sample_id=${sample_id}`, "_blank")}
 		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
 	></img>
 );
@@ -38,35 +38,40 @@ const HtmlIcon = ({ col, id }) => (
 	></img>
 );
 
-const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
-	Object.keys(schema.table[table].entity).forEach((key) => {
-		if (!acc[key]) {
-			acc[key] = {};
-		}
+// const props.tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
+// 	Object.keys(schema.table[table].entity).forEach((key) => {
+// 		if (!acc[key]) {
+// 			acc[key] = {};
+// 		}
 
-		acc[key].alias = schema.table[table].entity[key].alias;
-		acc[key].group = schema.table[table].entity[key].group;
-		acc[key].source = schema.table[table].entity[key].source;
-		acc[key].order = schema.table[table].entity[key].order;
-	});
-	return acc;
-}, {});
+// 		acc[key].alias = schema.table[table].entity[key].alias;
+// 		acc[key].group = schema.table[table].entity[key].group;
+// 		acc[key].source = schema.table[table].entity[key].source;
+// 		acc[key].order = schema.table[table].entity[key].order;
+// 	});
+// 	return acc;
+// }, {});
 
 const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
 
 function DataTable(props) {
-	// handle 'view' functionalities for show/hide-ing columns
+	// console.log(props.tableHeaders);
+	// console.log("prop", props.tableHeadersProperties);
+	// console.log("seleccol", props.selectedColumns);
 	const resetTableHeaders = (binaryStr) => {
 		const columnsSelected = props.tableHeaders.filter((col, index) => binaryStr[index] === "1");
+		// console.log("columnsSelected", columnsSelected);
+		// console.log("binary string", binaryStr);
 		return columnsSelected.sort(
 			(col1, col2) =>
-				tableHeadersProperties[col1].group * 100 +
-				tableHeadersProperties[col1].order -
-				(tableHeadersProperties[col2].group * 100 + tableHeadersProperties[col2].order)
+				props.tableHeadersProperties[col1].group * 100 +
+				props.tableHeadersProperties[col1].order -
+				(props.tableHeadersProperties[col2].group * 100 + props.tableHeadersProperties[col2].order)
 		);
 	};
 
 	const [tableHeaders, setTableHeaders] = useState(() => resetTableHeaders(props.selectedColumns));
+	// console.log("tableHeaders", tableHeaders);
 	useEffect(() => {
 		setTableHeaders(resetTableHeaders(props.selectedColumns));
 	}, [props.selectedColumns]);
@@ -74,7 +79,7 @@ function DataTable(props) {
 	const data = Array.isArray(props.data) ? props.data : [];
 
 	const countTrueLanes = (row) => {
-		return Object.keys(row).filter((key) => key.startsWith("lane_") && row[key] === true).length;
+		return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
 	};
 
 	//   handle sorting
@@ -96,8 +101,6 @@ function DataTable(props) {
 	const handleSort = (index) => {
 		props.setSortedColumns((prevTrinary) => sortBit(prevTrinary, index));
 		props.setColumnToSort(index);
-		// console.log("setcoltosort", index);
-		// console.log(props.sortedColumns);
 	};
 
 	const getArrowIcon = (head) => {
@@ -125,14 +128,14 @@ function DataTable(props) {
 									{tableHeaders.map((head) => {
 										return (
 											<th key={head} className="border-b border-gray-300 !p-4">
-												<Tooltip content={tableHeadersProperties[head].source}>
+												<Tooltip content={props.tableHeadersProperties[head].source}>
 													<div className="flex items-center space-x-2">
 														<Typography
 															color="blue-gray"
 															variant="small"
 															className="!font-bold"
 														></Typography>
-														{tableHeadersProperties[head].alias} {getArrowIcon(head)}
+														{head} {getArrowIcon(head)}
 													</div>
 												</Tooltip>
 											</th>
@@ -145,7 +148,7 @@ function DataTable(props) {
 									<tr key={rowIndex}>
 										{tableHeaders.map((head) => {
 											const bgColor =
-												bgColors[tableHeadersProperties[head].group] +
+												bgColors[props.tableHeadersProperties[head].group] +
 												String((1 + (rowIndex % 2)) * 50);
 											return (
 												<td key={head} className={`!p-4 ${bgColor}`}>
@@ -154,7 +157,7 @@ function DataTable(props) {
 														color={row[head] === "" ? "red" : "blue-gray"}
 														className={typeof row[head] === "boolean" ? "font-semibold" : ""}
 													>
-														{head === "position" ? (
+														{head === "Flowcell Position" ? (
 															row[head] === "true" ? (
 																"A"
 															) : (
@@ -166,24 +169,24 @@ function DataTable(props) {
 															) : (
 																"False"
 															)
-														) : head === "yieldq30" ? (
+														) : head === "Yield Q30 (Gb)" ? (
 															(row[head] / Math.pow(10, 9)).toFixed(3)
-														) : head === "mean_qscore" ? (
+														) : head === "Mean Q Score" ? (
 															(row[head] / (2 * countTrueLanes(row))).toFixed(2)
-														) : head === "flowcell_id" ? (
+														) : head === "Flowcell ID" ? (
 															<>
 																<div className="flex items-center space-x-4">
 																	{row[head]} <HtmlIcon id={row[head]} />
 																</div>
 															</>
-														) : head === "submission_id" ? (
+														) : head === "Submission ID" ? (
 															<>
 																<div className="flex items-center justify-between">
 																	<div>{row[head]}</div>
 																	<HtmlIcon id={row[head]} />
 																</div>
 															</>
-														) : head === "sample_id" ? (
+														) : head === "LIMS ID" ? (
 															<>
 																<div className="flex items-center space-x-4">
 																	{row[head]}{" "}

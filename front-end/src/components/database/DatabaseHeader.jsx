@@ -5,22 +5,34 @@ import { AdjustmentsVerticalIcon, ArrowDownTrayIcon } from "@heroicons/react/24/
 import MenuWithCheckbox from "../shared/Menu";
 import SearchBar from "../shared/SearchBar";
 
-import schema from "@lib/schema.json";
+// import schema from "@lib/schema.json";
 
-const tableHeadersAlias = Object.keys(schema.table).reduce((acc, table) => {
-	Object.keys(schema.table[table].entity).forEach((key) => {
-		acc[key] = schema.table[table].entity[key].alias;
-	});
-	return acc;
-}, {});
+// const tableHeadersAlias = Object.keys(schema.table).reduce((acc, table) => {
+// 	Object.keys(schema.table[table].entity).forEach((key) => {
+// 		acc[key] = schema.table[table].entity[key].alias;
+// 	});
+// 	return acc;
+// }, {});
 
-const columns = Object.keys(schema.table)
-	.flatMap((table) => Object.keys(schema.table[table].entity))
-	.sort();
+// const columns = Object.keys(schema.table)
+// 	.flatMap((table) => Object.keys(schema.table[table].entity))
+// 	.sort();
 
-const columnsAlias = columns.map((col) => tableHeadersAlias[col]);
-const DatabaseHeader = (props) => {
+// const columnsAlias = columns.map((col) => tableHeadersAlias[col]);
+const DatabaseHeader = ({
+	baseURL,
+	tableHeaders,
+	searchKey,
+	setSearchKey,
+	setSearchValue,
+	selectedColumns,
+	setSelectedColumns,
+	reset,
+}) => {
 	// console.log(props);
+	const handleExport = (format) => {
+		window.open(`${baseURL}/export/database/${format}`, "_blank");
+	};
 	const [allSuggestions, setAllSuggestions] = useState([]);
 	const SearchMenu = () => {
 		const allKeys = [
@@ -32,9 +44,9 @@ const DatabaseHeader = (props) => {
 			"sample.sample_name",
 		];
 		const handleMenuClick = async (key) => {
-			props.setSearchKey(tableHeadersAlias[key.split(".")[1]]);
-			props.setSearchValue("");
-			const apiUrl = `${props.baseURL}/search/${key}`;
+			setSearchKey(tableHeaders[key.split(".")[1]]);
+			setSearchValue("");
+			const apiUrl = `${baseURL}/search/${key}`;
 			const dataResponse = await fetch(apiUrl);
 			if (!dataResponse.ok) {
 				console.error("Server error:", dataResponse);
@@ -47,13 +59,13 @@ const DatabaseHeader = (props) => {
 			<Menu>
 				<MenuHandler>
 					<Button variant="outlined" size="sm">
-						{props.searchKey}
+						{searchKey}
 					</Button>
 				</MenuHandler>
 				<MenuList>
 					{allKeys.map((entity, index) => (
 						<MenuItem key={index} onMouseDown={() => handleMenuClick(entity)}>
-							{tableHeadersAlias[entity.split(".")[1]]}
+							{tableHeaders[entity.split(".")[1]]}
 						</MenuItem>
 					))}
 				</MenuList>
@@ -68,7 +80,7 @@ const DatabaseHeader = (props) => {
 					color="gray"
 					variant="outlined"
 					className="flex items-center gap-1 py-1 h-8"
-					onClick={() => props.reset()}
+					onClick={() => reset()}
 				>
 					reset
 					<AdjustmentsVerticalIcon className="w-4 h-4 text-gray-900" />
@@ -80,17 +92,17 @@ const DatabaseHeader = (props) => {
 				<SearchMenu />
 				<SearchBar
 					allSuggestions={allSuggestions}
-					setSearchValue={props.setSearchValue}
-					searchKey={props.searchKey}
+					setSearchValue={setSearchValue}
+					searchKey={searchKey}
 				/>
 			</div>
 
 			{/* MenuWithCheckbox and Menu on the right */}
 			<div className="flex items-center space-x-4 mr-6">
 				<MenuWithCheckbox
-					columns={columnsAlias}
-					selectedColumns={props.selectedColumns}
-					setSelectedColumns={props.setSelectedColumns}
+					columns={tableHeaders}
+					selectedColumns={selectedColumns}
+					setSelectedColumns={setSelectedColumns}
 				/>
 				<Menu>
 					<MenuHandler>
@@ -100,9 +112,9 @@ const DatabaseHeader = (props) => {
 						</Button>
 					</MenuHandler>
 					<MenuList>
-						<MenuItem onClick={() => props.handleExport("csv")}>CSV</MenuItem>
-						<MenuItem onClick={() => props.handleExport("tsv")}>TSV</MenuItem>
-						<MenuItem onClick={() => props.handleExport("json")}>JSON</MenuItem>
+						<MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
+						<MenuItem onClick={() => handleExport("tsv")}>TSV</MenuItem>
+						<MenuItem onClick={() => handleExport("json")}>JSON</MenuItem>
 					</MenuList>
 				</Menu>
 			</div>

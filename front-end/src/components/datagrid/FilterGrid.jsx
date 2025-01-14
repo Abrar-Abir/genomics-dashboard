@@ -38,7 +38,11 @@ export default function FilterGrid({
 			if (index > -1) {
 				newSelectedItems[filterKey] = newSelectedItems[filterKey].filter((val) => val !== item);
 			} else {
-				newSelectedItems[filterKey] = [...newSelectedItems[filterKey], item];
+				if (filterKey === "submission.datatype") {
+					newSelectedItems[filterKey] = [item];
+				} else {
+					newSelectedItems[filterKey] = [...newSelectedItems[filterKey], item];
+				}
 			}
 			return newSelectedItems;
 		});
@@ -55,10 +59,10 @@ export default function FilterGrid({
 
 		const filterKey = `${outerKey}.${key}`;
 		return (
-			<AccordionBody className="py-2 px-1 bg-white max-h-40 overflow-y-auto">
+			<AccordionBody className="py-2 px-1 bg-white max-h-60 overflow-y-auto">
 				{items.length > 0 ? (
-					<div className="max-h-32 overflow-y-auto py-2">
-						{items.map((value, index) => {
+					<div className="max-h-52 overflow-y-auto py-2">
+						{items.map(([value, count], index) => {
 							const isSelected = selectedFilter[filterKey]?.includes(value) || false;
 							return (
 								<div
@@ -70,8 +74,10 @@ export default function FilterGrid({
 										toggleSelection(filterKey, value);
 									}}
 								>
-									<span className="text-black">{value}</span>
-									{/* <span className="text-gray-800 mr-2">{count}</span> */}
+									<span className="text-black">
+										{key === "datatype" ? value.slice(1, -1).replace(/'/g, "") : value}
+									</span>
+									<span className="text-gray-800 mr-2">{count}</span>
 								</div>
 							);
 						})}
@@ -98,7 +104,15 @@ export default function FilterGrid({
 						!!openAcc[`${key}.${innerKey}`] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
 					}`}
 				>
-					<span>{innerKey}</span>
+					<span>
+						{innerKey === "pi"
+							? "PI"
+							: innerKey === "project"
+							? "SDR No."
+							: innerKey === "datatype"
+							? "Datatype"
+							: ""}
+					</span>
 				</AccordionHeader>
 				<AccordionBody>
 					{renderAccordionBody(key, innerKey, data?.[`${key}.${innerKey}`])}
@@ -121,7 +135,7 @@ export default function FilterGrid({
 						openAcc[key] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
 					}`}
 				>
-					<span>{key}</span>
+					<span>{key === "submission" ? "Submission" : key === "project" ? "Project" : ""}</span>
 				</AccordionHeader>
 				<AccordionBody className="py-2 pl-2">{renderInnerAccordion(key, value)}</AccordionBody>
 			</Accordion>

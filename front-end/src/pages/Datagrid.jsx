@@ -21,13 +21,11 @@ export default function Datagrid({
 	setOpenProject,
 	hideSingleEntries,
 	setHideSingleEntries,
+	sampleTableHeaders,
+	sampleTableHeadersProperties,
 	reset,
 }) {
 	const { baseURL } = useOutletContext();
-
-	const handleExport = (format) => {
-		window.location.href = `${baseURL}/export/datagrid/${format}`;
-	};
 
 	useEffect(() => {
 		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -72,7 +70,7 @@ export default function Datagrid({
 	return (
 		<div className="flex flex-col h-screen">
 			<div className="flex-shrink-0">
-				<DatagridHeader reset={reset} baseURL={baseURL} handleExport={handleExport} />
+				<DatagridHeader baseURL={baseURL} reset={reset} />
 			</div>
 			<div className="flex flex-grow overflow-x-auto">
 				<FilterGrid
@@ -90,6 +88,9 @@ export default function Datagrid({
 					setOpenPi={setOpenPi}
 					openProject={openProject}
 					setOpenProject={setOpenProject}
+					sampleTableHeaders={sampleTableHeaders}
+					sampleTableHeadersProperties={sampleTableHeadersProperties}
+					baseURL={baseURL}
 				/>
 			</div>
 		</div>

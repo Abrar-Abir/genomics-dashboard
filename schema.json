@@ -648,7 +648,7 @@
 					"not_null": false,
 					"filter_option": true,
 					"view": true,
-					"alias": "Yeild Q30 (Gb)",
+					"alias": "Yield Q30 (Gb)",
 					"group": 2,
 					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'yield'/'yieldQ30' -> devide by 10^9",
 					"order": 8
