@@ -1,7 +1,8 @@
 import psycopg2
 import json
 import os
-
+from datetime import datetime
+from flask import Response
 
 def get_database_info(json_file: str = "active_config.json") -> tuple[str, str, str, str, str]:
     with open(json_file, 'r') as database_json:
@@ -28,8 +29,30 @@ def fetch(cursor: psycopg2.extensions.cursor, command: str, params: str) -> [Non
         result = cursor.fetchone()
         if result != None:
             num_of_entiites = len(command.split(','))
-        #   assert len(
-            # result) == num_of_entiites, f"fetchone() result {result} expected to have length {num_of_entiites} but got length {len(result)}"
     if params == "all":
         result = cursor.fetchall()
     return result
+
+
+def isdigit(obj):
+	text = str(obj).replace('.', '')
+	for char in text:
+		if char not in '0123456789':
+			return False
+	return True
+
+def get_id(l,e):
+	try:
+		return l.index(e)
+	except:
+		return -1
+
+def jsonify(data):
+	return Response(json.dumps(data, default=str), content_type="application/json")
+
+def parse_date(date):
+	dates = date.split("-")
+	start = datetime.strptime(dates[0], '%Y%m%d').date()
+	end = datetime.strptime(dates[1], '%Y%m%d').date()
+	return start, end
+

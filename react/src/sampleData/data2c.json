@@ -1,0 +1,1703 @@
+[
+  {
+    "pi": "OL",
+    "project": "SDR 202",
+    "sample_count": 968,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 197",
+    "sample_count": 948,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 199",
+    "sample_count": 938,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 201",
+    "sample_count": 781,
+    "genome": "genome1",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 200",
+    "sample_count": 775,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 203",
+    "sample_count": 576,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 198",
+    "sample_count": 525,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "OL",
+    "project": "SDR 196",
+    "sample_count": 225,
+    "genome": "genome2",
+    "pi_order": 32
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 164",
+    "sample_count": 989,
+    "genome": "genome1",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 167",
+    "sample_count": 934,
+    "genome": "genome2",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 165",
+    "sample_count": 915,
+    "genome": "genome1",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 168",
+    "sample_count": 701,
+    "genome": "genome2",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 161",
+    "sample_count": 627,
+    "genome": "genome1",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 166",
+    "sample_count": 542,
+    "genome": "genome2",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 163",
+    "sample_count": 457,
+    "genome": "genome2",
+    "pi_order": 6
+  },
+  {
+    "pi": "CA",
+    "project": "SDR 162",
+    "sample_count": 205,
+    "genome": "genome2",
+    "pi_order": 6
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 105",
+    "sample_count": 981,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 106",
+    "sample_count": 893,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 101",
+    "sample_count": 868,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 103",
+    "sample_count": 673,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 108",
+    "sample_count": 533,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 102",
+    "sample_count": 366,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 107",
+    "sample_count": 281,
+    "genome": "genome1",
+    "pi_order": 7
+  },
+  {
+    "pi": "CAW",
+    "project": "SDR 104",
+    "sample_count": 224,
+    "genome": "genome2",
+    "pi_order": 7
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 16",
+    "sample_count": 993,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 15",
+    "sample_count": 949,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 17",
+    "sample_count": 925,
+    "genome": "genome1",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 18",
+    "sample_count": 598,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 20",
+    "sample_count": 402,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 13",
+    "sample_count": 370,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 14",
+    "sample_count": 202,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "BPX",
+    "project": "SDR 19",
+    "sample_count": 136,
+    "genome": "genome2",
+    "pi_order": 2
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 31",
+    "sample_count": 931,
+    "genome": "genome2",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 26",
+    "sample_count": 867,
+    "genome": "genome2",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 28",
+    "sample_count": 776,
+    "genome": "genome1",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 27",
+    "sample_count": 610,
+    "genome": "genome1",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 32",
+    "sample_count": 548,
+    "genome": "genome2",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 30",
+    "sample_count": 458,
+    "genome": "genome2",
+    "pi_order": 13
+  },
+  {
+    "pi": "EIS",
+    "project": "SDR 29",
+    "sample_count": 59,
+    "genome": "genome2",
+    "pi_order": 13
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 239",
+    "sample_count": 819,
+    "genome": "genome2",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 233",
+    "sample_count": 686,
+    "genome": "genome1",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 237",
+    "sample_count": 640,
+    "genome": "genome1",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 235",
+    "sample_count": 627,
+    "genome": "genome1",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 238",
+    "sample_count": 515,
+    "genome": "genome1",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 232",
+    "sample_count": 357,
+    "genome": "genome1",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 236",
+    "sample_count": 340,
+    "genome": "genome2",
+    "pi_order": 31
+  },
+  {
+    "pi": "OAI",
+    "project": "SDR 234",
+    "sample_count": 222,
+    "genome": "genome2",
+    "pi_order": 31
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 83",
+    "sample_count": 885,
+    "genome": "genome1",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 82",
+    "sample_count": 876,
+    "genome": "genome2",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 86",
+    "sample_count": 856,
+    "genome": "genome2",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 85",
+    "sample_count": 567,
+    "genome": "genome1",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 87",
+    "sample_count": 490,
+    "genome": "genome1",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 81",
+    "sample_count": 360,
+    "genome": "genome1",
+    "pi_order": 3
+  },
+  {
+    "pi": "BU",
+    "project": "SDR 84",
+    "sample_count": 150,
+    "genome": "genome2",
+    "pi_order": 3
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 182",
+    "sample_count": 935,
+    "genome": "genome2",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 180",
+    "sample_count": 913,
+    "genome": "genome1",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 178",
+    "sample_count": 688,
+    "genome": "genome2",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 177",
+    "sample_count": 549,
+    "genome": "genome1",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 179",
+    "sample_count": 435,
+    "genome": "genome2",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 176",
+    "sample_count": 430,
+    "genome": "genome2",
+    "pi_order": 50
+  },
+  {
+    "pi": "WU",
+    "project": "SDR 181",
+    "sample_count": 106,
+    "genome": "genome1",
+    "pi_order": 50
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 171",
+    "sample_count": 815,
+    "genome": "genome2",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 169",
+    "sample_count": 699,
+    "genome": "genome2",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 174",
+    "sample_count": 686,
+    "genome": "genome1",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 175",
+    "sample_count": 567,
+    "genome": "genome2",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 173",
+    "sample_count": 542,
+    "genome": "genome2",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 172",
+    "sample_count": 532,
+    "genome": "genome2",
+    "pi_order": 5
+  },
+  {
+    "pi": "BY",
+    "project": "SDR 170",
+    "sample_count": 172,
+    "genome": "genome1",
+    "pi_order": 5
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 39",
+    "sample_count": 943,
+    "genome": "genome1",
+    "pi_order": 16
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 40",
+    "sample_count": 942,
+    "genome": "genome1",
+    "pi_order": 16
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 41",
+    "sample_count": 909,
+    "genome": "genome2",
+    "pi_order": 16
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 36",
+    "sample_count": 564,
+    "genome": "genome1",
+    "pi_order": 16
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 37",
+    "sample_count": 347,
+    "genome": "genome2",
+    "pi_order": 16
+  },
+  {
+    "pi": "FG",
+    "project": "SDR 38",
+    "sample_count": 274,
+    "genome": "genome2",
+    "pi_order": 16
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 68",
+    "sample_count": 902,
+    "genome": "genome2",
+    "pi_order": 12
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 70",
+    "sample_count": 830,
+    "genome": "genome1",
+    "pi_order": 12
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 67",
+    "sample_count": 794,
+    "genome": "genome1",
+    "pi_order": 12
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 71",
+    "sample_count": 711,
+    "genome": "genome1",
+    "pi_order": 12
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 69",
+    "sample_count": 523,
+    "genome": "genome2",
+    "pi_order": 12
+  },
+  {
+    "pi": "DZ",
+    "project": "SDR 72",
+    "sample_count": 194,
+    "genome": "genome1",
+    "pi_order": 12
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 74",
+    "sample_count": 835,
+    "genome": "genome1",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 80",
+    "sample_count": 728,
+    "genome": "genome1",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 77",
+    "sample_count": 537,
+    "genome": "genome2",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 75",
+    "sample_count": 481,
+    "genome": "genome1",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 79",
+    "sample_count": 462,
+    "genome": "genome1",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 76",
+    "sample_count": 377,
+    "genome": "genome1",
+    "pi_order": 8
+  },
+  {
+    "pi": "CPU",
+    "project": "SDR 78",
+    "sample_count": 339,
+    "genome": "genome2",
+    "pi_order": 8
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 113",
+    "sample_count": 820,
+    "genome": "genome2",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 115",
+    "sample_count": 812,
+    "genome": "genome1",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 110",
+    "sample_count": 573,
+    "genome": "genome2",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 111",
+    "sample_count": 400,
+    "genome": "genome1",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 112",
+    "sample_count": 287,
+    "genome": "genome1",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 114",
+    "sample_count": 245,
+    "genome": "genome1",
+    "pi_order": 35
+  },
+  {
+    "pi": "OYI",
+    "project": "SDR 109",
+    "sample_count": 239,
+    "genome": "genome2",
+    "pi_order": 35
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 45",
+    "sample_count": 873,
+    "genome": "genome2",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 44",
+    "sample_count": 772,
+    "genome": "genome2",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 42",
+    "sample_count": 602,
+    "genome": "genome1",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 47",
+    "sample_count": 573,
+    "genome": "genome2",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 43",
+    "sample_count": 305,
+    "genome": "genome1",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 46",
+    "sample_count": 126,
+    "genome": "genome1",
+    "pi_order": 24
+  },
+  {
+    "pi": "LB",
+    "project": "SDR 48",
+    "sample_count": 68,
+    "genome": "genome2",
+    "pi_order": 24
+  },
+  {
+    "pi": "OO",
+    "project": "SDR 136",
+    "sample_count": 985,
+    "genome": "genome1",
+    "pi_order": 33
+  },
+  {
+    "pi": "OO",
+    "project": "SDR 137",
+    "sample_count": 687,
+    "genome": "genome1",
+    "pi_order": 33
+  },
+  {
+    "pi": "OO",
+    "project": "SDR 133",
+    "sample_count": 607,
+    "genome": "genome2",
+    "pi_order": 33
+  },
+  {
+    "pi": "OO",
+    "project": "SDR 135",
+    "sample_count": 558,
+    "genome": "genome1",
+    "pi_order": 33
+  },
+  {
+    "pi": "OO",
+    "project": "SDR 134",
+    "sample_count": 447,
+    "genome": "genome1",
+    "pi_order": 33
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 131",
+    "sample_count": 564,
+    "genome": "genome2",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 127",
+    "sample_count": 555,
+    "genome": "genome1",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 130",
+    "sample_count": 486,
+    "genome": "genome2",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 132",
+    "sample_count": 391,
+    "genome": "genome1",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 129",
+    "sample_count": 368,
+    "genome": "genome1",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 125",
+    "sample_count": 331,
+    "genome": "genome1",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 128",
+    "sample_count": 281,
+    "genome": "genome2",
+    "pi_order": 1
+  },
+  {
+    "pi": "BIR",
+    "project": "SDR 126",
+    "sample_count": 270,
+    "genome": "genome2",
+    "pi_order": 1
+  },
+  {
+    "pi": "MF",
+    "project": "SDR 194",
+    "sample_count": 891,
+    "genome": "genome1",
+    "pi_order": 27
+  },
+  {
+    "pi": "MF",
+    "project": "SDR 193",
+    "sample_count": 807,
+    "genome": "genome2",
+    "pi_order": 27
+  },
+  {
+    "pi": "MF",
+    "project": "SDR 195",
+    "sample_count": 734,
+    "genome": "genome1",
+    "pi_order": 27
+  },
+  {
+    "pi": "MF",
+    "project": "SDR 192",
+    "sample_count": 529,
+    "genome": "genome1",
+    "pi_order": 27
+  },
+  {
+    "pi": "MF",
+    "project": "SDR 192",
+    "sample_count": 29,
+    "genome": "genome2",
+    "pi_order": 27
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 224",
+    "sample_count": 874,
+    "genome": "genome1",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 222",
+    "sample_count": 780,
+    "genome": "genome1",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 225",
+    "sample_count": 488,
+    "genome": "genome2",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 223",
+    "sample_count": 396,
+    "genome": "genome2",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 220",
+    "sample_count": 189,
+    "genome": "genome2",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 219",
+    "sample_count": 134,
+    "genome": "genome2",
+    "pi_order": 49
+  },
+  {
+    "pi": "WTV",
+    "project": "SDR 221",
+    "sample_count": 68,
+    "genome": "genome2",
+    "pi_order": 49
+  },
+  {
+    "pi": "IDL",
+    "project": "SDR 66",
+    "sample_count": 879,
+    "genome": "genome2",
+    "pi_order": 21
+  },
+  {
+    "pi": "IDL",
+    "project": "SDR 64",
+    "sample_count": 864,
+    "genome": "genome1",
+    "pi_order": 21
+  },
+  {
+    "pi": "IDL",
+    "project": "SDR 62",
+    "sample_count": 722,
+    "genome": "genome1",
+    "pi_order": 21
+  },
+  {
+    "pi": "IDL",
+    "project": "SDR 65",
+    "sample_count": 283,
+    "genome": "genome2",
+    "pi_order": 21
+  },
+  {
+    "pi": "IDL",
+    "project": "SDR 63",
+    "sample_count": 114,
+    "genome": "genome1",
+    "pi_order": 21
+  },
+  {
+    "pi": "OP",
+    "project": "SDR 55",
+    "sample_count": 993,
+    "genome": "genome1",
+    "pi_order": 34
+  },
+  {
+    "pi": "OP",
+    "project": "SDR 57",
+    "sample_count": 877,
+    "genome": "genome2",
+    "pi_order": 34
+  },
+  {
+    "pi": "OP",
+    "project": "SDR 58",
+    "sample_count": 849,
+    "genome": "genome1",
+    "pi_order": 34
+  },
+  {
+    "pi": "OP",
+    "project": "SDR 56",
+    "sample_count": 134,
+    "genome": "genome2",
+    "pi_order": 34
+  },
+  {
+    "pi": "LL",
+    "project": "SDR 3",
+    "sample_count": 908,
+    "genome": "genome2",
+    "pi_order": 26
+  },
+  {
+    "pi": "LL",
+    "project": "SDR 2",
+    "sample_count": 780,
+    "genome": "genome1",
+    "pi_order": 26
+  },
+  {
+    "pi": "LL",
+    "project": "SDR 4",
+    "sample_count": 723,
+    "genome": "genome2",
+    "pi_order": 26
+  },
+  {
+    "pi": "LL",
+    "project": "SDR 1",
+    "sample_count": 286,
+    "genome": "genome1",
+    "pi_order": 26
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 214",
+    "sample_count": 961,
+    "genome": "genome2",
+    "pi_order": 29
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 217",
+    "sample_count": 956,
+    "genome": "genome2",
+    "pi_order": 29
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 218",
+    "sample_count": 614,
+    "genome": "genome2",
+    "pi_order": 29
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 213",
+    "sample_count": 74,
+    "genome": "genome2",
+    "pi_order": 29
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 216",
+    "sample_count": 38,
+    "genome": "genome2",
+    "pi_order": 29
+  },
+  {
+    "pi": "NW",
+    "project": "SDR 215",
+    "sample_count": 29,
+    "genome": "genome1",
+    "pi_order": 29
+  },
+  {
+    "pi": "CQ",
+    "project": "SDR 9",
+    "sample_count": 797,
+    "genome": "genome1",
+    "pi_order": 9
+  },
+  {
+    "pi": "CQ",
+    "project": "SDR 6",
+    "sample_count": 691,
+    "genome": "genome1",
+    "pi_order": 9
+  },
+  {
+    "pi": "CQ",
+    "project": "SDR 5",
+    "sample_count": 605,
+    "genome": "genome1",
+    "pi_order": 9
+  },
+  {
+    "pi": "CQ",
+    "project": "SDR 7",
+    "sample_count": 358,
+    "genome": "genome2",
+    "pi_order": 9
+  },
+  {
+    "pi": "CQ",
+    "project": "SDR 8",
+    "sample_count": 48,
+    "genome": "genome2",
+    "pi_order": 9
+  },
+  {
+    "pi": "WXN",
+    "project": "SDR 208",
+    "sample_count": 900,
+    "genome": "genome1",
+    "pi_order": 52
+  },
+  {
+    "pi": "WXN",
+    "project": "SDR 207",
+    "sample_count": 683,
+    "genome": "genome2",
+    "pi_order": 52
+  },
+  {
+    "pi": "WXN",
+    "project": "SDR 204",
+    "sample_count": 654,
+    "genome": "genome2",
+    "pi_order": 52
+  },
+  {
+    "pi": "WXN",
+    "project": "SDR 206",
+    "sample_count": 120,
+    "genome": "genome2",
+    "pi_order": 52
+  },
+  {
+    "pi": "WXN",
+    "project": "SDR 205",
+    "sample_count": 64,
+    "genome": "genome1",
+    "pi_order": 52
+  },
+  {
+    "pi": "DT",
+    "project": "SDR 117",
+    "sample_count": 842,
+    "genome": "genome2",
+    "pi_order": 11
+  },
+  {
+    "pi": "DT",
+    "project": "SDR 120",
+    "sample_count": 650,
+    "genome": "genome1",
+    "pi_order": 11
+  },
+  {
+    "pi": "DT",
+    "project": "SDR 119",
+    "sample_count": 496,
+    "genome": "genome2",
+    "pi_order": 11
+  },
+  {
+    "pi": "DT",
+    "project": "SDR 118",
+    "sample_count": 190,
+    "genome": "genome2",
+    "pi_order": 11
+  },
+  {
+    "pi": "DT",
+    "project": "SDR 116",
+    "sample_count": 188,
+    "genome": "genome1",
+    "pi_order": 11
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 49",
+    "sample_count": 674,
+    "genome": "genome1",
+    "pi_order": 10
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 51",
+    "sample_count": 621,
+    "genome": "genome1",
+    "pi_order": 10
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 53",
+    "sample_count": 405,
+    "genome": "genome2",
+    "pi_order": 10
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 54",
+    "sample_count": 290,
+    "genome": "genome2",
+    "pi_order": 10
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 50",
+    "sample_count": 248,
+    "genome": "genome2",
+    "pi_order": 10
+  },
+  {
+    "pi": "CZ",
+    "project": "SDR 52",
+    "sample_count": 94,
+    "genome": "genome1",
+    "pi_order": 10
+  },
+  {
+    "pi": "LGW",
+    "project": "SDR 226",
+    "sample_count": 957,
+    "genome": "genome1",
+    "pi_order": 25
+  },
+  {
+    "pi": "LGW",
+    "project": "SDR 228",
+    "sample_count": 613,
+    "genome": "genome2",
+    "pi_order": 25
+  },
+  {
+    "pi": "LGW",
+    "project": "SDR 227",
+    "sample_count": 519,
+    "genome": "genome2",
+    "pi_order": 25
+  },
+  {
+    "pi": "LGW",
+    "project": "SDR 229",
+    "sample_count": 210,
+    "genome": "genome1",
+    "pi_order": 25
+  },
+  {
+    "pi": "EX",
+    "project": "SDR 91",
+    "sample_count": 964,
+    "genome": "genome1",
+    "pi_order": 15
+  },
+  {
+    "pi": "EX",
+    "project": "SDR 92",
+    "sample_count": 940,
+    "genome": "genome1",
+    "pi_order": 15
+  },
+  {
+    "pi": "EX",
+    "project": "SDR 93",
+    "sample_count": 224,
+    "genome": "genome1",
+    "pi_order": 15
+  },
+  {
+    "pi": "EX",
+    "project": "SDR 94",
+    "sample_count": 109,
+    "genome": "genome2",
+    "pi_order": 15
+  },
+  {
+    "pi": "KVU",
+    "project": "SDR 190",
+    "sample_count": 986,
+    "genome": "genome1",
+    "pi_order": 23
+  },
+  {
+    "pi": "KVU",
+    "project": "SDR 189",
+    "sample_count": 771,
+    "genome": "genome2",
+    "pi_order": 23
+  },
+  {
+    "pi": "KVU",
+    "project": "SDR 191",
+    "sample_count": 472,
+    "genome": "genome2",
+    "pi_order": 23
+  },
+  {
+    "pi": "HQO",
+    "project": "SDR 11",
+    "sample_count": 946,
+    "genome": "genome2",
+    "pi_order": 20
+  },
+  {
+    "pi": "HQO",
+    "project": "SDR 12",
+    "sample_count": 733,
+    "genome": "genome2",
+    "pi_order": 20
+  },
+  {
+    "pi": "HQO",
+    "project": "SDR 10",
+    "sample_count": 463,
+    "genome": "genome2",
+    "pi_order": 20
+  },
+  {
+    "pi": "WKZ",
+    "project": "SDR 187",
+    "sample_count": 636,
+    "genome": "genome2",
+    "pi_order": 47
+  },
+  {
+    "pi": "WKZ",
+    "project": "SDR 188",
+    "sample_count": 604,
+    "genome": "genome2",
+    "pi_order": 47
+  },
+  {
+    "pi": "WKZ",
+    "project": "SDR 186",
+    "sample_count": 489,
+    "genome": "genome2",
+    "pi_order": 47
+  },
+  {
+    "pi": "WKZ",
+    "project": "SDR 185",
+    "sample_count": 292,
+    "genome": "genome1",
+    "pi_order": 47
+  },
+  {
+    "pi": "WKZ",
+    "project": "SDR 184",
+    "sample_count": 119,
+    "genome": "genome1",
+    "pi_order": 47
+  },
+  {
+    "pi": "HNG",
+    "project": "SDR 122",
+    "sample_count": 860,
+    "genome": "genome1",
+    "pi_order": 19
+  },
+  {
+    "pi": "HNG",
+    "project": "SDR 123",
+    "sample_count": 590,
+    "genome": "genome2",
+    "pi_order": 19
+  },
+  {
+    "pi": "HNG",
+    "project": "SDR 124",
+    "sample_count": 397,
+    "genome": "genome2",
+    "pi_order": 19
+  },
+  {
+    "pi": "HNG",
+    "project": "SDR 121",
+    "sample_count": 184,
+    "genome": "genome1",
+    "pi_order": 19
+  },
+  {
+    "pi": "FO",
+    "project": "SDR 154",
+    "sample_count": 666,
+    "genome": "genome2",
+    "pi_order": 17
+  },
+  {
+    "pi": "FO",
+    "project": "SDR 152",
+    "sample_count": 436,
+    "genome": "genome1",
+    "pi_order": 17
+  },
+  {
+    "pi": "FO",
+    "project": "SDR 153",
+    "sample_count": 360,
+    "genome": "genome2",
+    "pi_order": 17
+  },
+  {
+    "pi": "FO",
+    "project": "SDR 150",
+    "sample_count": 348,
+    "genome": "genome1",
+    "pi_order": 17
+  },
+  {
+    "pi": "FO",
+    "project": "SDR 151",
+    "sample_count": 211,
+    "genome": "genome2",
+    "pi_order": 17
+  },
+  {
+    "pi": "TUV",
+    "project": "SDR 157",
+    "sample_count": 697,
+    "genome": "genome2",
+    "pi_order": 45
+  },
+  {
+    "pi": "TUV",
+    "project": "SDR 159",
+    "sample_count": 629,
+    "genome": "genome2",
+    "pi_order": 45
+  },
+  {
+    "pi": "TUV",
+    "project": "SDR 158",
+    "sample_count": 463,
+    "genome": "genome2",
+    "pi_order": 45
+  },
+  {
+    "pi": "GKE",
+    "project": "SDR 98",
+    "sample_count": 690,
+    "genome": "genome2",
+    "pi_order": 18
+  },
+  {
+    "pi": "GKE",
+    "project": "SDR 99",
+    "sample_count": 552,
+    "genome": "genome1",
+    "pi_order": 18
+  },
+  {
+    "pi": "GKE",
+    "project": "SDR 97",
+    "sample_count": 370,
+    "genome": "genome1",
+    "pi_order": 18
+  },
+  {
+    "pi": "GKE",
+    "project": "SDR 100",
+    "sample_count": 114,
+    "genome": "genome1",
+    "pi_order": 18
+  },
+  {
+    "pi": "WW",
+    "project": "SDR 242",
+    "sample_count": 887,
+    "genome": "genome1",
+    "pi_order": 51
+  },
+  {
+    "pi": "WW",
+    "project": "SDR 240",
+    "sample_count": 576,
+    "genome": "genome2",
+    "pi_order": 51
+  },
+  {
+    "pi": "WW",
+    "project": "SDR 241",
+    "sample_count": 219,
+    "genome": "genome2",
+    "pi_order": 51
+  },
+  {
+    "pi": "QM",
+    "project": "SDR 89",
+    "sample_count": 839,
+    "genome": "genome2",
+    "pi_order": 40
+  },
+  {
+    "pi": "QM",
+    "project": "SDR 88",
+    "sample_count": 538,
+    "genome": "genome2",
+    "pi_order": 40
+  },
+  {
+    "pi": "QM",
+    "project": "SDR 90",
+    "sample_count": 29,
+    "genome": "genome2",
+    "pi_order": 40
+  },
+  {
+    "pi": "MW",
+    "project": "SDR 138",
+    "sample_count": 892,
+    "genome": "genome2",
+    "pi_order": 28
+  },
+  {
+    "pi": "MW",
+    "project": "SDR 139",
+    "sample_count": 426,
+    "genome": "genome2",
+    "pi_order": 28
+  },
+  {
+    "pi": "JNX",
+    "project": "SDR 147",
+    "sample_count": 805,
+    "genome": "genome1",
+    "pi_order": 22
+  },
+  {
+    "pi": "JNX",
+    "project": "SDR 149",
+    "sample_count": 287,
+    "genome": "genome2",
+    "pi_order": 22
+  },
+  {
+    "pi": "JNX",
+    "project": "SDR 146",
+    "sample_count": 167,
+    "genome": "genome1",
+    "pi_order": 22
+  },
+  {
+    "pi": "JNX",
+    "project": "SDR 148",
+    "sample_count": 58,
+    "genome": "genome1",
+    "pi_order": 22
+  },
+  {
+    "pi": "RC",
+    "project": "SDR 22",
+    "sample_count": 412,
+    "genome": "genome2",
+    "pi_order": 41
+  },
+  {
+    "pi": "RC",
+    "project": "SDR 24",
+    "sample_count": 385,
+    "genome": "genome1",
+    "pi_order": 41
+  },
+  {
+    "pi": "RC",
+    "project": "SDR 23",
+    "sample_count": 322,
+    "genome": "genome1",
+    "pi_order": 41
+  },
+  {
+    "pi": "RC",
+    "project": "SDR 21",
+    "sample_count": 194,
+    "genome": "genome1",
+    "pi_order": 41
+  },
+  {
+    "pi": "PLL",
+    "project": "SDR 145",
+    "sample_count": 681,
+    "genome": "genome2",
+    "pi_order": 37
+  },
+  {
+    "pi": "PLL",
+    "project": "SDR 144",
+    "sample_count": 322,
+    "genome": "genome1",
+    "pi_order": 37
+  },
+  {
+    "pi": "PLL",
+    "project": "SDR 143",
+    "sample_count": 232,
+    "genome": "genome2",
+    "pi_order": 37
+  },
+  {
+    "pi": "QCH",
+    "project": "SDR 210",
+    "sample_count": 753,
+    "genome": "genome1",
+    "pi_order": 38
+  },
+  {
+    "pi": "QCH",
+    "project": "SDR 209",
+    "sample_count": 369,
+    "genome": "genome1",
+    "pi_order": 38
+  },
+  {
+    "pi": "YCM",
+    "project": "SDR 60",
+    "sample_count": 643,
+    "genome": "genome1",
+    "pi_order": 54
+  },
+  {
+    "pi": "YCM",
+    "project": "SDR 59",
+    "sample_count": 435,
+    "genome": "genome1",
+    "pi_order": 54
+  },
+  {
+    "pi": "ZKQ",
+    "project": "SDR 142",
+    "sample_count": 418,
+    "genome": "genome2",
+    "pi_order": 56
+  },
+  {
+    "pi": "ZKQ",
+    "project": "SDR 141",
+    "sample_count": 342,
+    "genome": "genome1",
+    "pi_order": 56
+  },
+  {
+    "pi": "ZKQ",
+    "project": "SDR 140",
+    "sample_count": 304,
+    "genome": "genome1",
+    "pi_order": 56
+  },
+  {
+    "pi": "YW",
+    "project": "SDR 73",
+    "sample_count": 1000,
+    "genome": "genome1",
+    "pi_order": 55
+  },
+  {
+    "pi": "ESU",
+    "project": "SDR 160",
+    "sample_count": 905,
+    "genome": "genome2",
+    "pi_order": 14
+  },
+  {
+    "pi": "TJT",
+    "project": "SDR 96",
+    "sample_count": 838,
+    "genome": "genome1",
+    "pi_order": 44
+  },
+  {
+    "pi": "PDO",
+    "project": "SDR 95",
+    "sample_count": 801,
+    "genome": "genome1",
+    "pi_order": 36
+  },
+  {
+    "pi": "UJJ",
+    "project": "SDR 25",
+    "sample_count": 786,
+    "genome": "genome2",
+    "pi_order": 46
+  },
+  {
+    "pi": "XLQ",
+    "project": "SDR 230",
+    "sample_count": 780,
+    "genome": "genome2",
+    "pi_order": 53
+  },
+  {
+    "pi": "QG",
+    "project": "SDR 212",
+    "sample_count": 512,
+    "genome": "genome1",
+    "pi_order": 39
+  },
+  {
+    "pi": "QG",
+    "project": "SDR 211",
+    "sample_count": 249,
+    "genome": "genome1",
+    "pi_order": 39
+  },
+  {
+    "pi": "SFT",
+    "project": "SDR 33",
+    "sample_count": 323,
+    "genome": "genome1",
+    "pi_order": 43
+  },
+  {
+    "pi": "SFT",
+    "project": "SDR 34",
+    "sample_count": 283,
+    "genome": "genome2",
+    "pi_order": 43
+  },
+  {
+    "pi": "NZC",
+    "project": "SDR 35",
+    "sample_count": 551,
+    "genome": "genome2",
+    "pi_order": 30
+  },
+  {
+    "pi": "WM",
+    "project": "SDR 61",
+    "sample_count": 485,
+    "genome": "genome1",
+    "pi_order": 48
+  },
+  {
+    "pi": "BW",
+    "project": "SDR 155",
+    "sample_count": 401,
+    "genome": "genome1",
+    "pi_order": 4
+  },
+  {
+    "pi": "BW",
+    "project": "SDR 156",
+    "sample_count": 72,
+    "genome": "genome2",
+    "pi_order": 4
+  },
+  {
+    "pi": "BI",
+    "project": "SDR 231",
+    "sample_count": 384,
+    "genome": "genome2",
+    "pi_order": 0
+  },
+  {
+    "pi": "RQT",
+    "project": "SDR 183",
+    "sample_count": 158,
+    "genome": "genome1",
+    "pi_order": 42
+  }
+]

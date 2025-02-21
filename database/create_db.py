@@ -18,7 +18,7 @@ def generate_create_table_sql(schema):
             column_type = column_details["type"]
             not_null = column_details["not_null"]
             columns.append(
-                f"""{column_name} {column_type} {'NOT NULL' if not_null else 'DEFAULT "N/A"'}""")
+                f"""{column_name} {column_type} """)
         if foreign_key:
             for fk in foreign_key:
                 column_type = schema["table"][fk.split(
