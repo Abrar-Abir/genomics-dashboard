@@ -14,41 +14,39 @@ import { IconButton } from "@material-tailwind/react";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { BiSolidPieChartAlt2 } from "react-icons/bi";
 import { RiDonutChartFill } from "react-icons/ri";
-import predefinedColors from "@lib/colors";
+import { COLORS } from "@components/utils.js";
 // import { act } from "react";
 
-const CustomDonutChart = (props) => {
+export default function DonutCard({ info, data }) {
 	const [legendValue, setLegendValue] = useState("");
 	const [activeLabel, setActiveLabel] = useState("");
-	const [chartVariant, setChartVariant] = useState("donut");
+	const [isDonut, setIsDonut] = useState(true);
 
-	const totalUnits = props.data?.reduce((total, item) => total + item.quantity, 0);
+	const totalUnits = data?.reduce((total, item) => total + item.quantity, 0);
 	const valueFormatter = (number) => {
 		const percentage = ((number / totalUnits) * 100).toFixed(2);
-		return `${percentage}% | ${Intl.NumberFormat("us").format(number).toString()}`;
+		return `${percentage}% | ${Intl.NumberFormat("us").format(number)}`;
 	};
 
 	const donutChartArgs = {
-		showLabel: true, // To show the label at the centre of the donut chart
+		showLabel: true,
 		showAnimation: true,
 		animationDuration: 500,
-		data: props.data,
-		category: props.category,
-		index: props.index,
-		variant: chartVariant,
-		className: props.className + " text-sm",
-		colors: predefinedColors,
+		data: data,
+		category: "quantity",
+		index: "type",
+		variant: isDonut ? "donut" : "pie",
+		className: " text-sm", ///
+		colors: COLORS,
 		valueFormatter: valueFormatter,
-		// The label is the total units formatted as a US number + the label received as prop
 		label: legendValue
 			? activeLabel
-			: Intl.NumberFormat("us").format(totalUnits).toString() + props.label,
+			: Intl.NumberFormat("us").format(totalUnits).toString() + info.label,
 	};
 
 	const legendArgs = {
-		// className: "flex flex-col max-w-fit",
-		categories: props.data?.map((item) => item.type), // Categories are the type of each data item
-		colors: predefinedColors, // Colors received as props
+		categories: data?.map((item) => item.type),
+		colors: COLORS,
 		// enableLegendSlider: true,
 	};
 
@@ -56,24 +54,24 @@ const CustomDonutChart = (props) => {
 		<Card decoration="top" decorationColor="teal" className="flex flex-col space-y-2 h-full">
 			<div className="flex justify-between font-cabin">
 				<div className="flex items-center space-x-0.5">
-					<Title> {props.title} </Title>{" "}
+					<Title> {info.title} </Title>{" "}
 					<Icon
 						icon={InformationCircleIcon}
 						variant="simple"
 						className=" text-teal-600 hover:text-teal-400 cursor-pointer"
-						tooltip={props.tooltip}
+						tooltip={info.tooltip}
 					/>
 				</div>
 				<IconButton color="deep-orange" variant="text" size="sm">
-					{chartVariant === "donut" ? (
+					{isDonut ? (
 						<BiSolidPieChartAlt2
 							className="h-8 p-1 w-auto border-2 rounded-lg border-deep-orange-50"
-							onClick={() => setChartVariant("pie")}
+							onClick={() => setIsDonut(false)}
 						/>
 					) : (
 						<RiDonutChartFill
 							className="h-8 p-1 w-auto border-2 rounded-lg border-deep-orange-50"
-							onClick={() => setChartVariant("donut")}
+							onClick={() => setIsDonut(true)}
 						/>
 					)}
 				</IconButton>
@@ -94,7 +92,7 @@ const CustomDonutChart = (props) => {
 						}
 					}}
 				/>
-				{props.data && (
+				{data && (
 					<div className="flex max-h-40">
 						<Legend
 							enableLegendSlider
@@ -111,6 +109,4 @@ const CustomDonutChart = (props) => {
 			</div>
 		</Card>
 	);
-};
-
-export default CustomDonutChart;
+}

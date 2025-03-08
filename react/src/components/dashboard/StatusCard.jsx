@@ -1,48 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BarChart, Subtitle, NumberInput } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon, ComputerDesktopIcon } from "@heroicons/react/24/solid";
+import { COLORS } from "@components/utils.js";
 
-export default function DataSampleStatusChart(props) {
+export default function StatusCard({ data }) {
+	const categories = useMemo(() => {
+		return data[0] ? Object.keys(data[0]).filter((key) => key !== "pi") : [];
+	}, [data]);
 	const [windowSize, setWindowSize] = useState(6);
 	const [windowStart, setWindowStart] = useState(0);
 	const [toggleStacked, setToggleStacked] = useState(true);
-	const [activeCategories, setActiveCategories] = useState(new Set(props.categories));
-
+	const [activeCategories, setActiveCategories] = useState(categories);
 	useEffect(() => {
-		setActiveCategories(new Set(props.categories));
-	}, [props.categories]);
+		setActiveCategories(categories);
+	}, [categories]);
 
-	const windowedData = props.data?.slice(windowStart, windowStart + windowSize);
+	const windowedData = data?.slice(windowStart, windowStart + windowSize);
 
-	const scrollData = (direction) => {
-		if (direction === "forward") {
-			setWindowStart(Math.min(windowStart + windowSize, props.data?.length - windowSize));
-		} else {
-			setWindowStart(Math.max(0, windowStart - windowSize));
+	const scroll = (direction) => {
+		const newStart = windowStart + direction * windowSize;
+
+		if (direction === 1) {
+			setWindowStart(Math.min(Math.max(data?.length - windowSize, 0), newStart));
+		} else if (direction === -1) {
+			setWindowStart(Math.max(newStart, 0));
 		}
 	};
 
 	const handleLegendClick = (category) => {
 		setActiveCategories((prev) => {
-			const newSet = new Set(prev);
-			newSet.has(category) ? newSet.delete(category) : newSet.add(category);
-			return newSet;
+			const index = prev.indexOf(category);
+			if (index !== -1) {
+				return [...prev.slice(0, index), ...prev.slice(index + 1)];
+			} else {
+				return [...prev, category];
+			}
 		});
 	};
 
 	const barChartArgs = {
-		categories: props.categories.filter((c) => activeCategories.has(c)),
+		categories: categories.filter((c) => activeCategories.includes(c)),
 		showAnimation: true,
 		animationDuration: 300,
 		autoMinValue: true,
-		className: props.className + " select-none",
 		data: windowedData,
-		index: props.index,
-		colors: props.colors.filter((_, i) => activeCategories.has(props.categories[i])),
+		index: "pi",
+		colors: COLORS.filter((_, i) => activeCategories.includes(categories[i])),
 		showLegend: false,
-		yAxisWidth: props.yAxisWidth,
-		xAxisLabel: props.xAxisLabel,
+		yAxisWidth: 56,
+		xAxisLabel: "PI",
 		stack: toggleStacked,
 	};
 
@@ -72,21 +79,21 @@ export default function DataSampleStatusChart(props) {
 
 				<div className="mt-4 h-full">
 					<BarChart {...barChartArgs} />
-					{props.data && (
+					{data && (
 						<div className="flex justify-center w-full gap-x-4 ml-6 mt-2">
 							<IconButton
 								color={"black"}
 								variant={windowStart === 0 ? "outlined" : "filled"}
 								disabled={windowStart === 0}
-								onClick={() => scrollData("backward")}
+								onClick={() => scroll(-1)}
 							>
 								<ChevronLeftIcon className="w-auto h-6" />
 							</IconButton>
 							<IconButton
 								color={"black"}
-								variant={windowStart + windowSize >= props.data?.length ? "outlined" : "filled"}
-								disabled={windowStart + windowSize >= props.data?.length}
-								onClick={() => scrollData("forward")}
+								variant={windowStart + windowSize >= data?.length ? "outlined" : "filled"}
+								disabled={windowStart + windowSize >= data?.length}
+								onClick={() => scroll(1)}
 							>
 								<ChevronRightIcon className="w-auto h-6" />
 							</IconButton>
@@ -96,7 +103,7 @@ export default function DataSampleStatusChart(props) {
 			</div>
 
 			<div className="flex flex-col items-start ml-6 space-y-2">
-				{props.categories.map((category, idx) => (
+				{categories.map((category, idx) => (
 					<div
 						key={category}
 						className="flex items-center cursor-pointer space-x-2"
@@ -105,12 +112,12 @@ export default function DataSampleStatusChart(props) {
 						<div
 							className="w-4 h-4 rounded"
 							style={{
-								backgroundColor: activeCategories.has(category) ? props.colors[idx] : "#ccc",
+								backgroundColor: activeCategories.includes(category) ? COLORS[idx] : "#ccc",
 							}}
 						/>
 						<span
 							className={`text-sm ${
-								activeCategories.has(category) ? "text-black" : "text-gray-400"
+								activeCategories.includes(category) ? "text-black" : "text-gray-400"
 							}`}
 						>
 							{category}

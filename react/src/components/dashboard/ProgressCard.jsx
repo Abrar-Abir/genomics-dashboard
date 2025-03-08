@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { COLORS } from "@components/utils.js";
 import { preprocessData } from "@components/utils.js";
 import {
 	Card,
@@ -23,100 +24,75 @@ import {
 } from "@heroicons/react/24/solid";
 import { PiEyedropperSampleFill, PiTextColumnsFill } from "react-icons/pi";
 
-export default function AreaChartCard({
-	title,
-	tooltip,
-	data,
-	index,
-	colors,
-	showLegend,
-	xAxisLabel,
-	yAxisWidth,
-	kpis,
-}) {
-	const [selectedIndex, setSelectedIndex] = useState(0);
-	const selectedKpi = kpis[selectedIndex];
-	const cumulativeSelectedKpi = kpis[selectedIndex + 2];
-	const [view, setView] = useState(1);
+export default function ProgressCard({ data }) {
+	const [isFlowcellsSelected, setIsFlowcellSelected] = useState(true);
+	const [isCumulative, setIsCumulative] = useState(false);
+	const [period, setPeriod] = useState(1);
 	const [windowSize, setWindowSize] = useState(30);
 	const [windowStart, setWindowStart] = useState(0);
 	const [preprocessedData, setPreprocessedData] = useState(data);
-	const [toggleCumulative, setToggleCumulative] = useState(false);
-
-	const categories = toggleCumulative ? [cumulativeSelectedKpi] : [selectedKpi];
-	//   const [colors, setColors] = useState([colors[0]]);
+	const category = isCumulative
+		? isFlowcellsSelected
+			? "FlowcellsTotal"
+			: "SamplesTotal"
+		: isFlowcellsSelected
+		? "Flowcells"
+		: "Samples";
 
 	useEffect(() => {
 		if (data) {
-			const newData = preprocessData(data, view);
-			setPreprocessedData(newData);
-		} else {
-			setPreprocessedData(null);
+			setPreprocessedData(preprocessData(data, period));
 		}
-	}, [data, view]);
+	}, [data, period]);
 
 	useEffect(() => {
 		if (preprocessedData) {
-			const initialWindowStart = Math.max(0, preprocessedData.length - windowSize);
-			setWindowStart(initialWindowStart);
+			setWindowStart(Math.max(0, preprocessedData.length - windowSize));
 		}
 	}, [preprocessedData, windowSize]);
 
 	const windowedData = preprocessedData?.slice(windowStart, windowStart + windowSize);
 
-	const scrollData = (direction) => {
-		if (direction === "forward") {
-			const newStart = windowStart + windowSize;
-			if (newStart + windowSize >= preprocessedData?.length) {
-				setWindowStart(
-					preprocessedData?.length - windowSize >= 0 ? preprocessedData?.length - windowSize : 0
-				);
-			} else {
-				setWindowStart(newStart);
-			}
-		} else if (direction === "backward") {
-			const newStart = windowStart - windowSize;
-			if (newStart < 0) {
-				setWindowStart(0);
-			} else {
-				setWindowStart(newStart);
-			}
+	const scroll = (direction) => {
+		const newStart = windowStart + direction * windowSize;
+		if (direction === 1) {
+			setWindowStart(Math.min(Math.max(preprocessedData?.length - windowSize, 0)), newStart);
+		} else if (direction === -1) {
+			setWindowStart(Math.max(newStart, 0));
 		}
 	};
 
-	const valueFormatter = (number) => `${Intl.NumberFormat("us").format(number).toString()}`;
-
 	const areaChartArgs = {
-		categories: categories,
+		categories: [category],
 		showAnimation: true,
 		animationDuration: 1000,
 		autoMinValue: true,
 		className: "select-none",
 		data: windowedData,
-		index: index,
-		colors: toggleCumulative ? [colors[2]] : [colors[selectedIndex]],
-		showLegend: showLegend,
-		yAxisWidth: yAxisWidth,
-		xAxisLabel: xAxisLabel,
-		valueFormatter: valueFormatter,
+		index: "date",
+		colors: [COLORS[isFlowcellsSelected ? 1 : 0]],
+		showLegend: true,
+		yAxisWidth: 56,
+		xAxisLabel: "Demultiplex Date",
+		valueFormatter: (number) => number.toLocaleString("en-US"),
 	};
 
 	return (
 		<Card decoration="top" decorationColor="teal" className="flex flex-col space-y-2 h-full">
 			<div className="flex space-x-0.5 font-cabin items-center">
-				<Title> {title} </Title>
+				<Title> Quantity processed over time</Title>
 				<Icon
 					icon={InformationCircleIcon}
 					variant="simple"
 					className=" text-teal-600 hover:text-teal-400 cursor-pointer"
-					tooltip={tooltip}
+					tooltip="Overview of the number of samples/flowcells processed along with the cumulative number of units in a daily/weekly/monthly/yearly view, over the specified Demultiplex date range."
 				/>
 			</div>
 			<div className="select-none h-[10%] flex flex-col md:flex-row justify-between items-center">
 				<TabGroup
 					className="flex justify-start"
-					index={selectedIndex}
-					onIndexChange={setSelectedIndex}
+					index={isFlowcellsSelected}
+					onIndexChange={() => setIsFlowcellSelected(!isFlowcellsSelected)}
 				>
 					<TabList variant="solid" color="indigo">
 						<Tab>
@@ -134,12 +110,10 @@ export default function AreaChartCard({
 					<div className="flex flex-col md:flex-row gap-y-4 md:gap-x-4 ml-4">
 						<Select
 							className="max-w-[14rem] justify-end text-gray-500 hover:text-black"
-							value={view}
+							value={period}
 							placeholder="Select a time period"
 							onValueChange={(val) => {
-								setView(val);
-								let newData = preprocessData(data, val);
-								setPreprocessedData(newData);
+								setPeriod(val);
 							}}
 							icon={EyeIcon}
 						>
@@ -165,8 +139,8 @@ export default function AreaChartCard({
 								type="checkbox"
 								id="checkbox1"
 								className="h-4 w-4 mx-2 rounded-sm"
-								checked={toggleCumulative}
-								onChange={() => setToggleCumulative(!toggleCumulative)}
+								checked={isCumulative}
+								onChange={() => setIsCumulative(!isCumulative)}
 							/>
 							<Subtitle>Cumulative</Subtitle>
 						</div>
@@ -182,7 +156,7 @@ export default function AreaChartCard({
 							color={"black"}
 							variant={windowStart === 0 ? "outlined" : "filled"}
 							disabled={windowStart === 0 ? true : false}
-							onClick={() => scrollData("backward")}
+							onClick={() => scroll(-1)}
 						>
 							<ChevronLeftIcon className="w-auto h-6" />
 						</IconButton>
@@ -191,7 +165,7 @@ export default function AreaChartCard({
 							color={"black"}
 							variant={windowStart + windowSize >= preprocessedData?.length ? "outlined" : "filled"}
 							disabled={windowStart + windowSize >= preprocessedData?.length ? true : false}
-							onClick={() => scrollData("forward")}
+							onClick={() => scroll(1)}
 						>
 							<ChevronRightIcon className="w-auto h-6" />
 						</IconButton>

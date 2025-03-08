@@ -700,7 +700,7 @@ def get_distinct(entity):
 	return [row[0] for row in columns]
 
 
-@ app.route('/areachart/<date>')
+@ app.route('/progress-area/<date>')
 def data1(date):
 	try:
 		start, end = parse_date(date)
@@ -738,7 +738,7 @@ def data1(date):
 	return jsonify(results)
 
 
-@ app.route('/barchart2a/<date>')
+@ app.route('/status-bar/<date>')
 def data2a(date):
 	try:
 		start, end = parse_date(date)
@@ -783,7 +783,7 @@ def data2a(date):
 	return jsonify(results)
 
 
-@ app.route('/barchart2b/<date>')
+@ app.route('/project-bar/<date>')
 def data2b(date):
 	try:
 		start, end = parse_date(date)
@@ -832,7 +832,7 @@ def data2b(date):
 	return jsonify(output)
 
 
-@ app.route('/barchart2c/<date>')
+@ app.route('/refgenome-bar/<date>')
 def data2c(date):
 	try:
 		start, end = parse_date(date)
@@ -842,7 +842,7 @@ def data2c(date):
 			SELECT JSON_AGG(result)
 			FROM (
 				SELECT
-					project.pi as "pi", project.project as "project", submission.rg as "genome", COUNT(*) as "sample_count"
+					project.pi as "pi", project.project as "project", COALESCE(NULLIF(submission.rg, ''), 'N/A') as "genome", COUNT(*) as "sample_count"
 				FROM
 					project
 				LEFT JOIN
@@ -870,15 +870,15 @@ def data2c(date):
 	for dct in results:
 		if dct['pi'] not in output:
 			output[dct['pi']] = dict()
-		elif dct['project'] not in output[dct['pi']]:
-			output[dct['pi']][dct['project']] = {dct['genome'] : dct['sample_count']}
-		else:
-			output[dct['pi']][dct['project']][dct['genome']] = dct['sample_count']
+		if dct['project'] not in output[dct['pi']]:
+			output[dct['pi']][dct['project']] = dict()
+
+		output[dct['pi']][dct['project']][dct['genome']] = dct['sample_count']
 		rg.add(dct['genome'])
 	return jsonify({'rg': list(rg), 'body': output})
 
 
-@ app.route('/donutchart3/<date>')
+@ app.route('/fctype-donut/<date>')
 def data3(date):
 	try:
 		start, end = parse_date(date)
@@ -905,7 +905,7 @@ def data3(date):
 	return jsonify(results)
 
 
-@ app.route('/donutchart4/<date>')
+@ app.route('/service-donut/<date>')
 def data4(date):
 	try:
 		start, end = parse_date(date)
@@ -915,7 +915,7 @@ def data4(date):
 	query = f"""
 		SELECT JSON_AGG(result)
 		FROM (
-			SELECT srv as "type", COUNT(*) as "quantity"
+			SELECT COALESCE(NULLIF(srv, ''), 'N/A') as "type", COUNT(*) as "quantity"
 			FROM submission
 			LEFT JOIN sample ON sample.submission_id = submission.submission_id
 			LEFT JOIN flowcell ON flowcell.flowcell_id = sample.flowcell_id
@@ -932,16 +932,15 @@ def data4(date):
 	else:
 		results = fetch_result[0][0]
 
-	# Replace empty strings with "N/A"
-	if results:
-		for item in results:
-			if item['type'] == "":
-				item['type'] = "N/A"
+	# if results:
+	# 	for item in results:
+	# 		if item['type'] == "":
+	# 			item['type'] = "N/A"
 
 	return jsonify(results)
 
 
-@ app.route('/donutchart5/<date>')
+@ app.route('/sequencer-donut/<date>')
 def data5(date):
 	try:
 		start, end = parse_date(date)
@@ -968,7 +967,7 @@ def data5(date):
 	return jsonify(results)
 
 
-@ app.route('/donutchart6/<date>')
+@ app.route('/refgenome-donut/<date>')
 def data6(date):
 	try:
 		start, end = parse_date(date)
@@ -977,7 +976,7 @@ def data6(date):
 	query = f"""
 			SELECT JSON_AGG(result)
 			FROM (
-				SELECT rg as "type", COUNT(*) as "quantity"
+				SELECT COALESCE(NULLIF(rg, ''), 'N/A') as "type", COUNT(*) as "quantity"
 				FROM submission
 				LEFT JOIN sample ON sample.submission_id = submission.submission_id
 				LEFT JOIN flowcell ON flowcell.flowcell_id = sample.flowcell_id

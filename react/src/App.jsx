@@ -65,7 +65,11 @@ export default function App() {
 
 	// Dashboard Page props
 
-	const dashboardStateFresh = { start: new Date("2000-01-01"), end: new Date(), qgp: false };
+	const dashboardStateFresh = {
+		startDate: new Date("2000-01-01"),
+		endDate: new Date(),
+		qgp: false,
+	};
 	const [dashboardState, setDashboardState] = useState(dashboardStateFresh);
 	const resetDashboard = () => {
 		setDashboardState(dashboardStateFresh);
@@ -116,7 +120,7 @@ export default function App() {
 						index
 						element={
 							<Dashboard
-								sate={dashboardState}
+								state={dashboardState}
 								setState={setDashboardState}
 								reset={resetDashboard}
 							/>

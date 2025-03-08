@@ -1,34 +1,43 @@
-import {
-  startOfMonth,
-  startOfWeek,
-  startOfYear,
-  format,
-  parse,
-} from "date-fns";
-import require$$0 from "dayjs";
+import {format, startOfWeek, startOfMonth, startOfYear, parse } from "date-fns";
+
+export const BASE_URL = "http://localhost:5001";
+// const BASE_URL = "https://genomics-dashboard-flask.onrender.com";
+// const BASE_URL = "http://172.32.79.51:5001";
+export const DATE_FORMAT = "yyyy-MM-dd";
+export const COLORS = [
+	"teal", // #14b8a6
+	"indigo", // #ef4444
+	"blue", // #a855f7
+	"orange", // #6366f1
+	"red", // #f97316
+	"amber", // #f59e0b
+	"cyan", // #06b6d4
+	"purple", // #3b82f6
+	"lime", // #84cc16
+	"yellow", // #eab308
+	"green", // #22c55e
+  ];
 
 export function preprocessData(data, period) {
   let aggregatedData = {};
-//   console.log(data);
   data.forEach((item) => {
-    // Parse the date using the correct format
     let date = parse(item.date, "dd-MM-yyyy", new Date());
     let key;
 
     switch (period) {
-      case 1: // Daily
+      case 1: 
         key = format(date, "dd-MM-yyyy");
         break;
-      case 2: // Weekly
-        key = format(startOfWeek(date, { weekStartsOn: 1 }), "dd-MM-yyyy"); // week starts on Monday
+      case 2:
+        key = format(startOfWeek(date), "dd-MM-yyyy");
         break;
-      case 3: // Monthly
+      case 3: 
         key = format(startOfMonth(date), "MM-yyyy");
         break;
-      case 4: // Yearly
+      case 4: 
         key = format(startOfYear(date), "yyyy");
         break;
-      default: // Default to daily
+      default: 
         key = format(date, "dd-MM-yyyy");
     }
 
@@ -43,19 +52,9 @@ export function preprocessData(data, period) {
     aggregatedData[key].Samples += item.Samples;
     aggregatedData[key].Flowcells += item.Flowcells;
 
-    // Since SamplesTotal and FlowcellsTotal are cumulative, we should take the latest available total value for the period
     aggregatedData[key].SamplesTotal = item.SamplesTotal;
     aggregatedData[key].FlowcellsTotal = item.FlowcellsTotal;
   });
 
-  // Convert aggregatedData from an object to an array
   return Object.values(aggregatedData);
-}
-
-export function formatDate(date, format = "YYYY-MM-DD") {
-  return date.format(format);
-}
-
-export function formatJsDate(date, format = "YYYYMMDD") {
-  return require$$0(date).format(format);
 }

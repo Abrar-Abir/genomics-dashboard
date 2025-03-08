@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
+// useeffect?
 import { BarChart, NumberInput } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon, ComputerDesktopIcon } from "@heroicons/react/24/solid";
-import predefinedColors from "@lib/colors";
+import { COLORS } from "@components/utils.js";
 
-export default function CustomBarChart2(props) {
+export default function ProjectCard({ data }) {
 	const [windowSize, setWindowSize] = useState(6);
 	const [windowStart, setWindowStart] = useState(0);
 	const [categories, setCategories] = useState([]);
-	const [colors, setColors] = useState(predefinedColors);
+	const [colors, setColors] = useState(COLORS);
 
 	useEffect(() => {
 		setWindowStart(0);
 	}, [windowSize]);
 
-	const windowedData = props.data?.slice(windowStart, windowStart + windowSize);
+	const windowedData = data?.slice(windowStart, windowStart + windowSize);
 
 	useEffect(() => {
-		// Extract all project names from the windowed data
-		if (props.data) {
+		if (data) {
 			const allProjects = {};
-			const windowedData = props.data.slice(windowStart, windowStart + windowSize);
+			const windowedData = data.slice(windowStart, windowStart + windowSize);
 
 			windowedData.forEach((item) => {
 				Object.keys(item).forEach((key) => {
@@ -30,49 +30,34 @@ export default function CustomBarChart2(props) {
 				});
 			});
 
-			//   console.log("all projects ", allProjects);
 			const allCategories = Object.keys(allProjects);
-			//   console.log("hehe", allCategories);
 			setCategories(allCategories);
-			const allColors = allCategories.map((_, i) => predefinedColors[i % predefinedColors.length]);
+			const allColors = allCategories.map((_, i) => COLORS[i % COLORS.length]);
 			setColors(allColors);
 		}
 	}, [windowStart, windowSize]);
 
-	// Update the window start index to scroll through the data
-	const scrollData = (direction) => {
-		if (direction === "forward") {
-			const newStart = windowStart + windowSize;
-			if (newStart + windowSize >= props.data?.length) {
-				// If moving forward would leave fewer than windowSize items, show the last windowSize or less
-				setWindowStart(props.data?.length - windowSize >= 0 ? props.data?.length - windowSize : 0);
-			} else {
-				setWindowStart(newStart);
-			}
-		} else if (direction === "backward") {
-			const newStart = windowStart - windowSize;
-			if (newStart < 0) {
-				// If moving backward would go before the start, set to 0
-				setWindowStart(0);
-			} else {
-				setWindowStart(newStart);
-			}
+	const scroll = (direction) => {
+		const newStart = windowStart + direction * windowSize;
+		if (direction === 1) {
+			setWindowStart(Math.min(Math.max(data?.length - windowSize, 0), newStart));
+		} else if (direction === -1) {
+			setWindowStart(Math.max(newStart, 0));
 		}
 	};
 
 	const valueFormatter = (number) => `${Intl.NumberFormat("us").format(number).toString()}`;
 
-	// Arguments to be passed to the BarChart component
 	const barChartArgs = {
 		categories: categories,
 		showAnimation: true,
 		animationDuration: 1000,
 		className: "select-none",
 		data: windowedData,
-		index: props.index,
+		index: "pi",
 		colors: colors,
-		showLegend: props.showLegend,
-		yAxisWidth: props.yAxisWidth,
+		showLegend: false,
+		yAxisWidth: 56,
 		valueFormatter: valueFormatter,
 		stack: true,
 	};
@@ -93,23 +78,23 @@ export default function CustomBarChart2(props) {
 			</div>
 			<div className="mt-4">
 				<BarChart {...barChartArgs} />
-				{props.data && (
+				{data && (
 					<div className="flex justify-center w-full gap-x-4 ml-6 mt-2">
 						<IconButton
 							className="cursor-pointer"
 							color={"black"}
 							variant={windowStart === 0 ? "outlined" : "filled"}
 							disabled={windowStart === 0 ? true : false}
-							onClick={() => scrollData("backward")}
+							onClick={() => scroll(-1)}
 						>
 							<ChevronLeftIcon className="w-auto h-6" />
 						</IconButton>
 						<IconButton
 							className="cursor-pointer"
 							color={"black"}
-							variant={windowStart + windowSize >= props.data?.length ? "outlined" : "filled"}
-							disabled={windowStart + windowSize >= props.data?.length ? true : false}
-							onClick={() => scrollData("forward")}
+							variant={windowStart + windowSize >= data?.length ? "outlined" : "filled"}
+							disabled={windowStart + windowSize >= data?.length ? true : false}
+							onClick={() => scroll(1)}
 						>
 							<ChevronRightIcon className="w-auto h-6" />
 						</IconButton>
@@ -119,5 +104,3 @@ export default function CustomBarChart2(props) {
 		</div>
 	);
 }
-
-// export default CustomBarChart2;
