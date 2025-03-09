@@ -700,13 +700,12 @@ def get_distinct(entity):
 	return [row[0] for row in columns]
 
 
-@ app.route('/progress-area/<date>')
-def data1(date):
+@ app.route('/progress-area/<date>/<no_qgp>')
+def data1(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
 		return jsonify("format should be 'yyyymmdd-yyyymmdd'")
-
 	query = f"""
 			SELECT JSON_AGG(result)
 			FROM (
@@ -720,8 +719,9 @@ def data1(date):
 					flowcell
 				INNER JOIN
 					sample ON flowcell.flowcell_id = sample.flowcell_id
+				{(no_qgp == 'true')* "LEFT JOIN submission ON submission.submission_id = sample.submission_id LEFT JOIN project ON project.project_id = submission.project_id"}
 				WHERE
-					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY
 					demultiplex_date
 				ORDER BY
@@ -730,33 +730,32 @@ def data1(date):
 			result;"""
 
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
-@ app.route('/status-bar/<date>')
-def data2a(date):
+@ app.route('/status-bar/<date>/<no_qgp>')
+def data2a(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
 		return jsonify("format should be 'yyyymmdd-yyyymmdd'")
 
-	results = get_distinct('sample.status')
+	# status = get_distinct('sample.status')
 
-	case_query = ""
-	for value in results:
-		case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else 'N/A'}","""
+	# case_query = ""
+	# for value in status:
+		# case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else 'N/A'}","""
 
 	query = f"""
 		SELECT JSON_AGG(result)
 		FROM (
 		  SELECT
-			pi,
-			{case_query[:-1]}
+			pi, COALESCE(NULLIF(sample.status, ''), 'N/A') as "status", COUNT(*) as "sample_count"
 		  FROM
 			project
 		  LEFT JOIN
@@ -766,9 +765,9 @@ def data2a(date):
 		  LEFT JOIN
 			flowcell ON sample.flowcell_id = flowcell.flowcell_id
 		  WHERE
-			demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+			demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 		  GROUP BY
-			pi
+			pi, sample.status
 		  ORDER BY
 		  	COUNT(*) DESC
 		  )
@@ -776,15 +775,36 @@ def data2a(date):
 
 	fetch_result = fetch(cursor, query, 'all')
 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+		return jsonify(None)
+	
+	results = fetch_result[0][0]
+	# return jsonify(results)
+	status_set = set()
+	output = dict()
+	for dct in results:
+		if dct['pi'] not in output:
+			output[dct['pi']] = dict()
 
-	return jsonify(results)
+		output[dct['pi']][dct['status']] = dct['sample_count']
+		status_set.add(dct['status'])
+
+	data = []
+	for pi in output:
+		pi_status = {"pi": pi, "total": 0}
+		for status in status_set:
+			pi_status[status] = output[pi].get(status, 0)
+			pi_status["total"] += pi_status[status] 
+		data.append(pi_status)
+
+	return jsonify({'status': list(status_set), 'body': sorted(data, key = lambda x : x["total"], reverse = True )})
+
+	# results = fetch_result[0][0]
+
+	# return jsonify(results)
 
 
-@ app.route('/project-bar/<date>')
-def data2b(date):
+@ app.route('/project-bar/<date>/<no_qgp>')
+def data2b(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -804,7 +824,7 @@ def data2b(date):
 				LEFT JOIN
 					flowcell ON sample.flowcell_id = flowcell.flowcell_id
 				WHERE
-					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY
 					project.pi, project.project
 				ORDER BY
@@ -813,10 +833,10 @@ def data2b(date):
 			result;
 		"""
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 	
 	output = []
 	if results:
@@ -832,8 +852,8 @@ def data2b(date):
 	return jsonify(output)
 
 
-@ app.route('/refgenome-bar/<date>')
-def data2c(date):
+@ app.route('/refgenome-bar/<date>/<no_qgp>')
+def data2c(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -852,7 +872,7 @@ def data2c(date):
 				LEFT JOIN
 					flowcell ON sample.flowcell_id = flowcell.flowcell_id
 				WHERE
-					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+					demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY
 					project.pi, project.project, submission.rg
 				ORDER BY
@@ -861,10 +881,11 @@ def data2c(date):
 			result;
 		"""
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0 or fetch_result[0][0] == None:
+		return jsonify(None)
+	# else:
+	# print(fetch_result)
+	results = fetch_result[0][0]
 	rg = set()
 	output = dict()
 	for dct in results:
@@ -878,8 +899,8 @@ def data2c(date):
 	return jsonify({'rg': list(rg), 'body': output})
 
 
-@ app.route('/fctype-donut/<date>')
-def data3(date):
+@ app.route('/fctype-donut/<date>/<no_qgp>')
+def data3(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -888,25 +909,26 @@ def data3(date):
 	query = f"""
 			SELECT JSON_AGG(result)
 			FROM (
-				SELECT flowcell_type as "type", COUNT(*) as "quantity"
+				SELECT flowcell_type as "type", COUNT(DISTINCT flowcell.flowcell_id) AS "quantity" 
 				FROM flowcell
-				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+				{(no_qgp == 'true') *"LEFT JOIN sample ON sample.flowcell_id = flowcell.flowcell_id LEFT JOIN submission ON submission.submission_id = sample.submission_id LEFT JOIN project ON project.project_id = submission.project_id"}
+				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY flowcell_type
-		ORDER BY COUNT(*) DESC
+				ORDER BY COUNT(DISTINCT flowcell.flowcell_id) DESC
 				)
 			result;
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
-@ app.route('/service-donut/<date>')
-def data4(date):
+@ app.route('/service-donut/<date>/<no_qgp>')
+def data4(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -919,7 +941,8 @@ def data4(date):
 			FROM submission
 			LEFT JOIN sample ON sample.submission_id = submission.submission_id
 			LEFT JOIN flowcell ON flowcell.flowcell_id = sample.flowcell_id
-			WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+			{(no_qgp == 'true') * "LEFT JOIN project on project.project_id = submission.project_id"}
+			WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 			GROUP BY srv
 			ORDER BY COUNT(*) DESC
 		)
@@ -927,21 +950,16 @@ def data4(date):
 	"""
 
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
-
-	# if results:
-	# 	for item in results:
-	# 		if item['type'] == "":
-	# 			item['type'] = "N/A"
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
-@ app.route('/sequencer-donut/<date>')
-def data5(date):
+@ app.route('/sequencer-donut/<date>/<no_qgp>')
+def data5(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -950,25 +968,26 @@ def data5(date):
 	query = f"""
 			SELECT JSON_AGG(result)
 			FROM (
-				SELECT sequencer_id as "type", COUNT(*) as "quantity"
+				SELECT sequencer_id as "type", COUNT(DISTINCT flowcell.flowcell_id) AS "quantity"
 				FROM flowcell
-				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+				{(no_qgp == 'true') *"LEFT JOIN sample ON sample.flowcell_id = flowcell.flowcell_id LEFT JOIN submission ON submission.submission_id = sample.submission_id LEFT JOIN project ON project.project_id = submission.project_id"}
+				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY sequencer_id
-		ORDER BY COUNT(*) DESC
+				ORDER BY COUNT(DISTINCT flowcell.flowcell_id) DESC
 				)
 			result;
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
-@ app.route('/refgenome-donut/<date>')
-def data6(date):
+@ app.route('/refgenome-donut/<date>/<no_qgp>')
+def data6(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -980,16 +999,17 @@ def data6(date):
 				FROM submission
 				LEFT JOIN sample ON sample.submission_id = submission.submission_id
 				LEFT JOIN flowcell ON flowcell.flowcell_id = sample.flowcell_id
-				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}'
+				{(no_qgp == 'true') * "LEFT JOIN project on project.project_id = submission.project_id"}
+				WHERE demultiplex_date BETWEEN '{start.strftime('%Y-%m-%d')}' AND '{end.strftime('%Y-%m-%d')}' {(no_qgp == 'true') * " AND project.pi != 'QGP'"}
 				GROUP BY rg
 				)
-			result;
+			result; 
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
-	else:
-		results = fetch_result[0][0]
+	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
+	# 	results = None
+	# else:
+	results = fetch_result[0][0]
 	return jsonify(results)
 
 

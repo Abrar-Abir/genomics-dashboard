@@ -21,7 +21,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .tremor-Legend-root.custom-legend > div {
   flex-direction: column;
   width: auto; /* Let the width adjust based on content */
-  overflow: scroll; /* Ensure no content is clipped */
+  overflow: auto; /* Ensure no content is clipped */
 }
 
 

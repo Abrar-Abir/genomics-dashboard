@@ -1,13 +1,11 @@
 import { BASE_URL } from "@components/utils.js";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DashboardHeader from "@components/dashboard/DashboardHeader";
 import ProgressCard from "@components/dashboard/ProgressCard";
 import PICard from "@components/dashboard/PICard";
 import DonutCard from "@components/dashboard/DonutCard";
-
-// const dashboardStateFresh = { start: new Date("2000-01-01"), end: new Date(), qgp: false };
-
+import { DATE_FORMAT } from "@components/utils.js";
 export default function Dashboard({ state, setState, reset }) {
 	const [data, setData] = useState({
 		"progress-area": [],
@@ -22,10 +20,9 @@ export default function Dashboard({ state, setState, reset }) {
 
 	const fetchData = async (key) => {
 		try {
-			console.log(state);
-			const start = format(state.startDate, "yyyyMMdd");
-			const end = format(state.endDate, "yyyyMMdd");
-			const response = await fetch(`${BASE_URL}/${key}/${start}-${end}`);
+			const start = format(state.startDate, DATE_FORMAT);
+			const end = format(state.endDate, DATE_FORMAT);
+			const response = await fetch(`${BASE_URL}/${key}/${start}-${end}/${!state.qgp}`);
 			if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
 			const data = await response.json();

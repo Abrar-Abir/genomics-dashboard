@@ -68,7 +68,7 @@ export default function App() {
 	const dashboardStateFresh = {
 		startDate: new Date("2000-01-01"),
 		endDate: new Date(),
-		qgp: false,
+		qgp: true,
 	};
 	const [dashboardState, setDashboardState] = useState(dashboardStateFresh);
 	const resetDashboard = () => {

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-// useeffect?
+import { useState } from "react";
 import { BarChart, NumberInput } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon, ComputerDesktopIcon } from "@heroicons/react/24/solid";
@@ -8,34 +7,11 @@ import { COLORS } from "@components/utils.js";
 export default function ProjectCard({ data }) {
 	const [windowSize, setWindowSize] = useState(6);
 	const [windowStart, setWindowStart] = useState(0);
-	const [categories, setCategories] = useState([]);
-	const [colors, setColors] = useState(COLORS);
-
-	useEffect(() => {
-		setWindowStart(0);
-	}, [windowSize]);
-
 	const windowedData = data?.slice(windowStart, windowStart + windowSize);
 
-	useEffect(() => {
-		if (data) {
-			const allProjects = {};
-			const windowedData = data.slice(windowStart, windowStart + windowSize);
-
-			windowedData.forEach((item) => {
-				Object.keys(item).forEach((key) => {
-					if (key !== "pi") {
-						allProjects[key] = true;
-					}
-				});
-			});
-
-			const allCategories = Object.keys(allProjects);
-			setCategories(allCategories);
-			const allColors = allCategories.map((_, i) => COLORS[i % COLORS.length]);
-			setColors(allColors);
-		}
-	}, [windowStart, windowSize]);
+	const allCategories = windowedData.flatMap((item) =>
+		Object.keys(item).filter((key) => key !== "pi")
+	);
 
 	const scroll = (direction) => {
 		const newStart = windowStart + direction * windowSize;
@@ -49,13 +25,13 @@ export default function ProjectCard({ data }) {
 	const valueFormatter = (number) => `${Intl.NumberFormat("us").format(number).toString()}`;
 
 	const barChartArgs = {
-		categories: categories,
+		categories: allCategories,
 		showAnimation: true,
 		animationDuration: 1000,
 		className: "select-none",
 		data: windowedData,
 		index: "pi",
-		colors: colors,
+		colors: COLORS,
 		showLegend: false,
 		yAxisWidth: 56,
 		valueFormatter: valueFormatter,
@@ -72,7 +48,6 @@ export default function ProjectCard({ data }) {
 					step={6}
 					enableStepper={true}
 					min={0}
-					// ??
 					onValueChange={(val) => setWindowSize(val)}
 				/>
 			</div>

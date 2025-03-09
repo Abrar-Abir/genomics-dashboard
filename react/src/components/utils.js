@@ -3,22 +3,24 @@ import {format, startOfWeek, startOfMonth, startOfYear, parse } from "date-fns";
 export const BASE_URL = "http://localhost:5001";
 // const BASE_URL = "https://genomics-dashboard-flask.onrender.com";
 // const BASE_URL = "http://172.32.79.51:5001";
-export const DATE_FORMAT = "yyyy-MM-dd";
+export const DATE_FORMAT = "yyyyMMdd";
 export const COLORS = [
 	"teal", // #14b8a6
-	"indigo", // #ef4444
 	"blue", // #a855f7
 	"orange", // #6366f1
+	"green", // #22c55e
+	"indigo", // #ef4444
+	"cyan", // #06b6d4
 	"red", // #f97316
 	"amber", // #f59e0b
-	"cyan", // #06b6d4
 	"purple", // #3b82f6
 	"lime", // #84cc16
 	"yellow", // #eab308
-	"green", // #22c55e
+
   ];
 
 export function preprocessData(data, period) {
+	if (data === null){return []};
   let aggregatedData = {};
   data.forEach((item) => {
     let date = parse(item.date, "dd-MM-yyyy", new Date());

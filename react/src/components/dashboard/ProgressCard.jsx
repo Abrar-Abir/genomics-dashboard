@@ -40,9 +40,7 @@ export default function ProgressCard({ data }) {
 		: "Samples";
 
 	useEffect(() => {
-		if (data) {
-			setPreprocessedData(preprocessData(data, period));
-		}
+		setPreprocessedData(preprocessData(data, period));
 	}, [data, period]);
 
 	useEffect(() => {
@@ -52,7 +50,6 @@ export default function ProgressCard({ data }) {
 	}, [preprocessedData, windowSize]);
 
 	const windowedData = preprocessedData?.slice(windowStart, windowStart + windowSize);
-
 	const scroll = (direction) => {
 		const newStart = windowStart + direction * windowSize;
 		if (direction === 1) {

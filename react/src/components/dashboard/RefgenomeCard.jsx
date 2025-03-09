@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { Card, Grid, Title, BarChart, Button, Legend } from "@tremor/react";
-import { Dialog, DialogBody, DialogFooter, DialogHeader } from "@material-tailwind/react";
+import { Card, Grid, Title, BarChart, Button } from "@tremor/react";
+import { Dialog, DialogBody, DialogHeader } from "@material-tailwind/react";
 import { COLORS } from "@components/utils.js";
+import Legend from "./Legend";
 
 export default function RefgenomeCard({ data }) {
+	const categories = data?.rg || [];
 	const [isOpen, setIsOpen] = useState(false);
 	const [genomeColors, setGenomeColors] = useState({});
-
+	const [activeCategories, setActiveCategories] = useState([]);
 	const openModal = () => setIsOpen(true);
 	const closeModal = () => setIsOpen(false);
 	const [rowSize, setRowSize] = useState(4);
@@ -15,12 +17,13 @@ export default function RefgenomeCard({ data }) {
 
 	const numItemsInGrid = rowSize;
 	useEffect(() => {
-		const genomeColorMapping = data.rg.reduce((acc, genome, index) => {
+		const genomeColorMapping = categories.reduce((acc, genome, index) => {
 			acc[genome] = COLORS[index % COLORS.length];
 			return acc;
 		}, {});
 		setGenomeColors(genomeColorMapping);
-	}, []);
+		setActiveCategories(categories);
+	}, [data]);
 
 	useEffect(() => {
 		setRowSize(4);
@@ -28,30 +31,29 @@ export default function RefgenomeCard({ data }) {
 
 	return (
 		<div className="flex flex-col space-y-4 h-full max-h-screen">
-			<Legend className="flex justify-end" categories={data.rg} colors={COLORS} />
+			<Legend
+				categories={categories}
+				colors={COLORS}
+				activeCategories={activeCategories}
+				setActiveCategories={setActiveCategories}
+			/>
 			<div className="flex justify-between space-x-2">
 				{Object.entries(data.body)
-					.slice(0, 3)
-					.map(([pi, piData]) => {
-						const chartData = Object.keys(piData).map((project) => ({
-							name: project,
-							...Object.keys(piData[project]).reduce((acc, rg) => {
-								acc[rg] = piData[project][rg];
-								return acc;
-							}, {}),
-						}));
-
-						const colors = Object.values(genomeColors);
+					.slice(0, 4)
+					.map(([pi, projects]) => {
+						const chartData = Object.entries(projects).map(([project, refgenomes]) => {
+							return { ...refgenomes, name: project };
+						});
 
 						return (
 							<Card key={pi}>
 								<Title>{pi}</Title>
 								<BarChart
-									className="w-auto"
+									className="w-auto h-[12vh]"
 									data={chartData}
 									index="name"
-									categories={Object.keys(genomeColors)}
-									colors={colors}
+									categories={categories.filter((c) => activeCategories.includes(c))}
+									colors={COLORS.filter((_, i) => activeCategories.includes(categories[i]))}
 									yAxisWidth={40}
 									showLegend={false}
 									showXAxis={false}
@@ -65,7 +67,7 @@ export default function RefgenomeCard({ data }) {
 				className="bg-gray-700 text-white hover:bg-gray-500 border-none mx-auto"
 				onClick={openModal}
 			>
-				Show more
+				Show All
 			</Button>
 			<Dialog open={isOpen} handler={setIsOpen} size="lg" className="h-[85vh]">
 				<DialogHeader className="flex justify-between items-center h-[10vh] px-4">
@@ -94,14 +96,17 @@ export default function RefgenomeCard({ data }) {
 				</DialogHeader>
 
 				<DialogBody className="h-[65vh]">
-					<Legend className="mb-1 flex justify-end h-[5vh]" categories={data.rg} colors={COLORS} />
+					<Legend
+						categories={categories}
+						colors={COLORS}
+						activeCategories={activeCategories}
+						setActiveCategories={setActiveCategories}
+					/>
 					<Grid numItems={numItemsInGrid} className="gap-2 overflow-y-auto max-h-[60vh]">
 						{Object.entries(data.body).map(([pi, projects]) => {
 							const chartData = Object.entries(projects).map(([project, refgenomes]) => {
 								return { ...refgenomes, name: project };
 							});
-
-							const colors = Object.values(genomeColors);
 
 							return (
 								<Card key={pi} className="pl-1">
@@ -109,8 +114,8 @@ export default function RefgenomeCard({ data }) {
 										className="w-auto h-[12vh]"
 										data={chartData}
 										index="name"
-										categories={Object.keys(genomeColors)}
-										colors={colors}
+										categories={categories.filter((c) => activeCategories.includes(c))}
+										colors={COLORS.filter((_, i) => activeCategories.includes(categories[i]))}
 										yAxisWidth={40}
 										showLegend={false}
 										stack={true}
