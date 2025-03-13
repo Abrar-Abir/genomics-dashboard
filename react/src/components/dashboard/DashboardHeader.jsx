@@ -1,12 +1,7 @@
 import Datepicker from "react-tailwindcss-datepicker";
-import { Button, Checkbox } from "@material-tailwind/react";
-import {
-	AdjustmentsVerticalIcon,
-	NoSymbolIcon,
-	CheckCircleIcon,
-	ArrowPathIcon,
-} from "@heroicons/react/24/solid";
-import { Title } from "@tremor/react";
+import { Button } from "@material-tailwind/react";
+import { NoSymbolIcon, CheckCircleIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
+// import { Title } from "@tremor/react";
 import { startOfMonth, startOfYear, subDays } from "date-fns";
 
 const getDateRange = (start) => ({
@@ -28,15 +23,6 @@ export default function DashboardHeader({ state, setState, reset }) {
 			</Button>
 
 			<div className="flex items-center gap-4">
-				{/* <Checkbox
-					label="QGP"
-					onClick={() =>
-						setState((prevState) => ({
-							...prevState,
-							qgp: !prevState.qgp,
-						}))
-					}
-				/> */}
 				<Button
 					color="gray"
 					variant="outlined"

@@ -29,7 +29,7 @@ export default function PICard({ data }) {
 								selectedTab === 0 ? "bg-blue-gray-50 font-semibold text-black" : ""
 							} px-4 py-2 rounded`}
 						>
-							Data Sample Status
+							Sample Status
 						</Tab>
 						<Tab
 							key={1}

@@ -16,7 +16,6 @@ import {
 } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import {
-	ComputerDesktopIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	EyeIcon,
@@ -119,18 +118,6 @@ export default function ProgressCard({ data }) {
 							<SelectItem value={3}>Monthly</SelectItem>
 							<SelectItem value={4}>Yearly</SelectItem>
 						</Select>
-
-						<div className="flex items-center text-gray-500 hover:text-black">
-							<NumberInput
-								value={windowSize}
-								icon={ComputerDesktopIcon}
-								step={6}
-								enableStepper={true}
-								min={0}
-								onValueChange={(val) => setWindowSize(val)}
-							/>
-						</div>
-
 						<div className="flex items-center ">
 							<input
 								type="checkbox"
@@ -157,6 +144,15 @@ export default function ProgressCard({ data }) {
 						>
 							<ChevronLeftIcon className="w-auto h-6" />
 						</IconButton>
+						<NumberInput
+							className="max-w-[2rem]"
+							value={windowSize}
+							// icon={ComputerDesktopIcon}
+							step={6}
+							enableStepper={true}
+							min={0}
+							onValueChange={(val) => setWindowSize(val)}
+						/>
 						<IconButton
 							className="cursor-pointer"
 							color={"black"}

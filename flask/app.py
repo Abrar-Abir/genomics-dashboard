@@ -694,14 +694,9 @@ def export_datagrid(format):
 
 
 ####### overview page ##################################################
-def get_distinct(entity):
-	query = f""" SELECT DISTINCT {entity.split('.')[1]} FROM {entity.split('.')[0]} ORDER BY {entity.split('.')[1]} ASC;"""
-	columns = fetch(cursor, query, 'all')
-	return [row[0] for row in columns]
-
 
 @ app.route('/progress-area/<date>/<no_qgp>')
-def data1(date, no_qgp):
+def progress_area(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -739,17 +734,12 @@ def data1(date, no_qgp):
 
 
 @ app.route('/status-bar/<date>/<no_qgp>')
-def data2a(date, no_qgp):
+def status_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
 		return jsonify("format should be 'yyyymmdd-yyyymmdd'")
 
-	# status = get_distinct('sample.status')
-
-	# case_query = ""
-	# for value in status:
-		# case_query += f"""SUM(CASE WHEN status = '{value}' THEN 1 ELSE 0 END) AS "{value if len(value) != 0 else 'N/A'}","""
 
 	query = f"""
 		SELECT JSON_AGG(result)
@@ -778,29 +768,27 @@ def data2a(date, no_qgp):
 		return jsonify(None)
 	
 	results = fetch_result[0][0]
-	# return jsonify(results)
 	status_set = set()
 	output = dict()
 	for dct in results:
 		if dct['pi'] not in output:
-			output[dct['pi']] = dict()
+			output[dct['pi']] = {"pi": dct["pi"], "total" : 0}
 
 		output[dct['pi']][dct['status']] = dct['sample_count']
+		output[dct['pi']]['total'] +=  dct['sample_count']
 		status_set.add(dct['status'])
 
-	data = []
-	for pi in output:
-		pi_status = {"pi": pi, "total": 0}
-		for status in status_set:
-			pi_status[status] = output[pi].get(status, 0)
-			pi_status["total"] += pi_status[status] 
-		data.append(pi_status)
+	# data = []
+	# for pi in output:
+	# 	pi_status = {"pi": pi, "total": 0}
+	# 	for status in output[pi]:
+	# 		pi_status[status] = output[pi][status]
+	# 	for status in status_set:
+	# 		# pi_status[status] = output[pi].get(status, 0)
+	# 		pi_status["total"] += output[pi].get(status, 0)
+	# 	data.append(pi_status)
 
-	return jsonify({'status': list(status_set), 'body': sorted(data, key = lambda x : x["total"], reverse = True )})
-
-	# results = fetch_result[0][0]
-
-	# return jsonify(results)
+	return jsonify({'legends': list(status_set), 'chart': sorted(output.values(), key = lambda x : x["total"], reverse = True )})
 
 
 @ app.route('/project-bar/<date>/<no_qgp>')
@@ -833,9 +821,6 @@ def data2b(date, no_qgp):
 			result;
 		"""
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 	
 	output = []
@@ -883,8 +868,6 @@ def data2c(date, no_qgp):
 	fetch_result = fetch(cursor, query, 'all')
 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0 or fetch_result[0][0] == None:
 		return jsonify(None)
-	# else:
-	# print(fetch_result)
 	results = fetch_result[0][0]
 	rg = set()
 	output = dict()
@@ -896,7 +879,7 @@ def data2c(date, no_qgp):
 
 		output[dct['pi']][dct['project']][dct['genome']] = dct['sample_count']
 		rg.add(dct['genome'])
-	return jsonify({'rg': list(rg), 'body': output})
+	return jsonify({'legends': list(rg), 'chart': output})
 
 
 @ app.route('/fctype-donut/<date>/<no_qgp>')

@@ -18,7 +18,7 @@ import JbrowseLogo from "@assets/jbrowse.png";
 
 const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
 
-export default function DataTable({
+export default function Table({
 	getID,
 	data,
 	totalCount,

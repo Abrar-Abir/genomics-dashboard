@@ -1,21 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-// import schema from "@lib/schema.json";
-import {
-	Button,
-	Navbar,
-	Collapse,
-	Typography,
-	IconButton,
-	//   Breadcrumbs,
-} from "@material-tailwind/react";
+import { Navbar, Collapse, Typography, IconButton } from "@material-tailwind/react";
 
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
-import {
-	DASHBOARD_SIDEBAR_LINKS,
-	DASHBOARD_SIDEBAR_BOTTOM_LINKS,
-} from "@lib/sidebarConfig.jsx";
+import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_SIDEBAR_BOTTOM_LINKS } from "@lib/sidebarConfig.jsx";
 import logo from "@assets/logo_without_text.png";
 
 export default function Header(props) {
@@ -25,18 +14,11 @@ export default function Header(props) {
 	const location = useLocation();
 
 	useEffect(() => {
-		window.addEventListener(
-			"resize",
-			() => window.innerWidth >= 960 && setOpen(false)
-		);
+		window.addEventListener("resize", () => window.innerWidth >= 960 && setOpen(false));
 	}, []);
 
 	return (
-		<Navbar
-			shadow={false}
-			fullWidth
-			className="!bg-white py-0 rounded-none relative z-10"
-		>
+		<Navbar shadow={false} fullWidth className="!bg-white py-0 rounded-none relative z-10">
 			<div className="flex items-center justify-between">
 				<img
 					src={logo}
@@ -60,11 +42,7 @@ export default function Header(props) {
 			<Collapse open={open}>
 				<div className="p-3">
 					{DASHBOARD_SIDEBAR_LINKS.map((item) => (
-						<Link
-							to={item.path}
-							key={item.key}
-							onClick={handleOpen}
-						>
+						<Link to={item.path} key={item.key} onClick={handleOpen}>
 							<Typography
 								as="li"
 								variant="small"
@@ -82,11 +60,7 @@ export default function Header(props) {
 				</div>
 				<div className="grid grid-cols-4 mt-4">
 					{DASHBOARD_SIDEBAR_BOTTOM_LINKS.map((item) => (
-						<Link
-							to={item.path}
-							key={item.key}
-							onClick={handleOpen}
-						>
+						<Link to={item.path} key={item.key} onClick={handleOpen}>
 							<Typography
 								as="li"
 								variant="small"

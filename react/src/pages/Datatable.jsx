@@ -1,40 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import FilterPanel from "@components/database/FilterPanel";
-import DataTable from "@components/database/DataTable";
-import DatabaseHeader from "../components/database/DatabaseHeader";
-import { useOutletContext } from "react-router-dom";
-
-export default function Database({
-	getID,
-	selectedFilter,
-	setSelectedFilter,
-	selectedRanges,
-	setSelectedRanges,
-	// filterPanelData,
-	// setFilterPanelData,
-	searchKey,
-	setSearchKey,
-	searchValue,
-	setSearchValue,
-	columnsToSort,
-	setColumnsToSort,
-	selectedColumns,
-	setSelectedColumns,
-	// data,
-	// setData,
-	tableHeaders,
-	tableHeadersProperties,
-	// totalCount,
-	// setTotalCount,
-	page,
-	setPage,
-	limit,
-	setLimit,
-	// reset,
-	openAcc,
-	setOpenAcc,
-}) {
-	const { baseURL } = useOutletContext();
+import FilterPanel from "@components/datatable/FilterPanel";
+import Table from "@components/datatable/Table";
+import DatabaseHeader from "../components/datatable/DatabaseHeader";
+import { BASE_URL } from "@components/utils.js";
+export default function Datatable({ state, setState, reset, getID, headers, properties }) {
 	const [data, setData] = useState([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [filterPanelData, setFilterPanelData] = useState(null);
@@ -43,17 +12,17 @@ export default function Database({
 
 	useEffect(() => {
 		let queryStr = "";
-		if (searchValue !== "") {
-			queryStr += `&${-1 * searchKey}=${searchValue}`;
+		if (state.value !== "") {
+			queryStr += `&${-1 * state.key}=${state.value}`;
 		}
 
-		if (selectedFilter.size > 0) {
-			for (let [key, values] of selectedFilter) {
+		if (state.filter.size > 0) {
+			for (let [key, values] of state.filter) {
 				queryStr += `&${key}=${JSON.stringify(values)}`;
 			}
 		}
-		if (Object.keys(selectedRanges).length > 0) {
-			Object.entries(selectedRanges).forEach(([key, [start, end]]) => {
+		if (Object.keys(state.range).length > 0) {
+			Object.entries(state.range).forEach(([key, [start, end]]) => {
 				if (start !== "") {
 					queryStr += `&${key}>=${start}`;
 				}
@@ -63,14 +32,14 @@ export default function Database({
 			});
 		}
 		setQuery(queryStr);
-	}, [selectedFilter, selectedRanges, searchValue]);
+	}, [state.filter, state.range, state.value]);
 
 	useEffect(() => {
 		async function fetchTableData() {
 			try {
-				const apiUrl = `${baseURL}/table?page=${page}&limit=${limit}&sort=${JSON.stringify(
-					columnsToSort
-				)}${query}`;
+				const apiUrl = `${BASE_URL}/table?page=${state.page}&limit=${
+					state.limit
+				}&sort=${JSON.stringify(state.sort)}${query}`;
 				const response = await fetch(apiUrl);
 
 				if (!response.ok) throw new Error(`Table Data Fetch Failed: ${response.statusText}`);
@@ -84,12 +53,12 @@ export default function Database({
 		}
 
 		fetchTableData();
-	}, [page, limit, columnsToSort, baseURL, query]);
+	}, [state.page, state.limit, state.sort, BASE_URL, query]);
 
 	useEffect(() => {
 		async function fetchFilterPanelData() {
 			try {
-				const apiUrl = `${baseURL}/analytics/table?${query.slice(1)}`;
+				const apiUrl = `${BASE_URL}/analytics/table?${query.slice(1)}`;
 				const response = await fetch(apiUrl);
 
 				if (!response.ok) throw new Error(`Filter Panel Data Fetch Failed: ${response.statusText}`);
@@ -112,9 +81,9 @@ export default function Database({
 			<div className="flex-shrink-0">
 				<DatabaseHeader
 					getID={getID}
-					tableHeaders={tableHeaders}
+					tableHeaders={headers}
 					query={query}
-					searchKey={searchKey}
+					searchKey={state.key}
 					setSearchKey={setSearchKey}
 					setSearchValue={setSearchValue}
 					selectedColumns={selectedColumns}
@@ -125,26 +94,26 @@ export default function Database({
 			<div className="flex flex-grow overflow-y-hidden overflow-x-auto">
 				<FilterPanel
 					data={filterPanelData}
-					tableHeaders={tableHeaders}
-					selectedFilter={selectedFilter}
+					tableHeaders={headers}
+					selectedFilter={state.filter}
 					setSelectedFilter={setSelectedFilter}
 					setSelectedRanges={setSelectedRanges}
 					openAcc={openAcc}
 					setOpenAcc={setOpenAcc}
 				/>
 
-				<DataTable
+				<Table
 					getID={getID}
 					data={data}
 					totalCount={totalCount}
-					page={page}
+					page={state.page}
 					setPage={setPage}
-					limit={limit}
+					limit={state.limit}
 					setLimit={setLimit}
-					tableHeaders={tableHeaders}
-					tableHeadersProperties={tableHeadersProperties}
+					tableHeaders={headers}
+					tableHeadersProperties={properties}
 					selectedColumns={selectedColumns}
-					columnsToSort={columnsToSort}
+					columnsToSort={state.sort}
 					setColumnsToSort={setColumnsToSort}
 				/>
 			</div>

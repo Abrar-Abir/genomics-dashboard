@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import FilterPanel from "@components/database/FilterPanel";
+import FilterPanel from "@components/datatable/FilterPanel";
 
 export default function Plot({
 	selectedFilter,

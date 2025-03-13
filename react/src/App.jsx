@@ -3,7 +3,7 @@ import { useState } from "react";
 import Layout from "./components/shared/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Database from "./pages/Database";
+import Datatable from "./pages/Datatable";
 import Plot from "./pages/Plot";
 import Datagrid from "./pages/Datagrid";
 import schema from "@lib/schema.json";
@@ -129,7 +129,7 @@ export default function App() {
 					<Route
 						path="datatable"
 						element={
-							<Database
+							<Datatable
 								state={tableState}
 								setState={setTableState}
 								reset={resetTable}

@@ -1,37 +1,41 @@
-import React, { useState } from "react";
-import { Card, Title, DonutChart, Icon, Legend } from "@tremor/react";
+import React, { useState, useEffect } from "react";
+import { Card, Title, DonutChart, Icon } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { BiSolidPieChartAlt2 } from "react-icons/bi";
 import { RiDonutChartFill } from "react-icons/ri";
 import { COLORS } from "@components/utils.js";
+import Legend from "./Legend";
 
 export default function DonutCard({ info, data }) {
-	const [legendValue, setLegendValue] = useState("");
-	const [activeLabel, setActiveLabel] = useState("");
-	const [isDonut, setIsDonut] = useState(true);
+	const [donut, setDonut] = useState(true);
+	const legends = data?.map((item) => item.type);
+	const [active, setActive] = useState([]);
+	const [label, setLabel] = useState("");
 
-	const totalUnits = data?.reduce((total, item) => total + item.quantity, 0);
+	useEffect(() => {
+		setActive(legends);
+	}, [data]);
 
 	const valueFormatter = (number) => {
 		const percentage = ((number / totalUnits) * 100).toFixed(2);
-		return `${percentage}% | ${Intl.NumberFormat("us").format(number)}`;
+		return `${percentage}% | ${number}`;
 	};
+	const filteredData = data.filter((item) => active.includes(item.type));
+	const totalUnits = filteredData?.reduce((total, item) => total + item.quantity, 0);
 
 	const donutChartArgs = {
 		showLabel: true,
 		showAnimation: true,
 		animationDuration: 500,
-		data: data,
+		data: filteredData,
 		category: "quantity",
 		index: "type",
-		variant: isDonut ? "donut" : "pie",
-		className: " text-sm", ///
-		colors: COLORS,
+		variant: donut ? "donut" : "pie",
+		className: " text-sm",
+		colors: COLORS.filter((_, i) => active.includes(legends[i])),
 		valueFormatter: valueFormatter,
-		label: legendValue
-			? activeLabel
-			: Intl.NumberFormat("us").format(totalUnits).toString() + info.label,
+		label: label ? label : totalUnits.toString() + info.label,
 	};
 
 	return (
@@ -51,33 +55,30 @@ export default function DonutCard({ info, data }) {
 					className="h-8 p-4 w-auto border-2 rounded-lg border-deep-orange-100"
 					variant="text"
 					size="sm"
-					onClick={() => setIsDonut(!isDonut)}
+					onClick={() => setDonut(!donut)}
 				>
-					{isDonut ? <BiSolidPieChartAlt2 /> : <RiDonutChartFill />}
+					{donut ? <BiSolidPieChartAlt2 /> : <RiDonutChartFill />}
 				</IconButton>
 			</div>
-			<div className="flex space-x-4">
+			<div className="flex space-x-4 items-center justify-start">
 				<DonutChart
 					{...donutChartArgs}
 					onValueChange={(e) => {
-						console.log(e);
 						if (e && e.type) {
-							setLegendValue(e.type);
-							setActiveLabel(e.quantity.toString() + " / " + totalUnits.toString());
+							setLabel(e.quantity.toString() + " / " + totalUnits.toString());
 						} else {
-							setLegendValue("");
+							setLabel("");
 						}
 					}}
 				/>
 				{data && (
-					<div className="flex max-h-40">
+					<div className="flex flex-col max-h-40">
 						<Legend
-							enableLegendSlider
-							className="custom-legend"
-							categories={data?.map((item) => item.type)}
+							legends={legends}
 							colors={COLORS}
-							onClickLegendItem={(e) => console.log(e)}
-							activeLegend={legendValue}
+							active={active}
+							setActive={setActive}
+							isVertical={true}
 						/>
 					</div>
 				)}
