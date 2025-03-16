@@ -5,7 +5,6 @@ import psycopg2
 from flask_cors import CORS
 import json
 import os
-# os.environ["PYGWALKER_SKIP_UPDATE_CHECK"] = "True"
 import io
 import csv
 # import tempfile
@@ -114,7 +113,7 @@ def table():
 	order_clause = get_order_clause(cols_to_sort)
 	table_filter = get_table_filter(request.args)
 	where_clause = get_where_clause(table_filter)
-	print(where_clause)
+	# print(where_clause)
 	count_query = f"""
 		SELECT COUNT(*)
 		FROM sample
@@ -127,7 +126,7 @@ def table():
 		LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 		{where_clause}
 	"""
-	total_count = fetch(cursor, count_query, 'one')[0]
+	count = fetch(cursor, count_query, 'one')[0]
 
 	data_query = f"""
 		SELECT {alias_clause}
@@ -144,7 +143,7 @@ def table():
 		LIMIT {limit} OFFSET {offset};
 	"""
 	results = fetch(cursor, data_query, 'all')
-	return jsonify({"data": results, "total_count": total_count})
+	return jsonify({"table": results, "count": count})
 
 @ app.route('/export/table/<format>')
 def export_table(format):
@@ -155,12 +154,10 @@ def export_table(format):
 	# 	order_clause = ''
 	# else:
 
-	cols_to_sort = request.args.get('sort', default = [])
-	
+	cols_to_sort = [int(id)  for id in request.args.get('sort', default = "[]")[1:-1].split(',') if len(id) > 0]
 	order_clause = get_order_clause(cols_to_sort)
-	table_filter = get_table_filter(request_args)
+	table_filter = get_table_filter(request.args)
 	where_clause = get_where_clause(table_filter)
-
 	data_query = f"""
 		SELECT JSON_AGG(result)
 		FROM (
@@ -182,9 +179,9 @@ def export_table(format):
 			return jsonify(None)
 	results = fetch_result[0][0]
 	
-	if format in ('json'):	
-		# if format == 'raw':
-		# 	return jsonify(results)	
+	if format in ('json', 'raw'):	
+		if format == 'raw':
+			return jsonify(results)	
 		data = dict()
 		for row in results:
 			sample = row['LIMS ID']
@@ -725,9 +722,6 @@ def progress_area(date, no_qgp):
 			result;"""
 
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 
 	return jsonify(results)
@@ -778,21 +772,11 @@ def status_bar(date, no_qgp):
 		output[dct['pi']]['total'] +=  dct['sample_count']
 		status_set.add(dct['status'])
 
-	# data = []
-	# for pi in output:
-	# 	pi_status = {"pi": pi, "total": 0}
-	# 	for status in output[pi]:
-	# 		pi_status[status] = output[pi][status]
-	# 	for status in status_set:
-	# 		# pi_status[status] = output[pi].get(status, 0)
-	# 		pi_status["total"] += output[pi].get(status, 0)
-	# 	data.append(pi_status)
-
 	return jsonify({'legends': list(status_set), 'chart': sorted(output.values(), key = lambda x : x["total"], reverse = True )})
 
 
 @ app.route('/project-bar/<date>/<no_qgp>')
-def data2b(date, no_qgp):
+def project_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -838,7 +822,7 @@ def data2b(date, no_qgp):
 
 
 @ app.route('/refgenome-bar/<date>/<no_qgp>')
-def data2c(date, no_qgp):
+def refgenome_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -883,7 +867,7 @@ def data2c(date, no_qgp):
 
 
 @ app.route('/fctype-donut/<date>/<no_qgp>')
-def data3(date, no_qgp):
+def fctype_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -902,16 +886,13 @@ def data3(date, no_qgp):
 			result;
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
 @ app.route('/service-donut/<date>/<no_qgp>')
-def data4(date, no_qgp):
+def service_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -933,16 +914,13 @@ def data4(date, no_qgp):
 	"""
 
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
 @ app.route('/sequencer-donut/<date>/<no_qgp>')
-def data5(date, no_qgp):
+def sequencer_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -961,16 +939,13 @@ def data5(date, no_qgp):
 			result;
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 
 	return jsonify(results)
 
 
 @ app.route('/refgenome-donut/<date>/<no_qgp>')
-def data6(date, no_qgp):
+def refgenome_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
 	except:
@@ -989,9 +964,6 @@ def data6(date, no_qgp):
 			result; 
 			"""
 	fetch_result = fetch(cursor, query, 'all')
-	# if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-	# 	results = None
-	# else:
 	results = fetch_result[0][0]
 	return jsonify(results)
 

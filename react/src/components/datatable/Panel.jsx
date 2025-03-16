@@ -7,7 +7,7 @@ import {
 	Input,
 } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import ResetIcon from "@assets/reset.png";
+// import ResetIcon from "@assets/reset.png";
 
 function Icon({ open }) {
 	return (
@@ -17,37 +17,29 @@ function Icon({ open }) {
 	);
 }
 
-export default function FilterPanel({
-	data,
-	tableHeaders,
-	selectedFilter,
-	setSelectedFilter,
-	setSelectedRanges,
-	openAcc,
-	setOpenAcc,
-}) {
+export default function Panel({ state, setState, data, headers }) {
 	const [allExpanded, setAllExpanded] = useState(false);
-	const handleOpenAcc = (key) => {
-		setOpenAcc((prev) => ({ ...prev, [key]: !prev[key] }));
+	const handleOpen = (key) => {
+		setState("open", (prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
-	const handleToggleAll = () => {
-		const newState = {};
-		tables.forEach((key) => {
+	const handleToggle = () => {
+		const newState = state.open;
+		Object.keys(data).forEach((key) => {
 			newState[key] = !allExpanded;
 		});
-		setOpenAcc(newState);
+		setState("open", newState);
 		setAllExpanded(!allExpanded);
 	};
 
-	const toggleSelection = (filterKey, item) => {
-		setSelectedFilter((prevSelectedItems) => {
-			const newSelectedItems = new Map(prevSelectedItems);
+	const toggle = (key, item) => {
+		setState("filter", (prevItems) => {
+			const newItems = new Map(prevItems);
 
-			if (!newSelectedItems.has(filterKey)) {
-				newSelectedItems.set(filterKey, [item]);
+			if (!newItems.has(key)) {
+				newItems.set(key, [item]);
 			} else {
-				const items = [...newSelectedItems.get(filterKey)];
+				const items = [...newItems.get(key)];
 				const index = items.indexOf(item);
 
 				if (index > -1) {
@@ -56,28 +48,27 @@ export default function FilterPanel({
 					items.push(item);
 				}
 				if (items.length === 0) {
-					newSelectedItems.delete(filterKey);
+					newItems.delete(key);
 				} else {
-					newSelectedItems.set(filterKey, items);
+					newItems.set(key, items);
 				}
 			}
-			return new Map(newSelectedItems);
+			return new Map(newItems);
 		});
 	};
 
-	const handleRangeChange = (columnID, index, value) => {
-		setSelectedRanges((prev) => {
-			const updatedRanges = {
+	const handleRange = (columnID, index, value) => {
+		setState("range", (prev) => {
+			const newRange = {
 				...prev,
 				[columnID]: prev[columnID] || ["", ""],
 			};
-			updatedRanges[columnID][index] = value;
+			newRange[columnID][index] = value;
 
-			if (updatedRanges[columnID][0] === "" && updatedRanges[columnID][1] === "") {
-				delete updatedRanges[columnID];
+			if (newRange[columnID][0] === "" && newRange[columnID][1] === "") {
+				delete newRange[columnID];
 			}
-
-			return updatedRanges;
+			return newRange;
 		});
 	};
 
@@ -93,11 +84,11 @@ export default function FilterPanel({
 					<Input
 						// className="!w-40"
 						variant="standard"
-						label={data?.[table]?.[columnID]?.[index] || "N/A"}
-						placeholder={tableHeaders[columnID]?.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
+						label={data[table]?.[columnID]?.[index] || "N/A"}
+						placeholder={headers[columnID]?.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								handleRangeChange(columnID, index, e.target.value);
+								handleRange(columnID, index, e.target.value);
 							}
 						}}
 					/>
@@ -115,7 +106,7 @@ export default function FilterPanel({
 		);
 	};
 
-	const renderRangeControl = (table, columnID) => {
+	const renderRange = (table, columnID) => {
 		return (
 			<div className="space-y-3">
 				<Range text="From" index={0} table={table} columnID={columnID} />
@@ -124,23 +115,22 @@ export default function FilterPanel({
 		);
 	};
 
-	const renderAccordionBody = (table, columnID) => {
+	const renderBody = (table, columnID) => {
 		const items = data[table][columnID];
-
-		const filterKey = columnID;
+		const key = columnID;
 		return (
 			<AccordionBody className="py-2 px-1 bg-white max-h-40 overflow-y-auto">
 				{items.length > 0 ? (
 					<div className="max-h-32 overflow-y-auto py-2">
 						{items.map(([value, count], index) => {
-							const isSelected = selectedFilter.get(filterKey)?.includes(value) || false;
+							const selected = state.filter.get(key)?.includes(value) || false;
 							return (
 								<div
 									key={index}
 									className={`flex justify-between py-1 px-2 text-xs cursor-pointer ${
-										isSelected ? "bg-blue-500/60" : "hover:bg-red-500/10"
+										selected ? "bg-blue-500/60" : "hover:bg-red-500/10"
 									}`}
-									onClick={() => toggleSelection(filterKey, value)}
+									onClick={() => toggle(key, value)}
 								>
 									<span className="text-black">{value || "N/A"}</span>
 									<span className="text-gray-800 mr-2">{count}</span>
@@ -155,51 +145,51 @@ export default function FilterPanel({
 		);
 	};
 
-	const renderInnerAccordion = (table) => {
+	const renderAccordion = (table) => {
 		return Object.keys(data[table]).map((columnID) => {
 			return (
 				<Accordion
 					id={columnID}
 					key={columnID}
-					open={openAcc?.[columnID] || false}
-					icon={<Icon open={openAcc[columnID]} />}
+					open={state.open[columnID] || false}
+					icon={<Icon open={state.open[columnID]} />}
 					className="border-b border-gray-400 w-full"
 				>
 					<AccordionHeader
-						onClick={() => handleOpenAcc(columnID)}
+						onClick={() => handleOpen(columnID)}
 						className={`flex justify-between items-center text-sm font-normal w-full m-0 py-0 px-1 hover:bg-indigo-300/60  ${
-							!!openAcc[columnID] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
+							state.open[columnID] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
 						}`}
 					>
-						<span>{tableHeaders[columnID]}</span>
+						<span>{headers[columnID]}</span>
 					</AccordionHeader>
 					<AccordionBody>
 						{data[table][columnID].length === 2 && typeof data[table][columnID][1] === "string"
-							? renderRangeControl(table, columnID)
-							: renderAccordionBody(table, columnID)}
+							? renderRange(table, columnID)
+							: renderBody(table, columnID)}
 					</AccordionBody>
 				</Accordion>
 			);
 		});
 	};
-	const renderAccordion = (table) => {
+	const render = (table) => {
 		return (
 			<Accordion
 				id={table}
 				key={table}
-				open={openAcc?.[table] || false}
-				icon={<Icon open={openAcc[table]} />}
+				open={state.open[table] || false}
+				icon={<Icon open={state.open[table]} />}
 				className="border-b border-gray-200 w-full"
 			>
 				<AccordionHeader
-					onClick={() => handleOpenAcc(table)}
+					onClick={() => handleOpen(table)}
 					className={`flex justify-between items-center text-base font-semibold w-full m-0 py-0 px-1 hover:bg-teal-300/40 capitalize ${
-						openAcc[table] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
+						state.open[table] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
 					}`}
 				>
 					<span>{table[0].toUpperCase() + table.slice(1)}</span>
 				</AccordionHeader>
-				<AccordionBody className="py-2 pl-2">{renderInnerAccordion(table)}</AccordionBody>
+				<AccordionBody className="py-2 pl-2">{renderAccordion(table)}</AccordionBody>
 			</Accordion>
 		);
 	};
@@ -208,13 +198,13 @@ export default function FilterPanel({
 			<Typography variant="h6" color="blue-gray" className="mb-2 flex justify-between">
 				Filters
 				<span
-					onClick={handleToggleAll}
+					onClick={handleToggle}
 					className={`text-sm cursor-pointer ${allExpanded ? "text-red-500" : "text-green-500"}`}
 				>
 					{allExpanded ? "Collapse All [-]" : "Expand All [+]"}
 				</span>
 			</Typography>
-			{data && Object.keys(data).map((table) => renderAccordion(table))}
+			{data && Object.keys(data).map((table) => render(table))}
 			{!data && <div className="flex justify-center items-center w-full">No data</div>}
 		</div>
 	);

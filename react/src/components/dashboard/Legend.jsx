@@ -12,8 +12,8 @@ export default function Legend({ legends = [], colors, active, setActive, isVert
 
 	return (
 		<div
-			className={`flex ${isVertical ? "flex-col" : "flex-row"} items-start overflow-auto ml-auto ${
-				isVertical ? "space-y-2" : "space-x-2"
+			className={`flex ${isVertical ? "flex-col" : "flex-row"} items-start  ${
+				isVertical ? "space-y-2 overflow-auto" : "ml-auto space-x-2"
 			}`}
 		>
 			{legends.map((legend, idx) => (

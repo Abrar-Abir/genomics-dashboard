@@ -24,20 +24,6 @@ export default function DonutCard({ info, data }) {
 	const filteredData = data.filter((item) => active.includes(item.type));
 	const totalUnits = filteredData?.reduce((total, item) => total + item.quantity, 0);
 
-	const donutChartArgs = {
-		showLabel: true,
-		showAnimation: true,
-		animationDuration: 500,
-		data: filteredData,
-		category: "quantity",
-		index: "type",
-		variant: donut ? "donut" : "pie",
-		className: " text-sm",
-		colors: COLORS.filter((_, i) => active.includes(legends[i])),
-		valueFormatter: valueFormatter,
-		label: label ? label : totalUnits.toString() + info.label,
-	};
-
 	return (
 		<Card decoration="top" decorationColor="teal" className="flex flex-col space-y-2 h-full">
 			<div className="flex justify-between font-cabin">
@@ -60,19 +46,34 @@ export default function DonutCard({ info, data }) {
 					{donut ? <BiSolidPieChartAlt2 /> : <RiDonutChartFill />}
 				</IconButton>
 			</div>
-			<div className="flex space-x-4 items-center justify-start">
-				<DonutChart
-					{...donutChartArgs}
-					onValueChange={(e) => {
-						if (e && e.type) {
-							setLabel(e.quantity.toString() + " / " + totalUnits.toString());
-						} else {
-							setLabel("");
-						}
-					}}
-				/>
+			<div className="flex items-center justify-start gap-4 w-full">
+				{/* Donut Chart Container (Takes 60% of the parent width) */}
+				<div className="w-[75%] flex-shrink-0">
+					<DonutChart
+						showLabel={true}
+						showAnimation={true}
+						animationDuration={500}
+						data={filteredData}
+						category="quantity"
+						index="type"
+						variant={donut ? "donut" : "pie"}
+						className="text-sm"
+						colors={COLORS.filter((_, i) => active.includes(legends[i]))}
+						valueFormatter={valueFormatter}
+						label={label ? label : totalUnits.toString() + info.label}
+						onValueChange={(e) => {
+							if (e && e.type) {
+								setLabel(e.quantity.toString() + " / " + totalUnits.toString());
+							} else {
+								setLabel("");
+							}
+						}}
+					/>
+				</div>
+
+				{/* Legend Container (Takes 40% of the parent width) */}
 				{data && (
-					<div className="flex flex-col max-h-40">
+					<div className="w-[25%] flex flex-col max-h-40 flex-shrink-0 overflow-auto">
 						<Legend
 							legends={legends}
 							colors={COLORS}

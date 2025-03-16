@@ -1,14 +1,21 @@
 import { useEffect, useState, useRef } from "react";
-import FilterPanel from "@components/datatable/FilterPanel";
+import Panel from "@components/datatable/Panel";
 import Table from "@components/datatable/Table";
-import DatabaseHeader from "../components/datatable/DatabaseHeader";
+import Header from "@components/datatable/Header";
 import { BASE_URL } from "@components/utils.js";
-export default function Datatable({ state, setState, reset, getID, headers, properties }) {
-	const [data, setData] = useState([]);
-	const [totalCount, setTotalCount] = useState(0);
-	const [filterPanelData, setFilterPanelData] = useState(null);
+
+export default function Datatable({ state, setState, reset, headers, properties }) {
+	const [data, setData] = useState({});
+	const [analytics, setAnalytics] = useState([]);
 	const [query, setQuery] = useState("");
-	const prevQuery = useRef(query);
+	// const [prevQuery, setPrevQuery] = useState("");
+
+	const setStateKey = (key) => (valOrUpdater) => {
+		setState((prevState) => ({
+			...prevState,
+			[key]: typeof valOrUpdater === "function" ? valOrUpdater(prevState[key]) : valOrUpdater,
+		}));
+	};
 
 	useEffect(() => {
 		let queryStr = "";
@@ -31,90 +38,74 @@ export default function Datatable({ state, setState, reset, getID, headers, prop
 				}
 			});
 		}
-		setQuery(queryStr);
+		if (queryStr !== query) {
+			setQuery(queryStr);
+		}
 	}, [state.filter, state.range, state.value]);
 
 	useEffect(() => {
-		async function fetchTableData() {
+		async function fetchTable() {
 			try {
-				const apiUrl = `${BASE_URL}/table?page=${state.page}&limit=${
+				const api = `${BASE_URL}/table?page=${state.page}&limit=${
 					state.limit
 				}&sort=${JSON.stringify(state.sort)}${query}`;
-				const response = await fetch(apiUrl);
+				const response = await fetch(api);
 
 				if (!response.ok) throw new Error(`Table Data Fetch Failed: ${response.statusText}`);
 
-				const dataResult = await response.json();
-				setData(Array.isArray(dataResult.data) ? dataResult.data : []);
-				setTotalCount(dataResult.total_count);
+				const result = await response.json();
+				setData(result);
 			} catch (error) {
 				console.error("Error fetching table data:", error);
 			}
 		}
+		fetchTable();
+	}, [state.page, state.limit, state.sort, query]);
 
-		fetchTableData();
-	}, [state.page, state.limit, state.sort, BASE_URL, query]);
+	const prevQueryRef = useRef("");
 
 	useEffect(() => {
-		async function fetchFilterPanelData() {
+		async function fetchAnalytics() {
 			try {
-				const apiUrl = `${BASE_URL}/analytics/table?${query.slice(1)}`;
-				const response = await fetch(apiUrl);
-
+				const api = `${BASE_URL}/analytics/table?${query.slice(1)}`;
+				const response = await fetch(api);
 				if (!response.ok) throw new Error(`Filter Panel Data Fetch Failed: ${response.statusText}`);
-
-				const filterPanelResult = await response.json();
-				setFilterPanelData(filterPanelResult);
+				const result = await response.json();
+				setAnalytics(result);
+				prevQueryRef.current = query;
 			} catch (error) {
 				console.error("Error fetching filter panel data:", error);
 			}
 		}
 
-		if (prevQuery.current !== query || filterPanelData === null) {
-			fetchFilterPanelData();
-			prevQuery.current = query;
+		if (prevQueryRef.current !== query || analytics.length === 0) {
+			fetchAnalytics();
 		}
-	}, [query]);
+	}, [query, analytics.length]);
 
 	return (
 		<div className="flex flex-col h-screen overflow-y-hidden">
 			<div className="flex-shrink-0">
-				<DatabaseHeader
-					getID={getID}
-					tableHeaders={headers}
-					query={query}
-					searchKey={state.key}
-					setSearchKey={setSearchKey}
-					setSearchValue={setSearchValue}
-					selectedColumns={selectedColumns}
-					setSelectedColumns={setSelectedColumns}
+				<Header
+					state={{ query: query, key: state.key, cols: state.cols, sort: state.sort }}
+					setState={(key, val) => setStateKey(key)(val)}
+					headers={headers}
 					reset={reset}
 				/>
 			</div>
 			<div className="flex flex-grow overflow-y-hidden overflow-x-auto">
-				<FilterPanel
-					data={filterPanelData}
-					tableHeaders={headers}
-					selectedFilter={state.filter}
-					setSelectedFilter={setSelectedFilter}
-					setSelectedRanges={setSelectedRanges}
-					openAcc={openAcc}
-					setOpenAcc={setOpenAcc}
+				<Panel
+					state={{ filter: state.filter, range: state.range, open: state.open }}
+					setState={(key, val) => setStateKey(key)(val)}
+					data={analytics}
+					headers={headers}
 				/>
-
 				<Table
-					getID={getID}
+					state={{ page: state.page, limit: state.limit, cols: state.cols, sort: state.sort }}
+					setState={(key, val) => setStateKey(key)(val)}
 					data={data}
-					totalCount={totalCount}
-					page={state.page}
-					setPage={setPage}
-					limit={state.limit}
-					setLimit={setLimit}
-					tableHeaders={headers}
-					tableHeadersProperties={properties}
-					selectedColumns={selectedColumns}
-					columnsToSort={state.sort}
-					setColumnsToSort={setColumnsToSort}
+					headers={headers}
+					properties={properties}
 				/>
 			</div>
 		</div>

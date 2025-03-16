@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import FilterPanel from "@components/datatable/FilterPanel";
+// import FilterPanel from "@components/datatable/FilterPanel";
 
 export default function Plot({
 	selectedFilter,
@@ -67,7 +67,7 @@ export default function Plot({
 
 	return (
 		<div className="flex h-screen-minus-header">
-			<FilterPanel
+			{/* <FilterPanel
 				data={filterPanelData}
 				setSelectedFilter={setSelectedFilter}
 				selectedFilter={selectedFilter}
@@ -75,7 +75,7 @@ export default function Plot({
 				openAcc={openAcc}
 				setOpenAcc={setOpenAcc}
 				baseURL={baseURL}
-			/>
+			/> */}
 			<div style={{ flex: 1, overflow: "auto" }}>
 				<div
 					style={{ width: "100%", height: "100%", overflow: "auto" }}

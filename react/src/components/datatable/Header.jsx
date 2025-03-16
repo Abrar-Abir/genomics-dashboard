@@ -1,52 +1,44 @@
 import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
-import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { AdjustmentsVerticalIcon, ArrowDownTrayIcon } from "@heroicons/react/24/solid";
-
+import { getID } from "@components/utils.js";
 import MenuWithCheckbox from "../shared/Menu";
 import SearchBar from "../shared/SearchBar";
+import { BASE_URL } from "@components/utils.js";
 
-const DatabaseHeader = ({
-	getID,
-	tableHeaders,
-	query,
-	searchKey,
-	setSearchKey,
-	setSearchValue,
-	selectedColumns,
-	setSelectedColumns,
-	reset,
-}) => {
-	const { baseURL } = useOutletContext();
+export default function Header({ state, setState, headers, reset }) {
 	const handleExport = (format) => {
-		window.open(`${baseURL}/export/table/${format}`, "_blank");
+		window.open(
+			`${BASE_URL}/export/table/${format}?sort=${JSON.stringify(state.sort)}${state.query}`,
+			"_blank"
+		);
 	};
 	const [allSuggestions, setAllSuggestions] = useState([]);
 	const SearchMenu = () => {
-		const allKeys = ["PI", "SDR No.", "Submission ID", "Flowcell ID", "LIMS ID", "Sample Name"];
-		const handleMenuClick = async (key) => {
-			const id = getID(tableHeaders, key);
-			setSearchKey(id);
-			setSearchValue("");
-			const apiUrl = `${baseURL}/search/${id}?${query.slice(1)}`;
-			const dataResponse = await fetch(apiUrl);
-			if (!dataResponse.ok) {
-				console.error("Server error:", dataResponse);
+		const keys = ["PI", "SDR No.", "Submission ID", "Flowcell ID", "LIMS ID", "Sample Name"];
+		const handleMenu = async (key) => {
+			const id = getID(headers, key);
+			setState("key", id);
+			setState("value", "");
+			const api = `${BASE_URL}/search/${id}?${state.query.slice(1)}`;
+			const response = await fetch(api);
+			if (!response.ok) {
+				console.error("Server error:", response);
 			} else {
-				const dataResult = await dataResponse.json();
-				setAllSuggestions(dataResult);
+				const result = await response.json();
+				setAllSuggestions(result);
 			}
 		};
 		return (
 			<Menu>
 				<MenuHandler>
 					<Button variant="outlined" size="sm">
-						{tableHeaders[searchKey] || "Search"}
+						{headers[state.key] || "Search"}
 					</Button>
 				</MenuHandler>
 				<MenuList>
-					{allKeys.map((entity, index) => (
-						<MenuItem key={index} onMouseDown={() => handleMenuClick(entity)}>
+					{keys.map((entity, index) => (
+						<MenuItem key={index} onMouseDown={() => handleMenu(entity)}>
 							{entity}
 						</MenuItem>
 					))}
@@ -70,14 +62,14 @@ const DatabaseHeader = ({
 
 			<div className="flex space-x-4 items-center">
 				<SearchMenu />
-				<SearchBar allSuggestions={allSuggestions} setSearchValue={setSearchValue} />
+				<SearchBar allSuggestions={allSuggestions} setValue={(val) => setState("value", val)} />
 			</div>
 
 			<div className="flex items-center space-x-4 mr-6">
 				<MenuWithCheckbox
-					columns={tableHeaders}
-					selectedColumns={selectedColumns}
-					setSelectedColumns={setSelectedColumns}
+					headers={headers}
+					cols={state.cols}
+					setCols={(cols) => setState("cols", cols)}
 				/>
 				<Menu>
 					<MenuHandler>
@@ -97,6 +89,4 @@ const DatabaseHeader = ({
 			</div>
 		</div>
 	);
-};
-
-export default DatabaseHeader;
+}

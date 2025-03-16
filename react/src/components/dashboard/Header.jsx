@@ -1,7 +1,6 @@
 import Datepicker from "react-tailwindcss-datepicker";
 import { Button } from "@material-tailwind/react";
 import { NoSymbolIcon, CheckCircleIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
-// import { Title } from "@tremor/react";
 import { startOfMonth, startOfYear, subDays } from "date-fns";
 
 const getDateRange = (start) => ({
@@ -9,9 +8,9 @@ const getDateRange = (start) => ({
 	end: new Date(),
 });
 
-export default function DashboardHeader({ state, setState, reset }) {
+export default function Header({ state, setState, reset }) {
 	return (
-		<div className="flex justify-between items-center px-6 py-1 bg-white">
+		<div className="flex justify-between items-center px-6 py-1 bg-white sticky top-0 z-50">
 			<Button
 				color="gray"
 				variant="outlined"

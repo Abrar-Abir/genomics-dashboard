@@ -7,6 +7,7 @@ import Datatable from "./pages/Datatable";
 import Plot from "./pages/Plot";
 import Datagrid from "./pages/Datagrid";
 import schema from "@lib/schema.json";
+import { getID } from "@components/utils.js";
 
 export default function App() {
 	// minimize states shared
@@ -39,15 +40,6 @@ export default function App() {
 				: "0"
 		)
 		.join("");
-
-	function getID(array, element) {
-		for (let i = 0; i < array.length; i++) {
-			if (array[i] === element) {
-				return i;
-			}
-		}
-		return -1;
-	}
 
 	const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
 		Object.keys(schema.table[table].entity).forEach((key) => {
@@ -97,7 +89,7 @@ export default function App() {
 
 	const resetTable = () => {
 		setTableState((prevState) => ({
-			...initialState,
+			...tableStateFresh,
 			open: prevState.open,
 		}));
 	};
@@ -133,7 +125,6 @@ export default function App() {
 								state={tableState}
 								setState={setTableState}
 								reset={resetTable}
-								getID={getID}
 								headers={tableHeaders}
 								properties={tableHeadersProperties}
 							/>

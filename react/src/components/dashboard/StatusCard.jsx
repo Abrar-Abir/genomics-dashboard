@@ -14,7 +14,7 @@ export default function StatusCard({ data }) {
 	const [active, setActive] = useState(legends);
 	useEffect(() => {
 		setActive(legends);
-	}, [legends]);
+	}, [data]);
 
 	const window = chart.slice(start, start + size);
 

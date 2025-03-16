@@ -1,7 +1,7 @@
 import { BASE_URL } from "@components/utils.js";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import DashboardHeader from "@components/dashboard/DashboardHeader";
+import Header from "@components/dashboard/Header";
 import ProgressCard from "@components/dashboard/ProgressCard";
 import PICard from "@components/dashboard/PICard";
 import DonutCard from "@components/dashboard/DonutCard";
@@ -47,7 +47,7 @@ export default function Dashboard({ state, setState, reset }) {
 
 	return (
 		<>
-			<DashboardHeader state={state} setState={setState} reset={reset} />
+			<Header state={state} setState={setState} reset={reset} />
 			<section className="flex w-full flex-col items-center lg:items-start px-8 pb-8">
 				<div className="grid w-full grid-cols-1 gap-4 md:grid-cols-10 md:grid-rows-2 mt-3 h-full">
 					<div className="md:col-span-7 md:row-span-2">

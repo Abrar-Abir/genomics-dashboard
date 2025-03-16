@@ -16,8 +16,16 @@ export const COLORS = [
 	"purple", // #3b82f6
 	"lime", // #84cc16
 	"yellow", // #eab308
-
   ];
+
+export function getID(array, element) {
+	for (let i = 0; i < array.length; i++) {
+		if (array[i] === element) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 export function preprocessData(data, period) {
 	if (data === null){return []};
