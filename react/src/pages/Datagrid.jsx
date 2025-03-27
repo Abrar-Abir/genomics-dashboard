@@ -1,104 +1,101 @@
 import { useState, useEffect } from "react";
-import FilterGrid from "@components/datagrid/FilterGrid";
+import Panel from "@components/datatable/Panel";
 import Grid from "@components/datagrid/Grid";
-import { useOutletContext } from "react-router-dom";
-import DatagridHeader from "../components/datagrid/DatagridHeader";
+import Header from "../components/datagrid/Header";
+import { BASE_URL } from "@components/utils.js";
+import axios from "axios";
 
-export default function Datagrid({
-	selectedFilter,
-	setSelectedFilter,
-	// filterPanelData,
-	// setFilterPanelData,
-	showProject,
-	setShowProject,
-	// data,
-	// setData,
-	// gridHeaders,
-	// setGridHeaders,
-	openPi,
-	setOpenPi,
-	openProject,
-	setOpenProject,
-	hideSingleEntries,
-	setHideSingleEntries,
-	tableHeaders,
-	tableHeadersProperties,
-	// reset,
-}) {
-	const { baseURL } = useOutletContext();
-	const [data, setData] = useState([]);
-	const [filterPanelData, setFilterPanelData] = useState(null);
-	const [gridHeaders, setGridHeaders] = useState([]);
-	const reset = () => {
-		setGridFilters(new Map());
-		setShowProject([]);
-		// setOpenPi({});
-		// setOpenProject({});
-		setHideSingleEntries(false);
+export default function Datagrid({ state, setState, reset }) {
+	const token = localStorage.getItem("token");
+	const [data, setData] = useState({ grid: [], headers: [] });
+	const [analytics, setAnalytics] = useState([]);
+	const setStateKey = (key) => (valOrUpdater) => {
+		setState((prevState) => ({
+			...prevState,
+			[key]: typeof valOrUpdater === "function" ? valOrUpdater(prevState[key]) : valOrUpdater,
+		}));
 	};
+
 	useEffect(() => {
-		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 		async function fetchData() {
 			try {
-				let apiUrl = `${baseURL}/datagrid?hide=${hideSingleEntries ? "1" : "0"}`;
-				if (showProject.length > 0) {
-					apiUrl += `&show=${JSON.stringify(showProject)}`;
-				}
-				if (Object.keys(selectedFilter).length > 0) {
-					Object.entries(selectedFilter).forEach(([key, values]) => {
-						if (values.length > 0) {
-							apiUrl += `&${key}=${JSON.stringify(values)}`;
-						}
-					});
-				}
-				const dataResponse = await fetch(apiUrl);
+				const params = new URLSearchParams({ hide: state.hide ? "1" : "0" });
 
-				if (!dataResponse.ok) {
-					console.error("Server error:", dataResponse);
-				} else {
-					await delay(5);
-					const dataResult = await dataResponse.json();
-					setData(dataResult.data);
-					setGridHeaders(Array.isArray(dataResult.columns) ? dataResult.columns : []);
-					const filterPanelResponse = await fetch(`${baseURL}/analytics/datagrid`);
-					if (!filterPanelResponse.ok) {
-						console.error("Server error:", filterPanelResponse);
-					} else {
-						const filterPanelResult = await filterPanelResponse.json();
-						setFilterPanelData(filterPanelResult);
+				if (state.show.length > 0) {
+					params.append("show", JSON.stringify(state.show));
+				}
+
+				// Object.entries(state.filter).forEach(([key, values]) => {
+				// 	if (values.length > 0) {
+				// 		params.append(key, JSON.stringify(values));
+				// 	}
+				// });
+
+				if (state.filter.size > 0) {
+					for (let [key, values] of state.filter) {
+						// queryStr += `&${key}=${JSON.stringify(values)}`;
+						params.append(key, JSON.stringify(values));
 					}
 				}
+
+				const [dataResponse, analyticsResponse] = await Promise.all([
+					axios.get(`${BASE_URL}/datagrid?${params.toString()}`, {
+						headers: { Authorization: `Bearer ${token}` },
+					}),
+					axios.get(`${BASE_URL}/analytics/datagrid`, {
+						headers: { Authorization: `Bearer ${token}` },
+					}),
+				]);
+
+				if (dataResponse.status != 200 || analyticsResponse.status != 200) {
+					console.error("Server error:", dataResponse, analyticsResponse);
+					return;
+				}
+
+				// const [dataResult, analyticsResult] = await Promise.all([
+				// 	dataResponse.json(),
+				// 	analyticsResponse.json(),
+				// ]);
+
+				setData(dataResponse.data);
+				setAnalytics(analyticsResponse.data);
 			} catch (error) {
 				console.error("Error fetching data:", error);
 			}
 		}
 
 		fetchData();
-	}, [selectedFilter, showProject, hideSingleEntries]);
+	}, [state.filter, state.show, state.hide]);
 
 	return (
 		<div className="flex flex-col h-screen">
 			<div className="flex-shrink-0">
-				<DatagridHeader baseURL={baseURL} reset={reset} />
+				<Header reset={reset} />
 			</div>
 			<div className="flex flex-grow overflow-x-auto">
-				<FilterGrid
-					data={filterPanelData}
-					setSelectedFilter={setSelectedFilter}
-					selectedFilter={selectedFilter}
-					hideSingleEntries={hideSingleEntries}
-					setHideSingleEntries={setHideSingleEntries}
+				<Panel
+					state={{ hide: state.hide, filter: state.filter, open: state.open }}
+					setState={(key, val) => setStateKey(key)(val)}
+					data={analytics}
+
+					// setSelectedFilter={setSelectedFilter}
+					// selectedFilter={selectedFilter}
+					// hideSingleEntries={hideSingleEntries}
+					// setHideSingleEntries={setHideSingleEntries}
 				/>
 				<Grid
+					state={{ openPi: state.openPi, openProject: state.openProject, show: state.show }}
+					setState={(key, val) => setStateKey(key)(val)}
 					data={data}
-					gridHeaders={gridHeaders}
-					setShowProject={setShowProject}
-					openPi={openPi}
-					setOpenPi={setOpenPi}
-					openProject={openProject}
-					setOpenProject={setOpenProject}
-					tableHeaders={tableHeaders}
-					tableHeadersProperties={tableHeadersProperties}
+					// gridHeaders={gridHeaders}
+
+					// setShowProject={setShowProject}
+					// openPi={openPi}
+					// setOpenPi={setOpenPi}
+					// openProject={openProject}
+					// setOpenProject={setOpenProject}
+					// headers={headers}
+					// properties={properties}
 				/>
 			</div>
 		</div>

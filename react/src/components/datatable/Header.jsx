@@ -1,12 +1,13 @@
 import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
 import { useState } from "react";
 import { AdjustmentsVerticalIcon, ArrowDownTrayIcon } from "@heroicons/react/24/solid";
-import { getID } from "@components/utils.js";
+import { getID, BASE_URL } from "@components/utils.js";
 import MenuWithCheckbox from "../shared/Menu";
 import SearchBar from "../shared/SearchBar";
-import { BASE_URL } from "@components/utils.js";
+import schema from "@lib/schema.json";
 
-export default function Header({ state, setState, headers, reset }) {
+export default function Header({ state, setState, reset }) {
+	const headers = schema.headers;
 	const handleExport = (format) => {
 		window.open(
 			`${BASE_URL}/export/table/${format}?sort=${JSON.stringify(state.sort)}${state.query}`,

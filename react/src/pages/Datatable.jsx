@@ -3,12 +3,13 @@ import Panel from "@components/datatable/Panel";
 import Table from "@components/datatable/Table";
 import Header from "@components/datatable/Header";
 import { BASE_URL } from "@components/utils.js";
+import axios from "axios";
 
-export default function Datatable({ state, setState, reset, headers, properties }) {
+export default function Datatable({ state, setState, reset }) {
+	const token = localStorage.getItem("token");
 	const [data, setData] = useState({});
 	const [analytics, setAnalytics] = useState([]);
 	const [query, setQuery] = useState("");
-	// const [prevQuery, setPrevQuery] = useState("");
 
 	const setStateKey = (key) => (valOrUpdater) => {
 		setState((prevState) => ({
@@ -49,12 +50,12 @@ export default function Datatable({ state, setState, reset, headers, properties 
 				const api = `${BASE_URL}/table?page=${state.page}&limit=${
 					state.limit
 				}&sort=${JSON.stringify(state.sort)}${query}`;
-				const response = await fetch(api);
+				const response = await axios.get(api, { headers: { Authorization: `Bearer ${token}` } });
 
-				if (!response.ok) throw new Error(`Table Data Fetch Failed: ${response.statusText}`);
-
-				const result = await response.json();
-				setData(result);
+				// if (!response.ok) throw new Error(`Table Data Fetch Failed: ${response.statusText}`);
+				if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
+				// const result = await response.json();
+				setData(response.data);
 			} catch (error) {
 				console.error("Error fetching table data:", error);
 			}
@@ -68,10 +69,11 @@ export default function Datatable({ state, setState, reset, headers, properties 
 		async function fetchAnalytics() {
 			try {
 				const api = `${BASE_URL}/analytics/table?${query.slice(1)}`;
-				const response = await fetch(api);
-				if (!response.ok) throw new Error(`Filter Panel Data Fetch Failed: ${response.statusText}`);
-				const result = await response.json();
-				setAnalytics(result);
+				const response = await axios.get(api, { headers: { Authorization: `Bearer ${token}` } });
+				// if (!response.ok) throw new Error(`Filter Panel Data Fetch Failed: ${response.statusText}`);
+				// const result = await response.json();
+				if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
+				setAnalytics(response.data);
 				prevQueryRef.current = query;
 			} catch (error) {
 				console.error("Error fetching filter panel data:", error);
@@ -89,7 +91,6 @@ export default function Datatable({ state, setState, reset, headers, properties 
 				<Header
 					state={{ query: query, key: state.key, cols: state.cols, sort: state.sort }}
 					setState={(key, val) => setStateKey(key)(val)}
-					headers={headers}
 					reset={reset}
 				/>
 			</div>
@@ -98,14 +99,12 @@ export default function Datatable({ state, setState, reset, headers, properties 
 					state={{ filter: state.filter, range: state.range, open: state.open }}
 					setState={(key, val) => setStateKey(key)(val)}
 					data={analytics}
-					headers={headers}
 				/>
 				<Table
 					state={{ page: state.page, limit: state.limit, cols: state.cols, sort: state.sort }}
 					setState={(key, val) => setStateKey(key)(val)}
 					data={data}
-					headers={headers}
-					properties={properties}
+					minimal={false}
 				/>
 			</div>
 		</div>

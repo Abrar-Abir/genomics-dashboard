@@ -6,7 +6,10 @@ import ProgressCard from "@components/dashboard/ProgressCard";
 import PICard from "@components/dashboard/PICard";
 import DonutCard from "@components/dashboard/DonutCard";
 import { DATE_FORMAT } from "@components/utils.js";
+import axios from "axios";
+
 export default function Dashboard({ state, setState, reset }) {
+	const token = localStorage.getItem("token");
 	const [data, setData] = useState({
 		"progress-area": [],
 		"status-bar": [],
@@ -22,13 +25,19 @@ export default function Dashboard({ state, setState, reset }) {
 		try {
 			const start = format(state.startDate, DATE_FORMAT);
 			const end = format(state.endDate, DATE_FORMAT);
-			const response = await fetch(`${BASE_URL}/${key}/${start}-${end}/${!state.qgp}`);
-			if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+			const response = await axios.get(`${BASE_URL}/${key}/${start}-${end}/${!state.qgp}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
-			const data = await response.json();
+			// console.log(response.data);
+			// if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+			if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
+
 			setData((prevState) => ({
 				...prevState,
-				[key]: data,
+				[key]: response.data,
 			}));
 		} catch (error) {
 			console.error(error);

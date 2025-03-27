@@ -6,8 +6,8 @@ import {
 	CardFooter,
 	Tooltip,
 } from "@material-tailwind/react";
-import { BASE_URL } from "@components/utils.js";
-import { getID } from "@components/utils.js";
+import schema from "@lib/schema.json";
+import { BASE_URL, getID } from "@components/utils.js";
 import { ArrowsUpDownIcon, ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
@@ -17,7 +17,9 @@ import JbrowseLogo from "@assets/jbrowse.png";
 
 const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
 
-export default function Table({ state, setState, data, headers, properties }) {
+export default function Table({ state, setState, data, minimal }) {
+	const headers = schema.headers;
+	const properties = schema.properties;
 	const JsonIcon = ({ sampleId }) => (
 		<img
 			src={JsonPng}
@@ -74,6 +76,10 @@ export default function Table({ state, setState, data, headers, properties }) {
 			></img>
 		);
 	};
+	const countTrueLanes = (row) => {
+		return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
+	};
+	const [selectedHeaders, setSelectedHeaders] = useState([]);
 
 	const handlePrev = () => {
 		setState("page", (prevPage) => Math.max(prevPage - 1, 1));
@@ -86,37 +92,6 @@ export default function Table({ state, setState, data, headers, properties }) {
 	const handleLimit = (number) => {
 		setState("limit", number);
 		setState("page", 1);
-	};
-
-	const resetHeaders = (binaryStr) => {
-		const cols = headers.filter((_, idx) => binaryStr[idx] === "1");
-
-		return cols.sort((col1, col2) => properties[col1].order - properties[col2].order);
-	};
-
-	const [selectedHeaders, setSelectedHeaders] = useState([]);
-
-	useEffect(() => {
-		setSelectedHeaders(resetHeaders(state.cols));
-	}, [state.cols]);
-
-	const totalPages = Math.ceil(data.count / state.limit);
-	const countTrueLanes = (row) => {
-		return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
-	};
-
-	const handleSort = (id, index) => {
-		if (index === -1) {
-			setState("sort", (prevSort) => [...prevSort, id]);
-		} else if (id >= 0) {
-			setState("sort", (prevSort) => [
-				...prevSort.slice(0, index),
-				-1 * id,
-				...prevSort.slice(index + 1),
-			]);
-		} else {
-			setState("sort", (prevSort) => [...prevSort.slice(0, index), ...prevSort.slice(index + 1)]);
-		}
 	};
 
 	const getArrow = (head) => {
@@ -136,6 +111,36 @@ export default function Table({ state, setState, data, headers, properties }) {
 			);
 		}
 	};
+
+	const totalPages = Math.ceil(data.count / state.limit);
+
+	const handleSort = (id, index) => {
+		if (index === -1) {
+			setState("sort", (prevSort) => [...prevSort, id]);
+		} else if (id >= 0) {
+			setState("sort", (prevSort) => [
+				...prevSort.slice(0, index),
+				-1 * id,
+				...prevSort.slice(index + 1),
+			]);
+		} else {
+			setState("sort", (prevSort) => [...prevSort.slice(0, index), ...prevSort.slice(index + 1)]);
+		}
+	};
+
+	if (minimal) {
+		const selectedHeaders = headers;
+	} else {
+		const resetHeaders = (binaryStr) => {
+			const cols = headers.filter((_, idx) => binaryStr[idx] === "1");
+
+			return cols.sort((col1, col2) => properties[col1].order - properties[col2].order);
+		};
+
+		useEffect(() => {
+			setSelectedHeaders(resetHeaders(state.cols));
+		}, [state.cols]);
+	}
 
 	return (
 		<section className="flex-1 overflow-x-auto overflow-y-hidden h-full">
@@ -228,52 +233,54 @@ export default function Table({ state, setState, data, headers, properties }) {
 						<div className="flex justify-center items-center h-full w-full">No data</div>
 					)}
 				</div>
-				<CardFooter className="flex justify-between items-center flex-shrink-0 bg-white">
-					<Typography variant="h6" color="blue-gray">
-						Page {state.page}{" "}
-						<span className="font-normal text-gray-600">
-							of {Math.ceil(data.count / state.limit)} (Total {data.count} rows)
-						</span>
-					</Typography>
-					<Typography variant="h6" className="flex space-x-2 font-normal text-gray-600">
-						<span>Showing</span>
-						<ButtonGroup variant="outlined" size="sm" className="-mt-1">
-							{[25, 50, 100, 200].map((limit) => {
-								return (
-									<Button
-										key={limit}
-										className={state.limit === limit ? "bg-black text-white" : ""}
-										onClick={() => handleLimit(limit)}
-									>
-										{limit}
-									</Button>
-								);
-							})}
-						</ButtonGroup>
-						<span>items per page</span>
-					</Typography>
-					<div className="flex gap-4">
-						<Button
-							variant="outlined"
-							size="sm"
-							className="flex items-center gap-1"
-							onClick={handlePrev}
-							disabled={state.page === 1}
-						>
-							<ChevronLeftIcon strokeWidth={3} className="h-3 w-3" />
-							prev
-						</Button>
-						<Button
-							variant="outlined"
-							className="flex items-center gap-1"
-							onClick={handleNext}
-							disabled={state.page === totalPages}
-						>
-							next
-							<ChevronRightIcon strokeWidth={3} className="h-3 w-3" />
-						</Button>
-					</div>
-				</CardFooter>
+				{!minimal && (
+					<CardFooter className="flex justify-between items-center flex-shrink-0 bg-white">
+						<Typography variant="h6" color="blue-gray">
+							Page {state.page}{" "}
+							<span className="font-normal text-gray-600">
+								of {Math.ceil(data.count / state.limit)} (Total {data.count} rows)
+							</span>
+						</Typography>
+						<Typography variant="h6" className="flex space-x-2 font-normal text-gray-600">
+							<span>Showing</span>
+							<ButtonGroup variant="outlined" size="sm" className="-mt-1">
+								{[25, 50, 100, 200].map((limit) => {
+									return (
+										<Button
+											key={limit}
+											className={state.limit === limit ? "bg-black text-white" : ""}
+											onClick={() => handleLimit(limit)}
+										>
+											{limit}
+										</Button>
+									);
+								})}
+							</ButtonGroup>
+							<span>items per page</span>
+						</Typography>
+						<div className="flex gap-4">
+							<Button
+								variant="outlined"
+								size="sm"
+								className="flex items-center gap-1"
+								onClick={handlePrev}
+								disabled={state.page === 1}
+							>
+								<ChevronLeftIcon strokeWidth={3} className="h-3 w-3" />
+								prev
+							</Button>
+							<Button
+								variant="outlined"
+								className="flex items-center gap-1"
+								onClick={handleNext}
+								disabled={state.page === totalPages}
+							>
+								next
+								<ChevronRightIcon strokeWidth={3} className="h-3 w-3" />
+							</Button>
+						</div>
+					</CardFooter>
+				)}
 			</Card>
 		</section>
 	);

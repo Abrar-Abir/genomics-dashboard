@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import Layout from "./components/shared/Layout";
 import Login from "./pages/Login";
@@ -9,51 +9,18 @@ import Datagrid from "./pages/Datagrid";
 import schema from "@lib/schema.json";
 import { getID } from "@components/utils.js";
 
+const ProtectedRoute = ({ children }) => {
+	return localStorage.getItem("token") ? children : <Navigate to="/login" />;
+};
+
+const PrivateRoute = ({ element, ...rest }) => {
+	const token = localStorage.getItem("token");
+	return token ? <Route {...rest} element={element} /> : <Navigate to="/login" />;
+};
+
 export default function App() {
-	// minimize states shared
-	// router
-	// layout > togglesidebar
-	//  files
-
-	// const tableHeadersView = Object.keys(schema.table).reduce((acc, table) => {
-	// 	Object.keys(schema.table[table].entity).forEach((key) => {
-	// 		acc[schema.table[table].entity[key].alias] = schema.table[table].entity[key].view;
-	// 	});
-	// 	return acc;
-	// }, {});
-
-	// const binaryStr = tableHeaders.map((col) => (tableHeadersView[col] ? "1" : "0")).join("");
-
-	const tableHeaders = Object.keys(schema.table)
-		.flatMap((table) => Object.values(schema.table[table].entity).map((entity) => entity.alias))
-		.sort();
-
-	const binaryStr = tableHeaders
-		.map((col) =>
-			Object.keys(schema.table).some((table) =>
-				Object.keys(schema.table[table].entity).some(
-					(key) =>
-						schema.table[table].entity[key].alias === col && schema.table[table].entity[key].view
-				)
-			)
-				? "1"
-				: "0"
-		)
-		.join("");
-
-	const tableHeadersProperties = Object.keys(schema.table).reduce((acc, table) => {
-		Object.keys(schema.table[table].entity).forEach((key) => {
-			if (!acc[schema.table[table].entity[key].alias]) {
-				acc[schema.table[table].entity[key].alias] = {};
-			}
-
-			acc[schema.table[table].entity[key].alias].source = schema.table[table].entity[key].source;
-			acc[schema.table[table].entity[key].alias].order =
-				schema.table[table].entity[key].group * 100 + schema.table[table].entity[key].order;
-			acc[schema.table[table].entity[key].alias].filter = schema.table[table].entity[key].order;
-		});
-		return acc;
-	}, {});
+	const headers = schema.headers;
+	const binaryStr = schema.binaryStr;
 
 	// Dashboard Page props
 
@@ -74,9 +41,9 @@ export default function App() {
 		range: {},
 		cols: binaryStr,
 		sort: [
-			getID(tableHeaders, "Loading Date"),
-			getID(tableHeaders, "Submission ID"),
-			getID(tableHeaders, "LIMS ID"),
+			getID(headers, "Loading Date"),
+			getID(headers, "Submission ID"),
+			getID(headers, "LIMS ID"),
 		],
 		key: -1,
 		value: "",
@@ -95,7 +62,14 @@ export default function App() {
 	};
 
 	// Datagrid Props
-	const gridStateFresh = { filter: new Map(), show: [], hide: false, open: {} };
+	const gridStateFresh = {
+		filter: new Map(),
+		show: [],
+		hide: false,
+		openPi: {},
+		openProject: {},
+		open: {},
+	};
 	const [gridState, setGridState] = useState(gridStateFresh);
 	const resetGrid = () => {
 		setGridState(gridStateFresh);
@@ -106,40 +80,34 @@ export default function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path="login" element={<Login />} />
+				<Route path="/login" element={<Login />} />
 				<Route path="/" element={<Layout />}>
 					<Route
-						index
+						path="dashboard"
 						element={
-							<Dashboard
-								state={dashboardState}
-								setState={setDashboardState}
-								reset={resetDashboard}
-							/>
+							<ProtectedRoute>
+								<Dashboard
+									state={dashboardState}
+									setState={setDashboardState}
+									reset={resetDashboard}
+								/>
+							</ProtectedRoute>
 						}
 					/>
 					<Route
 						path="datatable"
 						element={
-							<Datatable
-								state={tableState}
-								setState={setTableState}
-								reset={resetTable}
-								headers={tableHeaders}
-								properties={tableHeadersProperties}
-							/>
+							<ProtectedRoute>
+								<Datatable state={tableState} setState={setTableState} reset={resetTable} />
+							</ProtectedRoute>
 						}
 					/>
 					<Route
 						path="datagrid"
 						element={
-							<Datagrid
-								state={gridState}
-								setState={setGridState}
-								reset={resetGrid}
-								headers={tableHeaders}
-								properties={tableHeadersProperties}
-							/>
+							// <ProtectedRoute>
+							<Datagrid state={gridState} setState={setGridState} reset={resetGrid} />
+							// </ProtectedRoute>
 						}
 					/>
 					<Route path="plot" element={<Plot />} />

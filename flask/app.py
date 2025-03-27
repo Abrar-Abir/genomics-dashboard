@@ -1,8 +1,12 @@
 from library import connect_to_postgres, fetch, get_database_info, get_id, parse_date, jsonify
 from flask import Flask, request, send_file, render_template
+
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 from datetime import datetime, date
 import psycopg2
-from flask_cors import CORS
 import json
 import os
 import io
@@ -13,21 +17,42 @@ import pygwalker as pyg
 import pandas as pd
 import numpy as np
 
+
+
 	
 
-class CustomJSONEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, np.bool_):
-			return bool(obj)
-		if isdigit(obj):
-			return str(obj)
-		if isinstance(obj, (date, datetime)):
-			return datetime.strftime(obj, '%d-%m-%Y')
-		return super().default(obj)
+# class CustomJSONEncoder(json.JSONEncoder):
+# 	def default(self, obj):
+# 		if isinstance(obj, np.bool_):
+# 			return bool(obj)
+# 		if isdigit(obj):
+# 			return str(obj)
+# 		if isinstance(obj, (date, datetime)):
+# 			return datetime.strftime(obj, '%d-%m-%Y')
+# 		return super().default(obj)
+# app.json_encoder = CustomJSONEncoder
 
 app = Flask(__name__)
-# app.json_encoder = CustomJSONEncoder
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:mypassword@localhost/auth'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'supersecretkey'
+
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+
+
+
+
 dir = os.getcwd()
 parent = os.path.dirname(dir)
 table, host, user, password, port = get_database_info()
@@ -46,7 +71,7 @@ columns_sorted = [col[0] + '.' + col[1]
 alias_clause = ', '.join([col[0] + '.' + col[1] + ' AS ' + '"' + col[2] + '"'
 				 for col in sorted(all_columns, key=lambda x: x[2])])
 
-# datatype_columns = ['WGS', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA', 'totRNA-50', 'totRNAGlob-50', '10XscRNA', 'NXTRA', 'sRNA8M', 'mRNA-40']
+datatype_columns = ['WGS', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA', 'totRNA-50', 'totRNAGlob-50', '10XscRNA', 'NXTRA', 'sRNA8M', 'mRNA-40']
 
 def stringify(obj):
 	if isinstance(obj, (date, datetime)):
@@ -102,8 +127,20 @@ def get_where_clause(filter_dict, filter_key=None):
 			where_clause += filter_dict[key] + " AND "
 	return where_clause[:-5]
 
+@app.route('/login', methods=['POST'])
+def login():
+	data = request.get_json()
+	user = User.query.filter_by(username=data['username']).first()
+	# if user and bcrypt.check_password_hash(user.password, data['password']):
+	if user and user.password == data['password']:    
+		access_token = create_access_token(identity=user.id)
+		return jsonify({'token': access_token, 'redirect_url': '/dashboard'}), 200
+
+	return jsonify({'message': 'Invalid credentials'}), 401
+
 ######## table page #######################################
 @ app.route('/table')
+@jwt_required()
 def table():
 	page = int(request.args.get('page', default = 1))
 	limit = int(request.args.get('limit', default = 50))
@@ -146,6 +183,7 @@ def table():
 	return jsonify({"table": results, "count": count})
 
 @ app.route('/export/table/<format>')
+@jwt_required()
 def export_table(format):
 	# if format == 'raw':
 	# 	key = list(request.args.keys())[0]
@@ -244,6 +282,7 @@ def get_analytics(column_name, table_filter, query, fetch_arg):
 	return [(str(row[0]), row[1]) for row in results]
 
 @ app.route('/analytics/table')
+@jwt_required()
 def analytics_table():
 	analytics_data = {}
 	table_filter = get_table_filter(request.args)
@@ -289,6 +328,7 @@ def analytics_table():
 	return jsonify(analytics_data)
 
 @ app.route('/search/<id>')
+@jwt_required()
 def search(id):
 	table_filter = get_table_filter(request.args)
 	where_clause = get_where_clause(table_filter)
@@ -338,8 +378,9 @@ def get_datagrid_filter(request_args):
 	return datagrid_filter
 
 @ app.route('/analytics/datagrid')
+@jwt_required()
 def analytics_datagrid():
-	analytics_data = {}
+	analytics_data = {"project": dict(), "submission": dict()}
 	datagrid_filter = get_datagrid_filter(request.args)
 	hide = datagrid_filter.get('hide', False)
 	having_clause = datagrid_filter.get('having', '')
@@ -360,7 +401,7 @@ def analytics_datagrid():
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{get_where_clause({'project.project' : datagrid_filter['project.project']} if 'project.project' in datagrid_filter else {})}
 		GROUP BY sample_name, pi """ + (hide or len(having_clause) != 0)*"""HAVING """ + (hide)*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and hide)*""" AND """ +  f"""{having_clause[3:]}""" + f""") AS SUBRESULT GROUP BY pi  ORDER BY total DESC;"""
-	analytics_data['project.pi'] = get_analytics('', dict(), pi_query, "all")
+	analytics_data['project'][str(get_id(columns_sorted, "project.pi"))] = get_analytics('', dict(), pi_query, "all")
 
 	project_query = f"""
 	SELECT project, SUM(OUTR.frequency) AS total
@@ -388,7 +429,7 @@ def analytics_datagrid():
 		ON INNR.sample_name = OUTR.sample_name
 		GROUP BY project  ORDER BY total DESC;"""
 	
-	analytics_data['project.project'] = get_analytics('', dict(), project_query, "all")
+	analytics_data['project'][str(get_id(columns_sorted,'project.project'))] = get_analytics('', dict(), project_query, "all")
 
 	datatype_query = f"""
 	SELECT datatype, SUM(SUBRESULT.frequency) AS total
@@ -407,15 +448,16 @@ def analytics_datagrid():
 		{get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k.startswith('project')})}
 		GROUP BY sample_name, pi """ + (hide)*"""HAVING COUNT(*) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
 	
-	analytics_data['submission.datatype'] = get_analytics('', dict(), datatype_query, "all")
+	analytics_data['submission'][str(get_id(columns_sorted, 'submission.datatype'))] = get_analytics('', dict(), datatype_query, "all")
 	return jsonify(analytics_data)
 
 
 @ app.route('/datagrid')
+@jwt_required()
 def datagrid():
 	global datatypeID, datatype_columns
 	datagrid_filter = get_datagrid_filter(request.args)
-	set_datagrid_filter(request.args)
+	# set_datagrid_filter(request.args)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
 	hide = datagrid_filter['hide']
@@ -554,9 +596,10 @@ def datagrid():
 	
 			
 	
-	return jsonify({"data": output, 'columns': ['Entity'] + datatype_columns + ['Count']})
+	return jsonify({"grid": output, 'headers': ['Entity'] + datatype_columns + ['Count']})
 
 @ app.route('/export/datagrid/<format>')
+@jwt_required()
 def export_datagrid(format):
 	global datatypeID, datatype_columns
 	datagrid_filter = get_datagrid_filter(request.args)
@@ -693,6 +736,7 @@ def export_datagrid(format):
 ####### overview page ##################################################
 
 @ app.route('/progress-area/<date>/<no_qgp>')
+@jwt_required()
 def progress_area(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -728,6 +772,7 @@ def progress_area(date, no_qgp):
 
 
 @ app.route('/status-bar/<date>/<no_qgp>')
+@jwt_required()
 def status_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -776,6 +821,7 @@ def status_bar(date, no_qgp):
 
 
 @ app.route('/project-bar/<date>/<no_qgp>')
+@jwt_required()
 def project_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -822,6 +868,7 @@ def project_bar(date, no_qgp):
 
 
 @ app.route('/refgenome-bar/<date>/<no_qgp>')
+@jwt_required()
 def refgenome_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -867,6 +914,7 @@ def refgenome_bar(date, no_qgp):
 
 
 @ app.route('/fctype-donut/<date>/<no_qgp>')
+@jwt_required()
 def fctype_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -892,6 +940,7 @@ def fctype_donut(date, no_qgp):
 
 
 @ app.route('/service-donut/<date>/<no_qgp>')
+@jwt_required()
 def service_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -920,6 +969,7 @@ def service_donut(date, no_qgp):
 
 
 @ app.route('/sequencer-donut/<date>/<no_qgp>')
+@jwt_required()
 def sequencer_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -945,6 +995,7 @@ def sequencer_donut(date, no_qgp):
 
 
 @ app.route('/refgenome-donut/<date>/<no_qgp>')
+@jwt_required()
 def refgenome_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -969,6 +1020,7 @@ def refgenome_donut(date, no_qgp):
 
 
 @ app.route('/plot')
+@jwt_required()
 def plot():
 	
 	table_filter = get_table_filter(request.args)

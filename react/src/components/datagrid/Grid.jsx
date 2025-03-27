@@ -1,6 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { BASE_URL, getID } from "@components/utils.js";
+import Table from "@components/datatable/Table";
+import schema from "@lib/schema.json";
 import {
 	Tooltip,
 	Badge,
@@ -9,69 +11,57 @@ import {
 	DialogFooter,
 	DialogHeader,
 	Button,
-	Typography,
+	// Typography,
 } from "@material-tailwind/react";
+const headers = schema.headers;
+// import JsonPng from "@assets/json.png";
+// import MultiQCLogo from "@assets/multiqc_logo_color.png";
 
-import JsonPng from "@assets/json.png";
-import MultiQCLogo from "@assets/multiqc_logo_color.png";
+// const JsonIcon = ({ baseURL, sample_id }) => (
+// 	<img
+// 		src={JsonPng}
+// 		onClick={() => window.open(`${baseURL}/raw/database/${sample_id}`, "_blank")}
+// 		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
+// 	></img>
+// );
+// const HtmlIcon = ({ col, id }) => (
+// 	<img
+// 		src={MultiQCLogo}
+// 		onClick={() =>
+// 			window.open(
+// 				col === "flowcell"
+// 					? `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${id}/${id}.html`
+// 					: `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/submission/${
+// 							id.split("_")[1]
+// 					  }/${id}/${id}.html`,
+// 				"_blank"
+// 			)
+// 		}
+// 		className="ml-2 h-2.5 cursor-pointer hover:bg-blue-300 rounded"
+// 	></img>
+// );
 
-const JsonIcon = ({ baseURL, sample_id }) => (
-	<img
-		src={JsonPng}
-		onClick={() => window.open(`${baseURL}/raw/database/${sample_id}`, "_blank")}
-		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
-	></img>
-);
-const HtmlIcon = ({ col, id }) => (
-	<img
-		src={MultiQCLogo}
-		onClick={() =>
-			window.open(
-				col === "flowcell"
-					? `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${id}/${id}.html`
-					: `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/submission/${
-							id.split("_")[1]
-					  }/${id}/${id}.html`,
-				"_blank"
-			)
-		}
-		className="ml-2 h-2.5 cursor-pointer hover:bg-blue-300 rounded"
-	></img>
-);
-
-export default function Grid({
-	data,
-	gridHeaders,
-	setShowProject,
-	openPi,
-	setOpenPi,
-	openProject,
-	setOpenProject,
-	tableHeaders,
-	tableHeadersProperties,
-	// baseURL,
-}) {
-	const { baseURL } = useOutletContext();
+export default function Grid({ state, setState, data }) {
 	const [openSample, setOpenSample] = useState("");
 	const closeModal = () => setOpenSample("");
 	const [sampleData, setSampleData] = useState([]);
 
 	const handleTogglePi = (pi) => {
-		setOpenPi((prevState) => ({
+		setState("openPi", (prevState) => ({
 			...prevState,
 			[pi]: !prevState[pi],
 		}));
 	};
 
 	const handleToggleProject = (project) => {
-		setOpenProject((prevState) => ({
+		setState("openProject", (prevState) => ({
 			...prevState,
 			[project]: !prevState[project],
 		}));
 	};
 
 	const handleToggleShow = (project) => {
-		setShowProject((prevState) => {
+		setState("show", (prevState) => {
 			if (prevState.includes(project)) {
 				return prevState.filter((p) => p !== project);
 			}
@@ -79,27 +69,29 @@ export default function Grid({
 		});
 	};
 
-	const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
-	const countTrueLanes = (row) => {
-		return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
-	};
+	// const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
+	// const countTrueLanes = (row) => {
+	// 	return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
+	// };
 
 	const handleExport = (format) => {
 		console.log(openSample);
-		window.open(`${baseURL}/export/database/${format}?sample_name=${openSample}`, "_blank");
+		window.open(`${BASE_URL}/export/database/${format}?sample_name=${openSample}`, "_blank");
 	};
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
 				if (openSample !== "") {
-					let apiUrl = `${baseURL}/database?sample.sample_name=[${openSample}]`;
-					const dataResponse = await fetch(apiUrl);
-					if (!dataResponse.ok) {
+					let url = `${BASE_URL}/table?${getID(headers, "Sample Name")}=[${JSON.stringify(
+						openSample
+					)}]`;
+					const response = await fetch(url);
+					if (!response.ok) {
 						console.error("Server error:", dataResponse);
 					} else {
-						const dataResult = await dataResponse.json();
-						setSampleData(dataResult.data);
+						const result = await response.json();
+						setSampleData(result.table);
 					}
 				}
 			} catch (error) {
@@ -108,6 +100,8 @@ export default function Grid({
 		}
 		fetchData();
 	}, [openSample]);
+
+	// console.log(data);
 
 	return (
 		<div className="overflow-x-hidden h-full bg-white">
@@ -151,7 +145,7 @@ export default function Grid({
 				</DialogHeader>
 				<DialogBody>
 					<div className="flex-1 overflow-auto">
-						<table className="w-full min-w-max table-auto text-left">
+						{/* <table className="w-full min-w-max table-auto text-left">
 							<thead className="sticky top-0 bg-white z-10">
 								<tr>
 									{sampleTableHeaders.map((head) => {
@@ -231,21 +225,14 @@ export default function Grid({
 									</tr>
 								))}
 							</tbody>
-						</table>
+						</table> */}
+						<Table
+							state={{ limit: 25, sort: [], cols: headers, page: 1 }}
+							setState={null}
+							data={sampleData}
+							minimal={true}
+						/>
 					</div>
-					{/* <Menu>
-						<MenuHandler>
-							<Button color="gray" variant="outlined" className="flex items-center gap-1 py-1 h-8">
-								Export
-								<ArrowDownTrayIcon className="w-4 h-4 text-gray-900" />
-							</Button>
-						</MenuHandler>
-						<MenuList className="!z-60">
-							<MenuItem onClick={() => handleExport("csv", { openSample })}>CSV</MenuItem>
-							<MenuItem onClick={() => handleExport("tsv", { openSample })}>TSV</MenuItem>
-							<MenuItem onClick={() => handleExport("json", { openSample })}>JSON</MenuItem>
-						</MenuList>
-					</Menu> */}
 				</DialogBody>
 
 				<DialogFooter>
@@ -262,7 +249,7 @@ export default function Grid({
 					<tr>
 						<td></td>
 						<td className="border-0"></td>
-						{tableHeaders.map((key) => (
+						{data.headers.map((key) => (
 							<th
 								key={key}
 								className="text-center font-semibold"
@@ -289,25 +276,25 @@ export default function Grid({
 						))}
 					</tr>
 				</thead>
-				{data === null ? (
+				{data?.grid === null ? (
 					<tbody>
 						<tr>
-							<td className="bg-teal-400 text-center text-white" colSpan={tableHeaders.length + 3}>
+							<td className="bg-teal-400 text-center text-white" colSpan={data.headers.length + 3}>
 								No result exist
 							</td>
 						</tr>
 					</tbody>
 				) : (
 					<tbody className="overflow-y-auto">
-						{Object.keys(data).map((pi) => {
-							const piData = data[pi];
+						{Object.keys(data.grid).map((pi) => {
+							const piData = data.grid[pi];
 							return (
 								<>
-									<tr key={pi} className="bg-teal-400 sticky z-20 top-[8.85rem]">
-										{tableHeaders.map((key, id) => {
+									<tr key={`pi-${pi}`} className="bg-teal-400 sticky z-20 top-[8.85rem]">
+										{data.headers.map((key, id) => {
 											return (
 												<td
-													key={key}
+													key={`pi-${pi}-header-${key}`}
 													onClick={key === "Entity" ? () => handleTogglePi(pi) : () => {}}
 													className={
 														"border-2 border-white px-4 text-white " +
@@ -329,7 +316,7 @@ export default function Grid({
 										})}
 									</tr>
 
-									{openPi[pi] &&
+									{state.openPi[pi] &&
 										Object.keys(piData.projects).map((project) => {
 											const projectData = piData.projects[project];
 
@@ -338,7 +325,7 @@ export default function Grid({
 													<tr key={project} className="sticky z-20 top-[8.85rem]">
 														<td className="bg-transparent w-[4rem]"></td>
 														{/*  */}
-														{tableHeaders.map((key, id) => (
+														{data.headers.map((key, id) => (
 															<td
 																key={key}
 																onClick={
@@ -363,7 +350,7 @@ export default function Grid({
 														))}
 													</tr>
 
-													{openProject[project] &&
+													{state.openProject[project] &&
 														projectData.samples.map((sampleDict, index) =>
 															sampleDict["Entity"] === "null" ? (
 																<tr key={index} className="sticky z-20 top-[8.85rem]">
@@ -371,7 +358,7 @@ export default function Grid({
 
 																	<td className="w-[10rem] bg-transparent"></td>
 
-																	{tableHeaders.map((key, id) => (
+																	{data.headers.map((key, id) => (
 																		<td
 																			key={key}
 																			onClick={
@@ -401,7 +388,7 @@ export default function Grid({
 																	<td className="w-[4rem]"></td>
 																	<td className="w-[10rem]"></td>
 
-																	{tableHeaders.map((key, id) => (
+																	{data.headers.map((key, id) => (
 																		<td
 																			key={key}
 																			onClick={

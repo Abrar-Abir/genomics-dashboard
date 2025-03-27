@@ -7,7 +7,7 @@ import {
 	Input,
 } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-// import ResetIcon from "@assets/reset.png";
+import schema from "@lib/schema.json";
 
 function Icon({ open }) {
 	return (
@@ -16,10 +16,12 @@ function Icon({ open }) {
 		/>
 	);
 }
+const headers = schema.headers;
 
-export default function Panel({ state, setState, data, headers }) {
+export default function Panel({ state, setState, data }) {
 	const [allExpanded, setAllExpanded] = useState(false);
 	const handleOpen = (key) => {
+		console.log(key, state.open);
 		setState("open", (prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
@@ -33,6 +35,7 @@ export default function Panel({ state, setState, data, headers }) {
 	};
 
 	const toggle = (key, item) => {
+		console.log(state.filter);
 		setState("filter", (prevItems) => {
 			const newItems = new Map(prevItems);
 
@@ -151,14 +154,14 @@ export default function Panel({ state, setState, data, headers }) {
 				<Accordion
 					id={columnID}
 					key={columnID}
-					open={state.open[columnID] || false}
-					icon={<Icon open={state.open[columnID]} />}
+					open={state.open?.[columnID] || false}
+					icon={<Icon open={state.open?.[columnID]} />}
 					className="border-b border-gray-400 w-full"
 				>
 					<AccordionHeader
 						onClick={() => handleOpen(columnID)}
 						className={`flex justify-between items-center text-sm font-normal w-full m-0 py-0 px-1 hover:bg-indigo-300/60  ${
-							state.open[columnID] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
+							state.open?.[columnID] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
 						}`}
 					>
 						<span>{headers[columnID]}</span>
@@ -177,14 +180,14 @@ export default function Panel({ state, setState, data, headers }) {
 			<Accordion
 				id={table}
 				key={table}
-				open={state.open[table] || false}
-				icon={<Icon open={state.open[table]} />}
+				open={state.open?.[table] || false}
+				icon={<Icon open={state.open?.[table]} />}
 				className="border-b border-gray-200 w-full"
 			>
 				<AccordionHeader
 					onClick={() => handleOpen(table)}
 					className={`flex justify-between items-center text-base font-semibold w-full m-0 py-0 px-1 hover:bg-teal-300/40 capitalize ${
-						state.open[table] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
+						state.open?.[table] ? "bg-teal-600 text-white" : "bg-gray-300 text-black"
 					}`}
 				>
 					<span>{table[0].toUpperCase() + table.slice(1)}</span>

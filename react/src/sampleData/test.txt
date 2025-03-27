@@ -1,6 +1,0 @@
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1247 CSC IFNg + Butyrate expected count 1 but got count 0
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1076 CSC IFNg + Butyrate expected count 1 but got count 0
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=IBMF-SDR#0014M expected count 1 but got count 0
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1076 FBS IFNg + Butyrate expected count 1 but got count 0
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=1247 FBS IFNg + Butyrate expected count 1 but got count 0
-AssertionError for url http://127.0.0.1:5001/type0?limit=5&offset=0&sample.sample_name=IBMF-SDR#0014 expected count 1 but got count 0

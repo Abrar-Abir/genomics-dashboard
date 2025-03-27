@@ -1,9 +1,0 @@
-export { default as data1 } from "./data1.json";
-export { default as data2a } from "./data2a.json";
-export { default as data2b } from "./data2b.json";
-export { default as data2c } from "./data2c.json";
-export { default as data3 } from "./data3.json";
-export { default as data4 } from "./data4.json";
-export { default as data5 } from "./data5.json";
-export { default as data6 } from "./data6.json";
-export { default as dataX } from "./dataX.json";
