@@ -51,21 +51,22 @@ export default function Table({ state, setState, data, minimal }) {
 
 	const JbrowseIcon = ({ sampleId }) => {
 		const handleClick = async () => {
-			try {
-				const response = await fetch(`${BASE_URL}/jbrowse/${sampleId}`);
+			window.open("http://172.32.79.51:8080/?config=0201382681.json", "_blank");
+			// try {
+			// 	const response = await fetch(`${BASE_URL}/jbrowse/${sampleId}`);
 
-				if (response.ok) {
-					const response = await response.json();
-					const url = response.url;
-					window.open(url, "_blank");
-				} else {
-					console.error("Error fetching custom URL:", response.statusText);
-				}
-			} catch (error) {
-				console.error("Error occurred:", error);
-			} finally {
-				setLoading(false);
-			}
+			// 	if (response.ok) {
+			// 		const response = await response.json();
+			// 		const url = response.url;
+			// 		window.open(url, "_blank");
+			// 	} else {
+			// 		console.error("Error fetching custom URL:", response.statusText);
+			// 	}
+			// } catch (error) {
+			// 	console.error("Error occurred:", error);
+			// } finally {
+			// 	setLoading(false);
+			// }
 		};
 
 		return (

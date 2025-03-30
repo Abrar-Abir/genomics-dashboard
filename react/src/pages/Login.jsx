@@ -3,7 +3,7 @@ import { useState } from "react";
 import { login } from "@lib/authService.js";
 import bg from "@assets/logo_without_text.png";
 
-function Login() {
+export default function Login() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -11,7 +11,7 @@ function Login() {
 		e.preventDefault();
 		try {
 			await login(username, password);
-			// alert("Login successful!");
+			alert("Login successful!");
 		} catch (error) {
 			alert("Invalid credentials");
 		}
@@ -89,5 +89,3 @@ function Login() {
 		</section>
 	);
 }
-
-export default Login;
