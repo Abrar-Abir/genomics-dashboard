@@ -1,6 +1,5 @@
 from library import connect_to_postgres, fetch, get_database_info, get_id, parse_date, jsonify
 from flask import Flask, request, send_file, render_template
-
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -11,23 +10,9 @@ import json
 import os
 import io
 import csv
-# import tempfile
-# import zipfile
 import pygwalker as pyg
 import pandas as pd
 import numpy as np
-
-
-# class CustomJSONEncoder(json.JSONEncoder):
-# 	def default(self, obj):
-# 		if isinstance(obj, np.bool_):
-# 			return bool(obj)
-# 		if isdigit(obj):
-# 			return str(obj)
-# 		if isinstance(obj, (date, datetime)):
-# 			return datetime.strftime(obj, '%d-%m-%Y')
-# 		return super().default(obj)
-# app.json_encoder = CustomJSONEncoder
 
 app = Flask(__name__)
 CORS(app)
@@ -67,19 +52,32 @@ alias_clause = ', '.join([col[0] + '.' + col[1] + ' AS ' + '"' + col[2] + '"'
 
 datatype_columns = ['WGS', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA', 'totRNA-50', 'totRNAGlob-50', '10XscRNA', 'NXTRA', 'sRNA8M', 'mRNA-40']
 
-def stringify(obj):
-	if isinstance(obj, (date, datetime)):
-		return obj.isoformat()
-	if isinstance(obj, list) and len(obj) > 0:
-		return [stringify(obj[0])] + stringify(obj[1:])
-	return obj 
+# def stringify(obj):
+# 	if isinstance(obj, (date, datetime)):
+# 		return obj.isoformat()
+# 	if isinstance(obj, list) and len(obj) > 0:
+# 		return [stringify(obj[0])] + stringify(obj[1:])
+# 	return obj 
+
+@app.route('/login', methods=['POST'])
+def login():
+	data = request.get_json()
+	user = User.query.filter_by(username=data['username']).first()
+	# if user and bcrypt.check_password_hash(user.password, data['password']):
+	if user and user.password == data['password']:    
+		access_token = create_access_token(identity=user.id)
+		return jsonify({'token': access_token, 'redirect_url': '/dashboard'}), 200
+
+	return jsonify({'message': 'Invalid credentials'}), 401
+
+######## table page #######################################
+
 
 def get_table_filter(request_args):
 	table_filter = {}
 	for key, value in request_args.items():
 		if key not in ('page', 'limit', 'sort'):
 			if key[0] != '-':
-				
 				if value[0] == '[' and value[-1] == ']':
 					table_filter['last'] = key
 					column = columns_sorted[int(key)]
@@ -121,18 +119,6 @@ def get_where_clause(filter_dict, filter_key=None):
 			where_clause += filter_dict[key] + " AND "
 	return where_clause[:-5]
 
-@app.route('/login', methods=['POST'])
-def login():
-	data = request.get_json()
-	user = User.query.filter_by(username=data['username']).first()
-	# if user and bcrypt.check_password_hash(user.password, data['password']):
-	if user and user.password == data['password']:    
-		access_token = create_access_token(identity=user.id)
-		return jsonify({'token': access_token, 'redirect_url': '/dashboard'}), 200
-
-	return jsonify({'message': 'Invalid credentials'}), 401
-
-######## table page #######################################
 @ app.route('/table')
 @jwt_required()
 def table():
@@ -144,7 +130,6 @@ def table():
 	order_clause = get_order_clause(cols_to_sort)
 	table_filter = get_table_filter(request.args)
 	where_clause = get_where_clause(table_filter)
-	# print(where_clause)
 	count_query = f"""
 		SELECT COUNT(*)
 		FROM sample
@@ -179,13 +164,6 @@ def table():
 @ app.route('/export/table/<format>')
 @jwt_required()
 def export_table(format):
-	# if format == 'raw':
-	# 	key = list(request.args.keys())[0]
-	# 	value = request.args.get(key, default=None, type=str)
-	# 	where_clause = f"""WHERE sample.{key} = '{value}' """
-	# 	order_clause = ''
-	# else:
-
 	cols_to_sort = [int(id)  for id in request.args.get('sort', default = "[]")[1:-1].split(',') if len(id) > 0]
 	order_clause = get_order_clause(cols_to_sort)
 	table_filter = get_table_filter(request.args)
@@ -211,9 +189,7 @@ def export_table(format):
 			return jsonify(None)
 	results = fetch_result[0][0]
 	
-	if format in ('json', 'raw'):	
-		if format == 'raw':
-			return jsonify(results)	
+	if format in ('json', 'raw'):
 		data = dict()
 		for row in results:
 			sample = row['LIMS ID']
@@ -223,8 +199,6 @@ def export_table(format):
 			data[sample][flowcell_id] = {key : row[key] for key in row if key not in ('LIMS ID', 'Flowcell ID')}
 			data[sample][flowcell_id]['Mean Q Score'] = data[sample][flowcell_id]['Mean Q Score'] / ((sum([data[sample][flowcell_id][f'Lane {i}'] for i in range(1,9)]))*2)
 		
-		# if format == 'raw':
-		# 	return jsonify(data)
 		
 		json_file_path = "/tmp/data.json"
 		with open(json_file_path, 'w') as json_file:
@@ -351,11 +325,12 @@ def get_datagrid_filter(request_args):
 	datagrid_filter['hide'] = request_args.get('hide', default='0') == '1'
 	for key in request_args.keys():
 		if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
+			column = columns_sorted[int(key)]
 			if key == 'show':
 				values = request_args.get(key)[1:-1].split(',')
 				filter_str = str([value.replace('"', '') for value in values])
 				datagrid_filter[key] = f" project IN ({str(filter_str[1:-1])})"
-			elif key == 'submission.datatype':
+			elif column == 'submission.datatype':
 				values = [value.replace('"', '') for value in request_args.get(key)[1:-1].split(',')]
 				having_str = 'AND' + f""" ARRAY( SELECT UNNEST (ARRAY{request_args.get(key)[2:-2]}::character varying[]) ORDER BY 1) = ARRAY (
 							SELECT UNNEST(ARRAY_AGG(CASE 
@@ -367,7 +342,7 @@ def get_datagrid_filter(request_args):
 			else:
 				values = request_args.get(key)[1:-1].split(',')
 				filter_str = str([value.replace('"', '') for value in values])
-				datagrid_filter[key] = f" {key} IN ({str(filter_str[1:-1])})"
+				datagrid_filter[column] = f" {column} IN ({str(filter_str[1:-1])})"
 	
 	return datagrid_filter
 
@@ -452,6 +427,7 @@ def datagrid():
 	global datatypeID, datatype_columns
 	datagrid_filter = get_datagrid_filter(request.args)
 	# set_datagrid_filter(request.args)
+	print(datagrid_filter)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
 	hide = datagrid_filter['hide']
@@ -688,8 +664,6 @@ def export_datagrid(format):
 			
 			output[pi][project][sample][datatype] += 1	
 	if format == 'json':	
-		# with open("/tmp/data.json", 'w') as json_file:
-			# json.dump(output, json_file, indent=4)
 		json_buffer = io.StringIO()
 		json.dump(output, json_buffer, indent=4)
 		json_buffer.seek(0)

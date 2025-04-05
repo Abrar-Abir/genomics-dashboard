@@ -7,7 +7,7 @@ import {
 	Tooltip,
 } from "@material-tailwind/react";
 import schema from "@lib/schema.json";
-import { BASE_URL, getID } from "@components/utils.js";
+import { getID } from "@components/utils.js";
 import { ArrowsUpDownIcon, ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
@@ -27,13 +27,7 @@ const countTrueLanes = (row) => {
 const JsonIcon = ({ sampleId }) => (
 	<img
 		src={JsonPng}
-		onClick={() =>
-			// window.open(
-			// 	`${BASE_URL}/export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`,
-			// 	"_blank"
-			// )
-			secureOpen(`export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`)
-		}
+		onClick={() => secureOpen(`export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`, "raw")}
 		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
 	></img>
 );
@@ -133,20 +127,15 @@ export default function Table({ state, setState, data, minimal }) {
 		}
 	};
 
-	if (minimal) {
-		const selectedHeaders = headers;
-	} else {
-		const resetHeaders = (binaryStr) => {
-			const cols = headers.filter((_, idx) => binaryStr[idx] === "1");
+	const resetHeaders = (binaryStr) => {
+		const cols = headers.filter((_, idx) => binaryStr[idx] === "1");
 
-			return cols.sort((col1, col2) => properties[col1].order - properties[col2].order);
-		};
+		return cols.sort((col1, col2) => properties[col1].order - properties[col2].order);
+	};
 
-		useEffect(() => {
-			setSelectedHeaders(resetHeaders(state.cols));
-		}, [state.cols]);
-	}
-
+	useEffect(() => {
+		setSelectedHeaders(resetHeaders(state.cols));
+	}, [state.cols]);
 	return (
 		<section className="flex-1 overflow-x-auto overflow-y-hidden h-full">
 			<Card className="w-full h-full flex flex-col !rounded-none">
@@ -159,7 +148,7 @@ export default function Table({ state, setState, data, minimal }) {
 										<th key={head} className="border-b border-gray-300 !p-4">
 											<Tooltip content={properties[head].source}>
 												<div className="flex items-center space-x-2">
-													{head} {getArrow(head)}
+													{head} {!minimal && getArrow(head)}
 												</div>
 											</Tooltip>
 										</th>

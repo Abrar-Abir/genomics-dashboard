@@ -6,6 +6,7 @@ import {
 	Typography,
 	Input,
 } from "@material-tailwind/react";
+import ResetIcon from "@assets/reset.png";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import schema from "@lib/schema.json";
 
@@ -19,13 +20,12 @@ function Icon({ open }) {
 const headers = schema.headers;
 
 export default function Panel({ state, setState, data }) {
-	const [allExpanded, setAllExpanded] = useState(false);
+	const [allExpanded, setAllExpanded] = useState(true);
 	const handleOpen = (key) => {
-		console.log(key, state.open);
 		setState("open", (prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
-	const handleToggle = () => {
+	const handleOpenAll = () => {
 		const newState = state.open;
 		Object.keys(data).forEach((key) => {
 			newState[key] = !allExpanded;
@@ -85,7 +85,6 @@ export default function Panel({ state, setState, data }) {
 				</div>
 				<div>
 					<Input
-						// className="!w-40"
 						variant="standard"
 						label={data[table]?.[columnID]?.[index] || "N/A"}
 						placeholder={headers[columnID]?.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
@@ -96,15 +95,15 @@ export default function Panel({ state, setState, data }) {
 						}}
 					/>
 				</div>
-				{/* <div className="ml-4">
+				<div className="ml-4">
 					<button>
 						<img
 							src={ResetIcon}
 							className="w-5 cursor-pointer pointer-events-auto"
-							onClick={() => console.log("clicked")}
+							onClick={() => handleRange(columnID, index, "")}
 						></img>
 					</button>
-				</div> */}
+				</div>
 			</div>
 		);
 	};
@@ -197,11 +196,11 @@ export default function Panel({ state, setState, data }) {
 		);
 	};
 	return (
-		<div className="bg-gray-100 p-2 h-screen-minus-header overflow-scroll w-80">
+		<div className="bg-gray-100 p-2 h-screen-minus-header overflow-auto w-80">
 			<Typography variant="h6" color="blue-gray" className="mb-2 flex justify-between">
 				Filters
 				<span
-					onClick={handleToggle}
+					onClick={handleOpenAll}
 					className={`text-sm cursor-pointer ${allExpanded ? "text-red-500" : "text-green-500"}`}
 				>
 					{allExpanded ? "Collapse All [-]" : "Expand All [+]"}

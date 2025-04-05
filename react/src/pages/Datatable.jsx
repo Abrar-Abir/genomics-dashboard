@@ -63,6 +63,13 @@ export default function Datatable({ state, setState, reset }) {
 			try {
 				const response = await secureFetch(`analytics/table?${query.slice(1)}`);
 				setAnalytics(response);
+
+				for (let key in response) {
+					if (!state.open.hasOwnProperty(key)) {
+						state.open[key] = true;
+					}
+				}
+
 				prevQueryRef.current = query;
 			} catch (error) {
 				console.error("Error fetching filter panel data:", error);

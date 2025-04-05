@@ -22,44 +22,21 @@ export const secureFetch = async (path) => {
 	return response.data;
 };
 
-export const secureOpen = async (path) => {
-    const newTab = window.open("about:blank", "_blank");
-    try {
-        const response = await secureFetch(path);
-		// const jsonString = JSON.stringify(response, null, 4);
-        const blob = new Blob([JSON.stringify(response, null, 4)], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-        newTab.location.href = url;
-
-		newTab.onload = () => {
-            URL.revokeObjectURL(url);
-        };
-
-		setTimeout(() => {
-            URL.revokeObjectURL(url);
-        }, 5000); 
-    } catch (error) {
-        console.error("Failed to open in new tab:", error);
-        newTab.close();
-    }
-};
-
-export const secureDownload = async (path, format) => {
+export const secureOpen = async (path, format) => {
 	const newTab = window.open("about:blank", "_blank");
 	
 	try {
 	  const response = await secureFetch(path);
 	  let blob;
-	  if (format === 'json'){
-		// const jsonString = ;
+	  if (format === 'json' || format === 'raw'){
         blob = new Blob([JSON.stringify(response, null, 4)], { type: 'application/json' });
 	  }
 	  else {
 	    blob = new Blob([response]);
 	  }
-
 	  const url = URL.createObjectURL(blob);
 	  
+	  if (format !== 'raw'){
 	  const a = newTab.document.createElement('a');
 	  a.href = url;
 	  a.download = 'data.'+ format;
@@ -71,6 +48,18 @@ export const secureDownload = async (path, format) => {
 		URL.revokeObjectURL(url);
 		newTab.close();
 	  }, 100);
+	}
+	else {
+		newTab.location.href = url;
+
+		newTab.onload = () => {
+            URL.revokeObjectURL(url);
+        };
+
+		setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 5000);
+	}
 	  
 	} catch (error) {
 	  console.error("Download failed:", error);

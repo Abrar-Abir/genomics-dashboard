@@ -18,6 +18,8 @@ export const COLORS = [
 	"yellow", // #eab308
   ];
 
+export const FORMATS = ["raw", "csv", "tsv", "json"]
+
 export function getID(array, element) {
 	for (let i = 0; i < array.length; i++) {
 		if (array[i] === element) {

@@ -8,15 +8,25 @@ import Plot from "./pages/Plot";
 import Datagrid from "./pages/Datagrid";
 import schema from "@lib/schema.json";
 import { getID } from "@components/utils.js";
+import { jwtDecode } from "jwt-decode";
 
 const ProtectedRoute = ({ children }) => {
-	return localStorage.getItem("token") ? children : <Navigate to="/login" />;
+	const token = localStorage.getItem("token");
+	if (!token) {
+		return <Navigate to="/login" replace />;
+	}
+	try {
+		if (jwtDecode(token).exp < Date.now() / 1000) {
+			localStorage.removeItem("token");
+			return <Navigate to="/login" replace />;
+		}
+		return children;
+	} catch (error) {
+		console.error("Invalid token:", error);
+		localStorage.removeItem("token");
+		return <Navigate to="/login" replace />;
+	}
 };
-
-// const PrivateRoute = ({ element, ...rest }) => {
-// 	const token = localStorage.getItem("token");
-// 	return token ? <Route {...rest} element={element} /> : <Navigate to="/login" />;
-// };
 
 export default function App() {
 	const headers = schema.headers;
