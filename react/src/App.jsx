@@ -13,10 +13,10 @@ const ProtectedRoute = ({ children }) => {
 	return localStorage.getItem("token") ? children : <Navigate to="/login" />;
 };
 
-const PrivateRoute = ({ element, ...rest }) => {
-	const token = localStorage.getItem("token");
-	return token ? <Route {...rest} element={element} /> : <Navigate to="/login" />;
-};
+// const PrivateRoute = ({ element, ...rest }) => {
+// 	const token = localStorage.getItem("token");
+// 	return token ? <Route {...rest} element={element} /> : <Navigate to="/login" />;
+// };
 
 export default function App() {
 	const headers = schema.headers;
@@ -83,6 +83,10 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/" element={<Layout />}>
 					<Route
+						index
+						element={<Navigate to={localStorage.getItem("token") ? "/dashboard" : "/login"} />}
+					/>
+					<Route
 						path="dashboard"
 						element={
 							<ProtectedRoute>
@@ -105,9 +109,9 @@ export default function App() {
 					<Route
 						path="datagrid"
 						element={
-							// <ProtectedRoute>
-							<Datagrid state={gridState} setState={setGridState} reset={resetGrid} />
-							// </ProtectedRoute>
+							<ProtectedRoute>
+								<Datagrid state={gridState} setState={setGridState} reset={resetGrid} />
+							</ProtectedRoute>
 						}
 					/>
 					<Route path="plot" element={<Plot />} />

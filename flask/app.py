@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import psycopg2
 import json
 import os
@@ -17,9 +17,6 @@ import pygwalker as pyg
 import pandas as pd
 import numpy as np
 
-
-
-	
 
 # class CustomJSONEncoder(json.JSONEncoder):
 # 	def default(self, obj):
@@ -38,6 +35,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:mypassword@localhost/auth'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -48,10 +46,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-
-
-
-
 
 dir = os.getcwd()
 parent = os.path.dirname(dir)
@@ -234,7 +228,7 @@ def export_table(format):
 		
 		json_file_path = "/tmp/data.json"
 		with open(json_file_path, 'w') as json_file:
-			json.dump(data, json_file, indent=4, cls=CustomJSONEncoder)
+			json.dump(data, json_file, indent=4)
 
 		return send_file(json_file_path,
 						 mimetype='application/json',
@@ -694,10 +688,12 @@ def export_datagrid(format):
 			
 			output[pi][project][sample][datatype] += 1	
 	if format == 'json':	
-		with open("/tmp/data.json", 'w') as json_file:
-			json.dump(output, json_file, indent=4, cls=CustomJSONEncoder)
-
-		return send_file("/tmp/data.json",
+		# with open("/tmp/data.json", 'w') as json_file:
+			# json.dump(output, json_file, indent=4)
+		json_buffer = io.StringIO()
+		json.dump(output, json_buffer, indent=4)
+		json_buffer.seek(0)
+		return send_file(io.BytesIO(json_buffer.getvalue().encode('utf-8')),
 						 mimetype='application/json',
 						 as_attachment=True,
 						 download_name='data.json')

@@ -2,11 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import Panel from "@components/datatable/Panel";
 import Table from "@components/datatable/Table";
 import Header from "@components/datatable/Header";
-import { BASE_URL } from "@components/utils.js";
-import axios from "axios";
+import { secureFetch } from "@lib/authService.js";
 
 export default function Datatable({ state, setState, reset }) {
-	const token = localStorage.getItem("token");
 	const [data, setData] = useState({});
 	const [analytics, setAnalytics] = useState([]);
 	const [query, setQuery] = useState("");
@@ -47,15 +45,10 @@ export default function Datatable({ state, setState, reset }) {
 	useEffect(() => {
 		async function fetchTable() {
 			try {
-				const api = `${BASE_URL}/table?page=${state.page}&limit=${
-					state.limit
-				}&sort=${JSON.stringify(state.sort)}${query}`;
-				const response = await axios.get(api, { headers: { Authorization: `Bearer ${token}` } });
-
-				// if (!response.ok) throw new Error(`Table Data Fetch Failed: ${response.statusText}`);
-				if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
-				// const result = await response.json();
-				setData(response.data);
+				const response = await secureFetch(
+					`table?page=${state.page}&limit=${state.limit}&sort=${JSON.stringify(state.sort)}${query}`
+				);
+				setData(response);
 			} catch (error) {
 				console.error("Error fetching table data:", error);
 			}
@@ -68,12 +61,8 @@ export default function Datatable({ state, setState, reset }) {
 	useEffect(() => {
 		async function fetchAnalytics() {
 			try {
-				const api = `${BASE_URL}/analytics/table?${query.slice(1)}`;
-				const response = await axios.get(api, { headers: { Authorization: `Bearer ${token}` } });
-				// if (!response.ok) throw new Error(`Filter Panel Data Fetch Failed: ${response.statusText}`);
-				// const result = await response.json();
-				if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
-				setAnalytics(response.data);
+				const response = await secureFetch(`analytics/table?${query.slice(1)}`);
+				setAnalytics(response);
 				prevQueryRef.current = query;
 			} catch (error) {
 				console.error("Error fetching filter panel data:", error);

@@ -4,6 +4,8 @@ import { login } from "@lib/authService.js";
 import bg from "@assets/logo_without_text.png";
 
 export default function Login() {
+	localStorage.removeItem("token");
+
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -11,9 +13,14 @@ export default function Login() {
 		e.preventDefault();
 		try {
 			await login(username, password);
-			alert("Login successful!");
 		} catch (error) {
 			alert("Invalid credentials");
+		}
+	};
+
+	const handleKeyDown = (event) => {
+		if (event.key === "Enter") {
+			handleLogin(event);
 		}
 	};
 
@@ -74,6 +81,7 @@ export default function Login() {
 								className: "hidden",
 							}}
 							onChange={(e) => setPassword(e.target.value)}
+							onKeyDown={handleKeyDown}
 						/>
 					</div>
 					<div className="flex flex-wrap items-center justify-end gap-2">

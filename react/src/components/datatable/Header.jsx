@@ -1,17 +1,19 @@
 import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
 import { useState } from "react";
 import { AdjustmentsVerticalIcon, ArrowDownTrayIcon } from "@heroicons/react/24/solid";
-import { getID, BASE_URL } from "@components/utils.js";
+import { getID } from "@components/utils.js";
 import MenuWithCheckbox from "../shared/Menu";
 import SearchBar from "../shared/SearchBar";
 import schema from "@lib/schema.json";
+import { secureDownload, secureFetch } from "../../lib/authService";
+
+const headers = schema.headers;
 
 export default function Header({ state, setState, reset }) {
-	const headers = schema.headers;
 	const handleExport = (format) => {
-		window.open(
-			`${BASE_URL}/export/table/${format}?sort=${JSON.stringify(state.sort)}${state.query}`,
-			"_blank"
+		secureDownload(
+			`/export/table/${format}?sort=${JSON.stringify(state.sort)}${state.query}`,
+			format
 		);
 	};
 	const [allSuggestions, setAllSuggestions] = useState([]);
@@ -21,14 +23,8 @@ export default function Header({ state, setState, reset }) {
 			const id = getID(headers, key);
 			setState("key", id);
 			setState("value", "");
-			const api = `${BASE_URL}/search/${id}?${state.query.slice(1)}`;
-			const response = await fetch(api);
-			if (!response.ok) {
-				console.error("Server error:", response);
-			} else {
-				const result = await response.json();
-				setAllSuggestions(result);
-			}
+			const response = await secureFetch(`/search/${id}?${state.query.slice(1)}`);
+			setAllSuggestions(response);
 		};
 		return (
 			<Menu>

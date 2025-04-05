@@ -1,4 +1,3 @@
-import { BASE_URL } from "@components/utils.js";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import Header from "@components/dashboard/Header";
@@ -6,10 +5,9 @@ import ProgressCard from "@components/dashboard/ProgressCard";
 import PICard from "@components/dashboard/PICard";
 import DonutCard from "@components/dashboard/DonutCard";
 import { DATE_FORMAT } from "@components/utils.js";
-import axios from "axios";
+import { secureFetch } from "@lib/authService.js";
 
 export default function Dashboard({ state, setState, reset }) {
-	const token = localStorage.getItem("token");
 	const [data, setData] = useState({
 		"progress-area": [],
 		"status-bar": [],
@@ -25,19 +23,10 @@ export default function Dashboard({ state, setState, reset }) {
 		try {
 			const start = format(state.startDate, DATE_FORMAT);
 			const end = format(state.endDate, DATE_FORMAT);
-			const response = await axios.get(`${BASE_URL}/${key}/${start}-${end}/${!state.qgp}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-
-			// console.log(response.data);
-			// if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
-			if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
-
+			const response = await secureFetch(`${key}/${start}-${end}/${!state.qgp}`);
 			setData((prevState) => ({
 				...prevState,
-				[key]: response.data,
+				[key]: response,
 			}));
 		} catch (error) {
 			console.error(error);

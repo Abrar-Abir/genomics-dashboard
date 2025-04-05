@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import Panel from "@components/datatable/Panel";
 import Grid from "@components/datagrid/Grid";
 import Header from "../components/datagrid/Header";
-import { BASE_URL } from "@components/utils.js";
-import axios from "axios";
+import { secureFetch } from "../lib/authService";
 
 export default function Datagrid({ state, setState, reset }) {
-	const token = localStorage.getItem("token");
 	const [data, setData] = useState({ grid: [], headers: [] });
 	const [analytics, setAnalytics] = useState([]);
 	const setStateKey = (key) => (valOrUpdater) => {
@@ -38,27 +36,13 @@ export default function Datagrid({ state, setState, reset }) {
 					}
 				}
 
-				const [dataResponse, analyticsResponse] = await Promise.all([
-					axios.get(`${BASE_URL}/datagrid?${params.toString()}`, {
-						headers: { Authorization: `Bearer ${token}` },
-					}),
-					axios.get(`${BASE_URL}/analytics/datagrid`, {
-						headers: { Authorization: `Bearer ${token}` },
-					}),
+				const [data, analytics] = await Promise.all([
+					secureFetch(`/datagrid?${params.toString()}`),
+					secureFetch(`analytics/datagrid`),
 				]);
 
-				if (dataResponse.status != 200 || analyticsResponse.status != 200) {
-					console.error("Server error:", dataResponse, analyticsResponse);
-					return;
-				}
-
-				// const [dataResult, analyticsResult] = await Promise.all([
-				// 	dataResponse.json(),
-				// 	analyticsResponse.json(),
-				// ]);
-
-				setData(dataResponse.data);
-				setAnalytics(analyticsResponse.data);
+				setData(data);
+				setAnalytics(analytics);
 			} catch (error) {
 				console.error("Error fetching data:", error);
 			}

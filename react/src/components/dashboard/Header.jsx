@@ -10,7 +10,7 @@ const getDateRange = (start) => ({
 
 export default function Header({ state, setState, reset }) {
 	return (
-		<div className="flex justify-between items-center px-6 py-1 bg-white sticky top-0 z-50">
+		<div className="!h-14 flex justify-between items-center px-6 py-1 bg-white sticky top-0 z-50">
 			<Button
 				color="gray"
 				variant="outlined"

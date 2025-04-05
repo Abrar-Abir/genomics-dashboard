@@ -14,72 +14,76 @@ import { useState, useEffect } from "react";
 import JsonPng from "@assets/json.png";
 import MultiQCLogo from "@assets/multiqc_logo_color.png";
 import JbrowseLogo from "@assets/jbrowse.png";
+import { secureOpen } from "../../lib/authService";
 
 const bgColors = ["bg-blue-", "bg-teal-", "bg-blue-"];
+const headers = schema.headers;
+const properties = schema.properties;
+
+const countTrueLanes = (row) => {
+	return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
+};
+
+const JsonIcon = ({ sampleId }) => (
+	<img
+		src={JsonPng}
+		onClick={() =>
+			// window.open(
+			// 	`${BASE_URL}/export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`,
+			// 	"_blank"
+			// )
+			secureOpen(`export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`)
+		}
+		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
+	></img>
+);
+const HtmlIcon = ({ col, id }) => (
+	<img
+		src={MultiQCLogo}
+		onClick={() =>
+			window.open(
+				col === "Flowcell ID"
+					? `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${id}/${id}.html`
+					: `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/submission/${
+							id.split("_")[1]
+					  }/${id}/${id}.html`,
+				"_blank"
+			)
+		}
+		className="ml-2 h-2.5 cursor-pointer hover:bg-blue-300 rounded"
+	></img>
+);
+
+const JbrowseIcon = ({ sampleId }) => {
+	const handleClick = async () => {
+		window.open("http://172.32.79.51:8080/?config=0201382681.json", "_blank");
+		// try {
+		// 	const response = await fetch(`${BASE_URL}/jbrowse/${sampleId}`);
+
+		// 	if (response.ok) {
+		// 		const response = await response.json();
+		// 		const url = response.url;
+		// 		window.open(url, "_blank");
+		// 	} else {
+		// 		console.error("Error fetching custom URL:", response.statusText);
+		// 	}
+		// } catch (error) {
+		// 	console.error("Error occurred:", error);
+		// } finally {
+		// 	setLoading(false);
+		// }
+	};
+
+	return (
+		<img
+			src={JbrowseLogo}
+			onClick={handleClick}
+			className="h-5 cursor-pointer hover:bg-blue-300 rounded"
+		></img>
+	);
+};
 
 export default function Table({ state, setState, data, minimal }) {
-	const headers = schema.headers;
-	const properties = schema.properties;
-	const JsonIcon = ({ sampleId }) => (
-		<img
-			src={JsonPng}
-			onClick={() =>
-				window.open(
-					`${BASE_URL}/export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`,
-					"_blank"
-				)
-			}
-			className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
-		></img>
-	);
-	const HtmlIcon = ({ col, id }) => (
-		<img
-			src={MultiQCLogo}
-			onClick={() =>
-				window.open(
-					col === "Flowcell ID"
-						? `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/Flowcell/${id}/${id}.html`
-						: `https://pme.sidra.org/qc/home?path=sapipe/MultiQC/submission/${
-								id.split("_")[1]
-						  }/${id}/${id}.html`,
-					"_blank"
-				)
-			}
-			className="ml-2 h-2.5 cursor-pointer hover:bg-blue-300 rounded"
-		></img>
-	);
-
-	const JbrowseIcon = ({ sampleId }) => {
-		const handleClick = async () => {
-			window.open("http://172.32.79.51:8080/?config=0201382681.json", "_blank");
-			// try {
-			// 	const response = await fetch(`${BASE_URL}/jbrowse/${sampleId}`);
-
-			// 	if (response.ok) {
-			// 		const response = await response.json();
-			// 		const url = response.url;
-			// 		window.open(url, "_blank");
-			// 	} else {
-			// 		console.error("Error fetching custom URL:", response.statusText);
-			// 	}
-			// } catch (error) {
-			// 	console.error("Error occurred:", error);
-			// } finally {
-			// 	setLoading(false);
-			// }
-		};
-
-		return (
-			<img
-				src={JbrowseLogo}
-				onClick={handleClick}
-				className="h-5 cursor-pointer hover:bg-blue-300 rounded"
-			></img>
-		);
-	};
-	const countTrueLanes = (row) => {
-		return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
-	};
 	const [selectedHeaders, setSelectedHeaders] = useState([]);
 
 	const handlePrev = () => {

@@ -15,7 +15,7 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 	{
 		key: "dashboard",
 		label: "Dashboard",
-		path: "/",
+		path: "/dashboard",
 		icon: <PresentationChartBarIcon className={iconSize} />,
 	},
 	{
@@ -45,19 +45,20 @@ export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
 		icon: <InboxIcon className={iconSize} />,
 		badge: "14",
 	},
-	{
-		key: "profile",
-		label: "Profile",
-		icon: <UserCircleIcon className={iconSize} />,
-	},
-	{
-		key: "settings",
-		label: "Settings",
-		icon: <Cog6ToothIcon className={iconSize} />,
-	},
+	// {
+	// 	key: "profile",
+	// 	label: "Profile",
+	// 	icon: <UserCircleIcon className={iconSize} />,
+	// },
+	// {
+	// 	key: "settings",
+	// 	label: "Settings",
+	// 	icon: <Cog6ToothIcon className={iconSize} />,
+	// },
 	{
 		key: "logout",
 		label: "Logout",
+		path: "/login",
 		icon: <PowerIcon className={iconSize} />,
 	},
 ];
