@@ -41,11 +41,7 @@ def isdigit(obj):
 			return False
 	return True
 
-def get_id(l,e):
-	try:
-		return l.index(e)
-	except:
-		return -1
+
 
 def jsonify(data):
 	return Response(json.dumps(data, default=str), content_type="application/json")

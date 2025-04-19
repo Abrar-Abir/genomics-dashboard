@@ -1,4 +1,4 @@
-from library import connect_to_postgres, fetch, get_database_info, get_id, parse_date, jsonify
+from library import connect_to_postgres, fetch, get_database_info, parse_date, jsonify
 from flask import Flask, request, send_file, render_template
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -59,6 +59,12 @@ datatype_columns = ['WGS', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA', 'totRNA-50',
 # 		return [stringify(obj[0])] + stringify(obj[1:])
 # 	return obj 
 
+def get_id(element):
+	try:
+		return columns_sorted.index(element)
+	except:
+		return -1
+
 @app.route('/login', methods=['POST'])
 def login():
 	data = request.get_json()
@@ -72,30 +78,27 @@ def login():
 
 ######## table page #######################################
 
-
-def get_table_filter(request_args):
+def get_table_filter(request):
 	table_filter = {}
-	for key, value in request_args.items():
+	for key, value in request.items():
 		if key not in ('page', 'limit', 'sort'):
-			if key[0] != '-':
-				if value[0] == '[' and value[-1] == ']':
-					table_filter['last'] = key
-					column = columns_sorted[int(key)]
-					values = value[1:-1].split(',')
-					filter_str = str([value.replace('"', '') for value in values])
-					table_filter[key] = f" {column} IN ({str(filter_str[1:-1])})"
-				elif key[-1] == '>' or key[-1] == '<':
+			if key[0] == '-': # search
+				column = columns_sorted[int(key[1:])]
+				values = value.split(',')
+				filter_str = str([value.replace('"', '') for value in values])
+				table_filter['search'] = f" {column} IN ({str(filter_str[1:-1])})"
+			else:
+				if key[-1] == '>' or key[-1] == '<': # range
 					column = columns_sorted[int(key[:-1])]
 					if 'date' in column:
 						table_filter[key] = f" {column} {key[-1]}= '{value}'"
 					else:
 						table_filter[key] = f" {column} {key[-1]}= {value}"
-			else: 
-				column = columns_sorted[int(key[1:])]
-				values = value.split(',')
-				filter_str = str([value.replace('"', '') for value in values])
-				table_filter['search'] = f" {column} IN ({str(filter_str[1:-1])})"
-	
+				else: # select
+					table_filter['last'] = key
+					column = columns_sorted[int(key)]
+					filter_str = str(tuple([val.replace('"', '') for val in value]))
+					table_filter[key] = f" {column} IN ({filter_str})"
 	return table_filter
 
 
@@ -122,13 +125,13 @@ def get_where_clause(filter_dict, filter_key=None):
 @ app.route('/table')
 @jwt_required()
 def table():
-	page = int(request.args.get('page', default = 1))
-	limit = int(request.args.get('limit', default = 50))
-	cols_to_sort = [int(id)  for id in request.args.get('sort', default = "[]")[1:-1].split(',') if len(id) > 0]
+	query = request.get_json()
+	page = int(query.get('page', 1))
+	limit = int(query.get('limit', 25))
+	cols_to_sort = [int(id)  for id in query.get('sort', []) if len(id) > 0]
 	
-	offset = (page - 1) * limit
 	order_clause = get_order_clause(cols_to_sort)
-	table_filter = get_table_filter(request.args)
+	table_filter = get_table_filter(query)
 	where_clause = get_where_clause(table_filter)
 	count_query = f"""
 		SELECT COUNT(*)
@@ -156,7 +159,7 @@ def table():
 		LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
 		{where_clause}
 		{order_clause}
-		LIMIT {limit} OFFSET {offset};
+		LIMIT {limit} OFFSET {(page - 1) * limit};
 	"""
 	results = fetch(cursor, data_query, 'all')
 	return jsonify({"table": results, "count": count})
@@ -164,9 +167,10 @@ def table():
 @ app.route('/export/table/<format>')
 @jwt_required()
 def export_table(format):
-	cols_to_sort = [int(id)  for id in request.args.get('sort', default = "[]")[1:-1].split(',') if len(id) > 0]
+	query = request.get_json()
+	cols_to_sort = [int(id)  for id in query.get('sort', []) if len(id) > 0]
 	order_clause = get_order_clause(cols_to_sort)
-	table_filter = get_table_filter(request.args)
+	table_filter = get_table_filter(query)
 	where_clause = get_where_clause(table_filter)
 	data_query = f"""
 		SELECT JSON_AGG(result)
@@ -247,13 +251,14 @@ def get_analytics(column_name, table_filter, query, fetch_arg):
 	results = fetch(cursor, query_str, fetch_arg)
 	if fetch_arg == 'one':
 		return (str(results[0]), str(results[1]))
-	return [(str(row[0]), row[1]) for row in results]
+	return [(str(row[0]).replace('"', '').replace("'", "").replace("[", "").replace("]", "").replace(", ", " "), row[1]) for row in results]
 
 @ app.route('/analytics/table')
 @jwt_required()
 def analytics_table():
+	query = request.get_json()
+	table_filter = get_table_filter(query)
 	analytics_data = {}
-	table_filter = get_table_filter(request.args)
 
 	count_query = """
 		SELECT {column_name}, COUNT(*) AS frequency
@@ -285,7 +290,7 @@ def analytics_table():
 		analytics_table = dict()
 		for column in schema[table]["entity"]:
 			if schema[table]["entity"][column]["filter"]:
-				column_id = get_id(columns_sorted, table + '.' + column)
+				column_id = get_id(table + '.' + column)
 				if "NUMERIC" in schema[table]["entity"][column]["type"] or "DATE" in schema[table]["entity"][column]["type"]:
 					analytics_table[column_id] = get_analytics(
 						f"{table}.{column}", table_filter, range_query, "one")
@@ -298,9 +303,10 @@ def analytics_table():
 @ app.route('/search/<id>')
 @jwt_required()
 def search(id):
-	table_filter = get_table_filter(request.args)
+	query = request.get_json()
+	table_filter = get_table_filter(query)
 	where_clause = get_where_clause(table_filter)
-	print(where_clause)
+	# print(where_clause)
 	query = f"""
 		SELECT DISTINCT {columns_sorted[int(id)]}
 		FROM sample
@@ -325,24 +331,30 @@ def get_datagrid_filter(request_args):
 	datagrid_filter['hide'] = request_args.get('hide', default='0') == '1'
 	for key in request_args.keys():
 		if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
-			column = columns_sorted[int(key)]
 			if key == 'show':
 				values = request_args.get(key)[1:-1].split(',')
 				filter_str = str([value.replace('"', '') for value in values])
 				datagrid_filter[key] = f" project IN ({str(filter_str[1:-1])})"
-			elif column == 'submission.datatype':
-				values = [value.replace('"', '') for value in request_args.get(key)[1:-1].split(',')]
-				having_str = 'AND' + f""" ARRAY( SELECT UNNEST (ARRAY{request_args.get(key)[2:-2]}::character varying[]) ORDER BY 1) = ARRAY (
-							SELECT UNNEST(ARRAY_AGG(CASE 
-								WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
-								WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
-								ELSE datatype
-							END)) ORDER BY 1)"""
-				datagrid_filter['having'] = having_str
 			else:
-				values = request_args.get(key)[1:-1].split(',')
-				filter_str = str([value.replace('"', '') for value in values])
-				datagrid_filter[column] = f" {column} IN ({str(filter_str[1:-1])})"
+				column = columns_sorted[int(key)]
+				if column == 'submission.datatype':
+					# ["WGS totRNA-50"] => ['WGS', 'totRNA-50']
+					# ["WGS"] => ['WGS']
+					# ["WGS", "totRNA-50"] 
+					values = [value.replace('"', '') for value in request_args.get(key)[1:-1].split(',')]
+					
+					having_str = 'AND' + f""" ARRAY( SELECT UNNEST (ARRAY{request_args.get(key).replace('"', "'")}::character varying[]) ORDER BY 1) = ARRAY (
+								SELECT UNNEST(ARRAY_AGG(CASE 
+									WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
+									WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
+									ELSE datatype
+								END)) ORDER BY 1)"""
+					datagrid_filter['having'] = having_str
+					print(having_str)
+				else:
+					values = request_args.get(key)[1:-1].split(',')
+					filter_str = str([value.replace('"', '') for value in values])
+					datagrid_filter[column] = f" {column} IN ({str(filter_str[1:-1])})"
 	
 	return datagrid_filter
 
@@ -370,7 +382,8 @@ def analytics_datagrid():
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{get_where_clause({'project.project' : datagrid_filter['project.project']} if 'project.project' in datagrid_filter else {})}
 		GROUP BY sample_name, pi """ + (hide or len(having_clause) != 0)*"""HAVING """ + (hide)*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and hide)*""" AND """ +  f"""{having_clause[3:]}""" + f""") AS SUBRESULT GROUP BY pi  ORDER BY total DESC;"""
-	analytics_data['project'][str(get_id(columns_sorted, "project.pi"))] = get_analytics('', dict(), pi_query, "all")
+	# print(pi_query)
+	analytics_data['project'][str(get_id("project.pi"))] = get_analytics('', dict(), pi_query, "all")
 
 	project_query = f"""
 	SELECT project, SUM(OUTR.frequency) AS total
@@ -398,7 +411,7 @@ def analytics_datagrid():
 		ON INNR.sample_name = OUTR.sample_name
 		GROUP BY project  ORDER BY total DESC;"""
 	
-	analytics_data['project'][str(get_id(columns_sorted,'project.project'))] = get_analytics('', dict(), project_query, "all")
+	analytics_data['project'][str(get_id('project.project'))] = get_analytics('', dict(), project_query, "all")
 
 	datatype_query = f"""
 	SELECT datatype, SUM(SUBRESULT.frequency) AS total
@@ -417,17 +430,17 @@ def analytics_datagrid():
 		{get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k.startswith('project')})}
 		GROUP BY sample_name, pi """ + (hide)*"""HAVING COUNT(*) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
 	
-	analytics_data['submission'][str(get_id(columns_sorted, 'submission.datatype'))] = get_analytics('', dict(), datatype_query, "all")
+	analytics_data['submission'][str(get_id('submission.datatype'))] = get_analytics('', dict(), datatype_query, "all")
 	return jsonify(analytics_data)
 
 
 @ app.route('/datagrid')
 @jwt_required()
 def datagrid():
-	global datatypeID, datatype_columns
+	# global datatypeID, datatype_columns
 	datagrid_filter = get_datagrid_filter(request.args)
 	# set_datagrid_filter(request.args)
-	print(datagrid_filter)
+	# print(datagrid_filter)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
 	hide = datagrid_filter['hide']
@@ -571,7 +584,7 @@ def datagrid():
 @ app.route('/export/datagrid/<format>')
 @jwt_required()
 def export_datagrid(format):
-	global datatypeID, datatype_columns
+	# global datatypeID, datatype_columns
 	datagrid_filter = get_datagrid_filter(request.args)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
@@ -992,8 +1005,8 @@ def refgenome_donut(date, no_qgp):
 @ app.route('/plot')
 @jwt_required()
 def plot():
-	
-	table_filter = get_table_filter(request.args)
+	query = request.get_json()
+	table_filter = get_table_filter(query)
 	where_clause = get_where_clause(table_filter)
 	data_query = f"""
 		SELECT JSON_AGG(result)
