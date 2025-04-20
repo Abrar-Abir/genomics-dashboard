@@ -23,15 +23,8 @@ export default function Datagrid({ state, setState, reset }) {
 					params.append("show", JSON.stringify(state.show));
 				}
 
-				// Object.entries(state.filter).forEach(([key, values]) => {
-				// 	if (values.length > 0) {
-				// 		params.append(key, JSON.stringify(values));
-				// 	}
-				// });
-
 				if (state.filter.size > 0) {
 					for (let [key, values] of state.filter) {
-						// queryStr += `&${key}=${JSON.stringify(values)}`;
 						params.append(key, JSON.stringify(values));
 					}
 				}
@@ -65,7 +58,11 @@ export default function Datagrid({ state, setState, reset }) {
 	return (
 		<div className="flex flex-col h-screen">
 			<div className="flex-shrink-0">
-				<Header reset={reset} hide={state.hide} setHide={null} />
+				<Header
+					reset={reset}
+					state={{ filter: state.filter, hide: state.hide, show: state.show }}
+					setHide={(val) => setStateKey("hide")(val)}
+				/>
 			</div>
 			<div className="flex flex-grow overflow-x-auto">
 				<Panel

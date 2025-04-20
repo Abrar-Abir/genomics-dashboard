@@ -52,12 +52,6 @@ alias_clause = ', '.join([col[0] + '.' + col[1] + ' AS ' + '"' + col[2] + '"'
 
 datatype_columns = ['WGS', 'DNAPREP-30N', 'WES200', 'LEX8', 'mRNA', 'totRNA-50', 'totRNAGlob-50', '10XscRNA', 'NXTRA', 'sRNA8M', 'mRNA-40']
 
-# def stringify(obj):
-# 	if isinstance(obj, (date, datetime)):
-# 		return obj.isoformat()
-# 	if isinstance(obj, list) and len(obj) > 0:
-# 		return [stringify(obj[0])] + stringify(obj[1:])
-# 	return obj 
 
 def get_id(element):
 	try:
@@ -97,8 +91,8 @@ def get_table_filter(request):
 				else: # select
 					table_filter['last'] = key
 					column = columns_sorted[int(key)]
-					filter_str = str(tuple([val.replace('"', '') for val in value]))
-					table_filter[key] = f" {column} IN ({filter_str})"
+					filter_str = str([val.replace('"', '') for val in value])
+					table_filter[key] = f" {column} IN ({filter_str[1:-1]})"
 	return table_filter
 
 
@@ -125,13 +119,14 @@ def get_where_clause(filter_dict, filter_key=None):
 @ app.route('/table')
 @jwt_required()
 def table():
-	query = request.get_json()
-	page = int(query.get('page', 1))
-	limit = int(query.get('limit', 25))
-	cols_to_sort = [int(id)  for id in query.get('sort', []) if len(id) > 0]
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	page = int(params.get('page', 1))
+	limit = int(params.get('limit', 25))
+	cols_to_sort = [int(id) for id in params.get('sort', []) ]
 	
 	order_clause = get_order_clause(cols_to_sort)
-	table_filter = get_table_filter(query)
+	table_filter = get_table_filter(params)
 	where_clause = get_where_clause(table_filter)
 	count_query = f"""
 		SELECT COUNT(*)
@@ -167,10 +162,11 @@ def table():
 @ app.route('/export/table/<format>')
 @jwt_required()
 def export_table(format):
-	query = request.get_json()
-	cols_to_sort = [int(id)  for id in query.get('sort', []) if len(id) > 0]
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	cols_to_sort = [int(id)  for id in params.get('sort', [])]
 	order_clause = get_order_clause(cols_to_sort)
-	table_filter = get_table_filter(query)
+	table_filter = get_table_filter(params)
 	where_clause = get_where_clause(table_filter)
 	data_query = f"""
 		SELECT JSON_AGG(result)
@@ -203,16 +199,13 @@ def export_table(format):
 			data[sample][flowcell_id] = {key : row[key] for key in row if key not in ('LIMS ID', 'Flowcell ID')}
 			data[sample][flowcell_id]['Mean Q Score'] = data[sample][flowcell_id]['Mean Q Score'] / ((sum([data[sample][flowcell_id][f'Lane {i}'] for i in range(1,9)]))*2)
 		
-		
-		json_file_path = "/tmp/data.json"
-		with open(json_file_path, 'w') as json_file:
-			json.dump(data, json_file, indent=4)
-
-		return send_file(json_file_path,
+		json_buffer = io.StringIO()
+		json.dump(data, json_buffer, indent=4)
+		json_buffer.seek(0)
+		return send_file(io.BytesIO(json_buffer.getvalue().encode('utf-8')),
 						 mimetype='application/json',
 						 as_attachment=True,
-						 download_name='data.json')
-		
+						 download_name='data.json')		
 
 	elif format in ('csv', 'tsv'):
 	
@@ -256,8 +249,9 @@ def get_analytics(column_name, table_filter, query, fetch_arg):
 @ app.route('/analytics/table')
 @jwt_required()
 def analytics_table():
-	query = request.get_json()
-	table_filter = get_table_filter(query)
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	table_filter = get_table_filter(params)
 	analytics_data = {}
 
 	count_query = """
@@ -303,10 +297,10 @@ def analytics_table():
 @ app.route('/search/<id>')
 @jwt_required()
 def search(id):
-	query = request.get_json()
-	table_filter = get_table_filter(query)
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	table_filter = get_table_filter(params)
 	where_clause = get_where_clause(table_filter)
-	# print(where_clause)
 	query = f"""
 		SELECT DISTINCT {columns_sorted[int(id)]}
 		FROM sample
@@ -326,45 +320,46 @@ def search(id):
 # ################ Datagrid Page #####################
 datatypeID = {'WGS':0, 'DNAPREP-30N':1, 'WES200':2, 'LEX8':3, 'mRNA':4, 'totRNA-50':5, 'totRNAGlob-50':6, '10XscRNA':7, 'NXTRA':8, 'sRNA8M':9, 'mRNA-40':10}
 
-def get_datagrid_filter(request_args):
+def get_datagrid_filter(request):
 	datagrid_filter = {}
-	datagrid_filter['hide'] = request_args.get('hide', default='0') == '1'
-	for key in request_args.keys():
-		if request_args.get(key)[0] == '[' and request_args.get(key)[-1] == ']':
-			if key == 'show':
-				values = request_args.get(key)[1:-1].split(',')
-				filter_str = str([value.replace('"', '') for value in values])
-				datagrid_filter[key] = f" project IN ({str(filter_str[1:-1])})"
+
+	for key in request:
+		if key == 'hide':
+			datagrid_filter['hide'] = request['hide'] == '1'
+		elif key == 'show':
+			filter_str = str([value.replace('"', '') for value in request[key]])[1:-1]
+			datagrid_filter[key] = f" project IN ({filter_str})"
+		else:
+			column = columns_sorted[int(key)]
+			if column == 'submission.datatype':
+				having_str = 'AND'
+				for value in request[key]:
+					filter_str = str([val.replace('"', '') for val in value.split(' ')])
+					having_str += f""" ARRAY( SELECT UNNEST (ARRAY{filter_str}::character varying[]) ORDER BY 1) = ARRAY (
+							SELECT UNNEST(ARRAY_AGG(CASE 
+								WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
+								WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
+								ELSE datatype
+							END)) ORDER BY 1) OR """
+				datagrid_filter['having'] = having_str[:-4]
+				print(having_str)
 			else:
-				column = columns_sorted[int(key)]
-				if column == 'submission.datatype':
-					# ["WGS totRNA-50"] => ['WGS', 'totRNA-50']
-					# ["WGS"] => ['WGS']
-					# ["WGS", "totRNA-50"] 
-					values = [value.replace('"', '') for value in request_args.get(key)[1:-1].split(',')]
-					
-					having_str = 'AND' + f""" ARRAY( SELECT UNNEST (ARRAY{request_args.get(key).replace('"', "'")}::character varying[]) ORDER BY 1) = ARRAY (
-								SELECT UNNEST(ARRAY_AGG(CASE 
-									WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
-									WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
-									ELSE datatype
-								END)) ORDER BY 1)"""
-					datagrid_filter['having'] = having_str
-					print(having_str)
-				else:
-					values = request_args.get(key)[1:-1].split(',')
-					filter_str = str([value.replace('"', '') for value in values])
-					datagrid_filter[column] = f" {column} IN ({str(filter_str[1:-1])})"
+				filter_str = str([value.replace('"', '') for value in request[key]])[1:-1]
+				datagrid_filter[column] = f" {column} IN ({filter_str})"
 	
 	return datagrid_filter
 
 @ app.route('/analytics/datagrid')
 @jwt_required()
 def analytics_datagrid():
-	analytics_data = {"project": dict(), "submission": dict()}
-	datagrid_filter = get_datagrid_filter(request.args)
-	hide = datagrid_filter.get('hide', False)
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	datagrid_filter = get_datagrid_filter(params)
+	# hide = datagrid_filter.get('hide', False)
 	having_clause = datagrid_filter.get('having', '')
+	
+	analytics_data = {"project": dict(), "submission": dict()}
+	
 	pi_query = f"""
 	SELECT pi, SUM(SUBRESULT.frequency) AS total
 	FROM (	
@@ -381,7 +376,7 @@ def analytics_datagrid():
 		LEFT JOIN submission ON sample.submission_id = submission.submission_id
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{get_where_clause({'project.project' : datagrid_filter['project.project']} if 'project.project' in datagrid_filter else {})}
-		GROUP BY sample_name, pi """ + (hide or len(having_clause) != 0)*"""HAVING """ + (hide)*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and hide)*""" AND """ +  f"""{having_clause[3:]}""" + f""") AS SUBRESULT GROUP BY pi  ORDER BY total DESC;"""
+		GROUP BY sample_name, pi """ + (datagrid_filter["hide"] or len(having_clause) != 0)*"""HAVING """ + (datagrid_filter["hide"])*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and datagrid_filter["hide"])*""" AND """ +  f"""{having_clause[3:]}""" + f""") AS SUBRESULT GROUP BY pi  ORDER BY total DESC;"""
 	# print(pi_query)
 	analytics_data['project'][str(get_id("project.pi"))] = get_analytics('', dict(), pi_query, "all")
 
@@ -401,7 +396,7 @@ def analytics_datagrid():
 		LEFT JOIN submission ON sample.submission_id = submission.submission_id
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{get_where_clause({'project.pi' : datagrid_filter['project.pi']} if 'project.pi' in datagrid_filter else {})}
-		GROUP BY sample_name, pi """ + (hide or len(having_clause) != 0)*"""HAVING """ + (hide)*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and hide)*""" AND """ +  f"""{having_clause[3:]}""" + f""") INNR
+		GROUP BY sample_name, pi """ + (datagrid_filter["hide"] or len(having_clause) != 0)*"""HAVING """ + (datagrid_filter["hide"])*"""COUNT(*) > 1 """ + (len(having_clause) != 0 and datagrid_filter["hide"])*""" AND """ +  f"""{having_clause[3:]}""" + f""") INNR
 		LEFT JOIN
 		(SELECT project, sample_name, COUNT(*) AS frequency
 		FROM sample
@@ -428,7 +423,7 @@ def analytics_datagrid():
 		LEFT JOIN submission ON sample.submission_id = submission.submission_id
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k.startswith('project')})}
-		GROUP BY sample_name, pi """ + (hide)*"""HAVING COUNT(*) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
+		GROUP BY sample_name, pi """ + (datagrid_filter["hide"])*"""HAVING COUNT(*) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
 	
 	analytics_data['submission'][str(get_id('submission.datatype'))] = get_analytics('', dict(), datatype_query, "all")
 	return jsonify(analytics_data)
@@ -437,13 +432,11 @@ def analytics_datagrid():
 @ app.route('/datagrid')
 @jwt_required()
 def datagrid():
-	# global datatypeID, datatype_columns
-	datagrid_filter = get_datagrid_filter(request.args)
-	# set_datagrid_filter(request.args)
-	# print(datagrid_filter)
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	datagrid_filter = get_datagrid_filter(params)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
-	hide = datagrid_filter['hide']
 
 	if 'show' in datagrid_filter:
 		show_clause = f"""WHERE {datagrid_filter['show']}"""
@@ -472,11 +465,11 @@ def datagrid():
 		  GROUP BY
 			sample_name, project.pi
 		  HAVING
-			COUNT(*) = 1 {having_clause}"""
+			COUNT(DISTINCT sample.sample_id) = 1 {having_clause}"""
 	else:
 		show_query = ''
 
-	if hide or ',' in request.args.get('submission.datatype', ''):
+	if datagrid_filter["hide"]:
 		hide_query = ''
 	else:
 		hide_query = f"""UNION ALL
@@ -498,7 +491,7 @@ def datagrid():
 					LEFT JOIN project ON submission.project_id = project.project_id
 				{where_clause}
 				GROUP BY pi, sample_name
-				HAVING COUNT(*) = 1 {having_clause}
+				HAVING COUNT(DISTINCT sample.sample_id) = 1 {having_clause}
 			) AS single_row_samples
 			GROUP BY pi, project, datatype
 			{show_query}"""
@@ -528,14 +521,13 @@ def datagrid():
 		  GROUP BY
 			sample_name, project.pi
 		  HAVING
-			COUNT(*) > 1 {having_clause}
+			COUNT(DISTINCT sample.sample_id) > 1 {having_clause}
 		  {hide_query}
-		  
 		  ORDER BY
 		  	category DESC
 		  )
 		result;""" 
-
+		
 	fetch_result = fetch(cursor, query, 'all')
 	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
 		results = None
@@ -584,13 +576,13 @@ def datagrid():
 @ app.route('/export/datagrid/<format>')
 @jwt_required()
 def export_datagrid(format):
-	# global datatypeID, datatype_columns
-	datagrid_filter = get_datagrid_filter(request.args)
+	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
+          for k, v in request.args.items()}
+	datagrid_filter = get_datagrid_filter(params)
 	where_clause = get_where_clause({k : datagrid_filter[k] for k in datagrid_filter if k in ('project.pi', 'project.project')})
 	having_clause = datagrid_filter.get('having', '')
-	hide = datagrid_filter.get('hide', False)
 
-	if 'show' in datagrid_filter and hide == False:
+	if 'show' in datagrid_filter and datagrid_filter['hide'] == False:
 		show_clause = f"""WHERE {datagrid_filter['show']}"""
 		if len(where_clause) != 0:
 			show_clause += f""" AND {where_clause[5:]}"""
@@ -645,9 +637,8 @@ def export_datagrid(format):
 		  GROUP BY
 			sample_name, project.pi
 		  HAVING
-			COUNT(*) > 1 {having_clause}
+			COUNT(DISTINCT sample.sample_id) > 1 {having_clause}
 		  {show_query}
-		  
 		  ORDER BY
 		  	category DESC
 		  )
@@ -672,11 +663,13 @@ def export_datagrid(format):
 			if project not in output[pi]:
 				output[pi][project] = dict()
 			if len(output[pi][project]) == 0 or sample not in output[pi][project]:
-				sample_dict = {col : 0 for col in datatype_columns}
+				sample_dict = {col : 0 for col in datatype_columns}	
+				sample_dict["count"] = row["count"]
 				output[pi][project][sample] = sample_dict
 			
-			output[pi][project][sample][datatype] += 1	
-	if format == 'json':	
+			output[pi][project][sample][datatype] += 1
+
+	if format in ('raw', 'json'):	
 		json_buffer = io.StringIO()
 		json.dump(output, json_buffer, indent=4)
 		json_buffer.seek(0)
@@ -690,9 +683,9 @@ def export_datagrid(format):
 		for pi in output:
 			for project in output[pi]:
 				for sample in output[pi][project]:
-					output_list.append([pi, project, sample] + [output[pi][project][sample][col] for col in datatype_columns])
+					output_list.append([pi, project, sample] + [output[pi][project][sample][col] for col in datatype_columns] + [output[pi][project][sample]["count"]])
 		
-		df = pd.DataFrame(output_list, columns=['PI', 'SDR No.', 'Sample Name'] + datatype_columns)
+		df = pd.DataFrame(output_list, columns=['PI', 'SDR No.', 'Sample Name'] + datatype_columns + ["count"])
 
 		if format == 'csv':
 			csv_buffer = io.StringIO()
@@ -1050,6 +1043,59 @@ if __name__ == '__main__':
 # default N/A in dashboard
 # mean_qscore handling
 # state handling in app.jsx - data
-# embed datatable inside datagrid
 #  caching front end
 # use Pagestate & updatestate
+
+
+#  SELECT JSON_AGG(result)
+#	                 FROM (
+                #   SELECT
+                #         sample_name,
+                #         pi,
+                #         ARRAY_AGG(project) AS project,
+                #         ARRAY_AGG(
+                #                 CASE 
+                #                 WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
+                #                 WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
+                #                 ELSE datatype
+                #                 END
+                #         ) AS datatype,
+                #         COUNT(*) AS count,
+                #         2 AS category
+                #   FROM
+                #         sample
+                #         LEFT JOIN submission ON sample.submission_id = submission.submission_id
+                #         LEFT JOIN project ON submission.project_id = project.project_id
+                  
+                #   GROUP BY
+                #         sample_name, project.pi
+                #   HAVING
+                #         COUNT(*) > 1 
+#                   UNION ALL
+#                   SELECT 'null' AS sample_name, pi, project, datatype, COUNT(*) AS count, 1 AS category
+#                         FROM (
+#                                 SELECT 
+#                                         ARRAY_AGG(project) AS project,
+#                                         ARRAY_AGG(
+#                                                 CASE 
+#                                                 WHEN datatype IN ('WGS30N', 'WGS90N') THEN 'WGS'
+#                                                 WHEN datatype IN ('mRNA-20', 'mRNA-50') THEN 'mRNA'
+#                                                 ELSE datatype
+#                                                 END
+#                                         ) AS datatype,
+#                                         pi, 
+#                                         sample_name
+#                                 FROM sample
+#                                         LEFT JOIN submission ON sample.submission_id = submission.submission_id
+#                                         LEFT JOIN project ON submission.project_id = project.project_id
+
+#                                 GROUP BY pi, sample_name
+#                                 HAVING COUNT(*) = 1 
+#                         ) AS single_row_samples
+#                         GROUP BY pi, project, datatype
+
+                  
+#                   ORDER BY
+#                         category DESC
+#                   )
+#                 result;

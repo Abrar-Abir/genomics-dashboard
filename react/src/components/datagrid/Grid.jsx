@@ -13,8 +13,6 @@ import {
 	Button,
 } from "@material-tailwind/react";
 import { secureFetch, secureOpen } from "../../lib/authService";
-// const headers = schema.headers;
-const formats = ["raw", "csv", "tsv", "json"];
 
 export default function Grid({ state, setState, data }) {
 	const [openSample, setOpenSample] = useState("");
@@ -182,7 +180,6 @@ export default function Grid({ state, setState, data }) {
 									{state.openPi[pi] &&
 										Object.keys(piData.projects).map((project) => {
 											const projectData = piData.projects[project];
-
 											return (
 												<React.Fragment key={`project-fragment-${project}`}>
 													<tr key={project} className="sticky z-20 top-[8.85rem]">
@@ -266,7 +263,7 @@ export default function Grid({ state, setState, data }) {
 																				(key === "Entity"
 																					? "text-right text-black w-[17rem] bg-cyan-100 hover:bg-cyan-200 font-semibold hover:cursor-pointer"
 																					: sampleDict.row[id - 1] > 0 || key === "Count"
-																					? "text-center w-[5rem] bg-cyan-600 hover:bg-cyan-400 text-white hover:cursor-pointer"
+																					? "text-center w-[5rem] bg-cyan-600  text-white"
 																					: "w-[5rem]")
 																			}
 																		>

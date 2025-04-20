@@ -21,7 +21,8 @@ const headers = schema.headers;
 const properties = schema.properties;
 
 const countTrueLanes = (row) => {
-	return Object.keys(row).filter((key) => key.startsWith("Lane ") && row[key] === true).length;
+	return Object.keys(row).filter((key) => headers[key].startsWith("Lane ") && row[key] === true)
+		.length;
 };
 
 const JsonIcon = ({ sampleId }) => (
@@ -111,7 +112,7 @@ export default function Table({ state, setState, data, minimal }) {
 		}
 	};
 
-	const totalPages = Math.ceil(data.count / state.limit);
+	// const totalPages = ;
 
 	const handleSort = (id, index) => {
 		if (index === -1) {
@@ -129,7 +130,6 @@ export default function Table({ state, setState, data, minimal }) {
 
 	const resetHeaders = (binaryStr) => {
 		const cols = headers.filter((_, idx) => binaryStr[idx] === "1");
-
 		return cols.sort((col1, col2) => properties[col1].order - properties[col2].order);
 	};
 
@@ -267,7 +267,7 @@ export default function Table({ state, setState, data, minimal }) {
 								variant="outlined"
 								className="flex items-center gap-1"
 								onClick={handleNext}
-								disabled={state.page === totalPages}
+								disabled={state.page === Math.ceil(data.count / state.limit)}
 							>
 								next
 								<ChevronRightIcon strokeWidth={3} className="h-3 w-3" />

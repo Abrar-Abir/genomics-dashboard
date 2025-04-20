@@ -17,26 +17,31 @@ export default function Datatable({ state, setState, reset }) {
 	};
 
 	useEffect(() => {
-		let queryStr = "";
+		const params = new URLSearchParams();
+
 		if (state.value !== "") {
-			queryStr += `&${-1 * state.key}=${state.value}`;
+			params.set(`${-1 * state.key}`, state.value);
 		}
 
 		if (state.filter.size > 0) {
 			for (let [key, values] of state.filter) {
-				queryStr += `&${key}=${JSON.stringify(values)}`;
+				params.set(key, JSON.stringify(values));
 			}
 		}
+
 		if (Object.keys(state.range).length > 0) {
 			Object.entries(state.range).forEach(([key, [start, end]]) => {
 				if (start !== "") {
-					queryStr += `&${key}>=${start}`;
+					params.set(`${key}>=`, start);
 				}
 				if (end !== "") {
-					queryStr += `&${key}<=${end}`;
+					params.set(`${key}<=`, end);
 				}
 			});
 		}
+
+		const queryStr = `&${params.toString()}`;
+
 		if (queryStr !== query) {
 			setQuery(queryStr);
 		}
@@ -45,9 +50,12 @@ export default function Datatable({ state, setState, reset }) {
 	useEffect(() => {
 		async function fetchTable() {
 			try {
-				const response = await secureFetch(
-					`table?page=${state.page}&limit=${state.limit}&sort=${JSON.stringify(state.sort)}${query}`
-				);
+				const params = new URLSearchParams({
+					page: state.page,
+					limit: state.limit,
+					sort: JSON.stringify(state.sort),
+				});
+				const response = await secureFetch(`table?${params.toString()}${query}`);
 				setData(response);
 			} catch (error) {
 				console.error("Error fetching table data:", error);

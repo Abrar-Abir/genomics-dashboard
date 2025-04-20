@@ -35,7 +35,7 @@ export default function Panel({ state, setState, data }) {
 	};
 
 	const toggle = (key, item) => {
-		console.log(state.filter);
+		// console.log(state.filter);
 		setState("filter", (prevItems) => {
 			const newItems = new Map(prevItems);
 
