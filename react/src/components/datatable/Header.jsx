@@ -8,8 +8,6 @@ import ResetIcon from "@assets/reset.png";
 import schema from "@lib/schema.json";
 import { secureOpen, secureFetch } from "../../lib/authService";
 
-// const headers = schema.headers;
-
 export default function Header({ state, setState, reset }) {
 	const handleExport = (format) => {
 		secureOpen(`/export/table/${format}?sort=${JSON.stringify(state.sort)}${state.query}`, format);
