@@ -29,6 +29,16 @@ export function getID(array, element) {
 	return -1;
 }
 
+export function scroll ( direction, start, size, dataLength, setStart ){
+	const shift = start + direction * size;
+	if (direction === 1) {
+		setStart(Math.min(Math.max(dataLength - size, 0), shift));
+	} else if (direction === -1) {
+		setStart(Math.max(shift, 0));
+	}
+};
+
+
 export function preprocessData(data, period) {
 	if (data === null){return []};
   let aggregatedData = {};

@@ -15,7 +15,7 @@ def get_database_info(json_file: str = "active_config.json") -> tuple[str, str, 
     return database, host, user, password, port
 
 
-def connect_to_postgres(database="sidra", host="localhost", user="postgres", password="mypassword", port="5432") -> tuple[psycopg2.extensions.connection, psycopg2.extensions.cursor]:
+def connect_to_postgres(database="sidra", host="localhost", user="postgres", password="", port="5432"):
     conn = psycopg2.connect(database=database, host=host,
                             user=user, password=password, port=port)
     conn.set_session(autocommit=True)
@@ -23,7 +23,7 @@ def connect_to_postgres(database="sidra", host="localhost", user="postgres", pas
     return conn, cursor
 
 
-def fetch(cursor: psycopg2.extensions.cursor, command: str, params: str) -> [None | tuple | list]:
+def fetch(cursor, command, params):
     cursor.execute(command)
     if params == "one":
         result = cursor.fetchone()
@@ -40,8 +40,6 @@ def isdigit(obj):
 		if char not in '0123456789':
 			return False
 	return True
-
-
 
 def jsonify(data):
 	return Response(json.dumps(data, default=str), content_type="application/json")

@@ -14,11 +14,33 @@ import {
 } from "@material-tailwind/react";
 import { secureFetch, secureOpen } from "../../lib/authService";
 
+const getHeader = (data) => {
+	const piHeader = {};
+	const projectHeader = {};
+	for (const pi in data) {
+		const piSum = [];
+		for (const project in data[pi]) {
+			const projectSamples = data[pi][project];
+			const projectSum = [];
+			for (const sampleData of projectSamples) {
+				const values = sampleData[1];
+				values.forEach((v, i) => {
+					projectSum[i] = (projectSum[i] || 0) + v;
+					piSum[i] = (piSum[i] || 0) + v;
+				});
+				if (sampleData[0] === "") break;
+			}
+			projectHeader[project] = projectSum;
+		}
+		piHeader[pi] = piSum;
+	}
+	return [piHeader, projectHeader];
+};
+
 export default function Grid({ state, setState, data }) {
 	const [openSample, setOpenSample] = useState("");
 	const closeModal = () => setOpenSample("");
 	const [sampleData, setSampleData] = useState([]);
-
 	const handleTogglePi = (pi) => {
 		setState("openPi", (prevState) => ({
 			...prevState,
@@ -49,6 +71,8 @@ export default function Grid({ state, setState, data }) {
 		);
 	};
 
+	const [piHeader, projectHeader] = getHeader(data.grid);
+
 	useEffect(() => {
 		async function fetchData() {
 			try {
@@ -65,28 +89,26 @@ export default function Grid({ state, setState, data }) {
 		}
 		fetchData();
 	}, [openSample]);
-
 	return (
 		<div className="overflow-x-hidden h-full bg-white">
-			<Dialog open={openSample != ""} size="xl" className="w-full !z-50 relative">
+			<Dialog open={openSample !== ""} size="xl" className="w-full !z-50 relative">
 				<DialogHeader className="flex items-center justify-between">
 					<div className="text-left">Data for Sample Name {openSample}</div>
 					<div className="flex gap-2">
-						{FORMATS.map((format) => {
-							return (
-								<Button
-									key={format}
-									color="gray"
-									variant="outlined"
-									className="flex items-center gap-1 py-1 h-8"
-									onClick={() => handleExport(format)}
-								>
-									{format}
-								</Button>
-							);
-						})}
+						{FORMATS.map((format) => (
+							<Button
+								key={format}
+								color="gray"
+								variant="outlined"
+								className="flex items-center gap-1 py-1 h-8"
+								onClick={() => handleExport(format)}
+							>
+								{format}
+							</Button>
+						))}
 					</div>
 				</DialogHeader>
+
 				<DialogBody>
 					<Table
 						state={{ limit: 25, sort: [], cols: schema.binaryStr, page: 1 }}
@@ -105,6 +127,7 @@ export default function Grid({ state, setState, data }) {
 					</Button>
 				</DialogFooter>
 			</Dialog>
+
 			<table className="table-fixed border-collapse">
 				<thead className="sticky top-0 z-30 bg-gray-300 border-y-4 border-white">
 					<tr>
@@ -119,7 +142,6 @@ export default function Grid({ state, setState, data }) {
 										? {
 												width: "17rem",
 												height: "9rem",
-
 												border: "0.2rem solid white",
 												borderLeft: "0rem solid white",
 										  }
@@ -132,54 +154,57 @@ export default function Grid({ state, setState, data }) {
 										  }
 								}
 							>
-								{key}
+								{schema.tooltip[key] ? (
+									<Tooltip content={"aggregation of " + String(schema.tooltip[key])}>
+										<Badge color="blue"> {key}</Badge>
+									</Tooltip>
+								) : (
+									key
+								)}
 							</th>
 						))}
 					</tr>
 				</thead>
-				{data?.grid === null ? (
-					<tbody>
+
+				<tbody className="overflow-y-auto">
+					{data?.grid == null ? (
 						<tr>
 							<td className="bg-teal-400 text-center text-white" colSpan={data.headers.length + 3}>
 								No result exist
 							</td>
 						</tr>
-					</tbody>
-				) : (
-					<tbody className="overflow-y-auto">
-						{Object.keys(data.grid).map((pi) => {
+					) : (
+						Object.keys(data.grid).map((pi) => {
 							const piData = data.grid[pi];
 							return (
 								<React.Fragment key={`pi-fragment-${pi}`}>
 									<tr key={`pi-${pi}`} className="bg-teal-400 sticky z-20 top-[8.85rem]">
-										{data.headers.map((key, id) => {
-											return (
-												<td
-													key={`pi-${pi}-header-${key}`}
-													onClick={key === "Entity" ? () => handleTogglePi(pi) : () => {}}
-													className={
-														"border-2 border-white px-4 text-white " +
-														(key === "Entity"
-															? "w-[31rem] text-left hover:bg-teal-300 hover:cursor-pointer"
-															: key === "Count" || piData.header[id - 1] > 0
-															? "w-[5rem] text-center bg-teal-600"
-															: "w-[5rem]")
-													}
-													colSpan={key === "Entity" ? "3" : "1"}
-												>
-													{key === "Entity"
-														? pi
-														: key === "Count"
-														? piData.header.reduce((acc, curr) => acc + curr, 0)
-														: piData.header[id - 1] || ""}
-												</td>
-											);
-										})}
+										{data.headers.map((key, id) => (
+											<td
+												key={`pi-${pi}-header-${key}`}
+												onClick={key === "Entity" ? () => handleTogglePi(pi) : undefined}
+												className={
+													"border-2 border-white px-4 text-white " +
+													(key === "Entity"
+														? "w-[31rem] text-left hover:bg-teal-300 hover:cursor-pointer"
+														: key === "Count" || piHeader[pi][id - 1] > 0
+														? "w-[5rem] text-center bg-teal-600"
+														: "w-[5rem]")
+												}
+												colSpan={key === "Entity" ? 3 : 1}
+											>
+												{key === "Entity"
+													? pi
+													: key === "Count"
+													? piHeader[pi].reduce((acc, curr) => acc + curr, 0)
+													: piHeader[pi][id - 1] || ""}
+											</td>
+										))}
 									</tr>
 
 									{state.openPi[pi] &&
-										Object.keys(piData.projects).map((project) => {
-											const projectData = piData.projects[project];
+										Object.keys(piData).map((project) => {
+											const projectData = piData[project];
 											return (
 												<React.Fragment key={`project-fragment-${project}`}>
 													<tr key={project} className="sticky z-20 top-[8.85rem]">
@@ -188,62 +213,68 @@ export default function Grid({ state, setState, data }) {
 															<td
 																key={`project-${project}-${key}`}
 																onClick={
-																	key === "Entity" ? () => handleToggleProject(project) : () => {}
+																	key === "Entity" ? () => handleToggleProject(project) : undefined
 																}
 																className={
 																	"border-2 border-white px-4 text-white " +
 																	(key === "Entity"
 																		? "w-[27rem] text-left bg-light-blue-700 hover:bg-light-blue-500 hover:cursor-pointer"
-																		: key === "Count" || projectData.header[id - 1] > 0
+																		: key === "Count" || projectHeader[project][id - 1] > 0
 																		? "w-[5rem] text-center bg-light-blue-900"
 																		: "w-[5rem] bg-light-blue-700")
 																}
-																colSpan={key === "Entity" ? "2" : "1"}
+																colSpan={key === "Entity" ? 2 : 1}
 															>
 																{key === "Entity"
 																	? project
 																	: key === "Count"
-																	? projectData.header.reduce((acc, curr) => acc + curr, 0)
-																	: projectData.header[id - 1] || ""}
+																	? projectHeader[project].reduce((acc, curr) => acc + curr, 0)
+																	: projectHeader[project][id - 1] || ""}
 															</td>
 														))}
 													</tr>
 
 													{state.openProject[project] &&
-														projectData.samples.map((sampleDict, index) =>
-															sampleDict["Entity"] === "null" ? (
-																<tr
-																	key={`null-sample-${project}-${index}`}
-																	className="sticky z-20 top-[8.85rem]"
-																>
-																	<td className="w-[4rem] bg-transparent"></td>
-																	<td className="w-[10rem] bg-transparent"></td>
-																	{data.headers.map((key, id) => (
-																		<td
-																			key={`null-sample-${project}-${index}-${key}`}
-																			onClick={
-																				key === "Entity"
-																					? () => handleToggleShow(project)
-																					: () => {}
-																			}
-																			className={
-																				"border-[0.2rem] border-white px-4 text-white bg-blue-gray-400 " +
-																				(key === "Entity"
-																					? "text-right hover:bg-blue-gray-300 font-medianbold hover:cursor-pointer w-[17rem]"
-																					: key === "Count" || sampleDict.row[id - 1] > 0
-																					? "text-center bg-blue-gray-600 w-[5rem]"
-																					: "w-[5rem]")
-																			}
-																		>
-																			{key === "Entity"
-																				? "single entry samples"
-																				: key === "Count"
-																				? sampleDict.row.reduce((acc, curr) => acc + curr, 0)
-																				: sampleDict.row[id - 1] || ""}
-																		</td>
-																	))}
-																</tr>
-															) : (
+														projectData.map((sampleData, index) => {
+															// const sampleData = projectData[sample];
+															const sample = sampleData[0];
+															if (sample === "") {
+																return (
+																	<tr
+																		key={`null-sample-${project}-${index}`}
+																		className="sticky z-20 top-[8.85rem]"
+																	>
+																		<td className="w-[4rem] bg-transparent"></td>
+																		<td className="w-[10rem] bg-transparent"></td>
+																		{data.headers.map((key, id) => (
+																			<td
+																				key={`null-sample-${project}-${index}-${key}`}
+																				onClick={
+																					key === "Entity"
+																						? () => handleToggleShow(project)
+																						: undefined
+																				}
+																				className={
+																					"border-[0.2rem] border-white px-4 text-white bg-blue-gray-400 " +
+																					(key === "Entity"
+																						? "text-right hover:bg-blue-gray-300 font-medianbold hover:cursor-pointer w-[17rem]"
+																						: key === "Count" || sampleData[1][id - 1] > 0
+																						? "text-center bg-blue-gray-600 w-[5rem]"
+																						: "w-[5rem]")
+																				}
+																			>
+																				{key === "Entity"
+																					? "single entry samples"
+																					: key === "Count"
+																					? sampleData[1].reduce((acc, curr) => acc + curr, 0)
+																					: sampleData[1][id - 1] || ""}
+																			</td>
+																		))}
+																	</tr>
+																);
+															}
+
+															return (
 																<tr
 																	key={`sample-${project}-${index}`}
 																	className="bg-white sticky top-[5rem]"
@@ -254,54 +285,48 @@ export default function Grid({ state, setState, data }) {
 																		<td
 																			key={`sample-${project}-${index}-${key}`}
 																			onClick={
-																				key === "Entity"
-																					? () => setOpenSample(sampleDict[key])
-																					: null
+																				key === "Entity" ? () => setOpenSample(sample) : undefined
 																			}
 																			className={
-																				"border-[0.2rem] border-white px-4  " +
+																				"border-[0.2rem] border-white px-4 " +
 																				(key === "Entity"
 																					? "text-right text-black w-[17rem] bg-cyan-100 hover:bg-cyan-200 font-semibold hover:cursor-pointer"
-																					: sampleDict.row[id - 1] > 0 || key === "Count"
-																					? "text-center w-[5rem] bg-cyan-600  text-white"
+																					: sampleData[1][id - 1] > 0 || key === "Count"
+																					? "text-center w-[5rem] bg-cyan-600 text-white"
 																					: "w-[5rem]")
 																			}
 																		>
 																			{key === "Entity" ? (
-																				"other" in sampleDict ? (
-																					sampleDict?.other ? (
-																						<Tooltip
-																							content={
-																								"sample was also sequenced under SDR " +
-																								String(sampleDict.other)
-																							}
-																						>
-																							<Badge color="blue">{sampleDict?.[key]}</Badge>
-																						</Tooltip>
-																					) : (
-																						sampleDict?.[key]
-																					)
+																				sampleData[2].length > 0 ? (
+																					<Tooltip
+																						content={
+																							"sample was also sequenced under project " +
+																							sampleData[2]
+																						}
+																					>
+																						<Badge color="blue">{sample}</Badge>
+																					</Tooltip>
 																				) : (
-																					sampleDict?.[key]
+																					sample
 																				)
 																			) : key === "Count" ? (
-																				sampleDict.row.reduce((acc, curr) => acc + curr, 0)
+																				sampleData[1].reduce((acc, curr) => acc + curr, 0)
 																			) : (
-																				sampleDict.row[id - 1] || ""
+																				sampleData[1][id - 1] || ""
 																			)}
 																		</td>
 																	))}
 																</tr>
-															)
-														)}
+															);
+														})}
 												</React.Fragment>
 											);
 										})}
 								</React.Fragment>
 							);
-						})}
-					</tbody>
-				)}
+						})
+					)}
+				</tbody>
 			</table>
 		</div>
 	);

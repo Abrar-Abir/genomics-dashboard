@@ -3,5 +3,8 @@
     "host": "localhost",
     "password": "mypassword",
     "port": "5432",
-    "user": "postgres"
+    "user": "postgres",
+	"login": "https://apitest.sidra.org/ram/login",
+	"validate": "https://apvalidate",
+	"client": "ngc-test-client"	
 }

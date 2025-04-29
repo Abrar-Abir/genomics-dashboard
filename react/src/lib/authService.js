@@ -1,15 +1,12 @@
 import axios from 'axios';
 import { BASE_URL } from "@components/utils.js";
 
-export const register = async (username, password) => {
-    return await axios.post(`${BASE_URL}/register`, { username, password });
-};
 
 export const login = async (username, password) => {
     const response = await axios.post(`${BASE_URL}/login`, { username, password });
     if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        window.location.href = response.data.redirect_url || '/';  
+        window.location.href = response.data.redirect_url || '/dashboard';  
     }
     return response.data;
 };

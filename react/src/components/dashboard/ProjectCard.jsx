@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BarChart, NumberInput, Subtitle } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { COLORS } from "@components/utils.js";
+import { COLORS, scroll } from "@components/utils.js";
 
 export default function ProjectCard({ data }) {
 	const [size, setSize] = useState(6);
@@ -12,14 +12,14 @@ export default function ProjectCard({ data }) {
 
 	const projects = window.flatMap((dict) => Object.keys(dict).filter((key) => key !== "pi"));
 
-	const scroll = (direction) => {
-		const shift = start + direction * size;
-		if (direction === 1) {
-			setStart(Math.min(Math.max(data?.length - size, 0), shift));
-		} else if (direction === -1) {
-			setStart(Math.max(shift, 0));
-		}
-	};
+	// const scroll = (direction) => {
+	// 	const shift = start + direction * size;
+	// 	if (direction === 1) {
+	// 		setStart(Math.min(Math.max(data?.length - size, 0), shift));
+	// 	} else if (direction === -1) {
+	// 		setStart(Math.max(shift, 0));
+	// 	}
+	// };
 
 	return (
 		<div className="flex flex-col space-y-2 h-full">
@@ -54,7 +54,7 @@ export default function ProjectCard({ data }) {
 							color={"black"}
 							variant={start === 0 ? "outlined" : "filled"}
 							disabled={start === 0}
-							onClick={() => scroll(-1)}
+							onClick={() => scroll(-1, start, size, data?.length, setStart)}
 						>
 							<ChevronLeftIcon className="w-auto h-6" />
 						</IconButton>
@@ -71,7 +71,7 @@ export default function ProjectCard({ data }) {
 							color={"black"}
 							variant={start + size >= data?.length ? "outlined" : "filled"}
 							disabled={start + size >= data?.length}
-							onClick={() => scroll(1)}
+							onClick={() => scroll(1, start, size, data?.length, setStart)}
 						>
 							<ChevronRightIcon className="w-auto h-6" />
 						</IconButton>

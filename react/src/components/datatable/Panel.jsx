@@ -17,7 +17,6 @@ function Icon({ open }) {
 		/>
 	);
 }
-const headers = schema.headers;
 
 export default function Panel({ state, setState, data }) {
 	const [allExpanded, setAllExpanded] = useState(true);
@@ -35,7 +34,6 @@ export default function Panel({ state, setState, data }) {
 	};
 
 	const toggle = (key, item) => {
-		// console.log(state.filter);
 		setState("filter", (prevItems) => {
 			const newItems = new Map(prevItems);
 
@@ -87,7 +85,7 @@ export default function Panel({ state, setState, data }) {
 					<Input
 						variant="standard"
 						label={data[table]?.[columnID]?.[index] || "N/A"}
-						placeholder={headers[columnID]?.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
+						placeholder={schema.headers[columnID]?.includes("date") ? "yyyy-mm-dd" : "xx.yy"}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
 								handleRange(columnID, index, e.target.value);
@@ -118,6 +116,7 @@ export default function Panel({ state, setState, data }) {
 	};
 
 	const renderBody = (table, columnID) => {
+		// console.log(table, columnID, schema.headers[columnID], data[table][columnID]);
 		const items = data[table][columnID];
 		const key = columnID;
 		return (
@@ -163,7 +162,7 @@ export default function Panel({ state, setState, data }) {
 							state.open?.[columnID] ? "bg-indigo-400/80 text-white" : "bg-white text-black"
 						}`}
 					>
-						<span>{headers[columnID]}</span>
+						<span>{schema.headers[columnID]}</span>
 					</AccordionHeader>
 					<AccordionBody>
 						{data[table][columnID].length === 2 && typeof data[table][columnID][1] === "string"

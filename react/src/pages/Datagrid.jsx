@@ -30,8 +30,8 @@ export default function Datagrid({ state, setState, reset }) {
 				}
 
 				const [data, analytics] = await Promise.all([
-					secureFetch(`/datagrid?${params.toString()}`),
-					secureFetch(`analytics/datagrid?${params.toString()}`),
+					secureFetch(`/grid?${params.toString()}`),
+					secureFetch(`analytics/grid?${params.toString()}`),
 				]);
 
 				for (let key1 in analytics) {

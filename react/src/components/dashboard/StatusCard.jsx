@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { BarChart, Subtitle, NumberInput } from "@tremor/react";
 import { IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { COLORS } from "@components/utils.js";
+import { COLORS, scroll } from "@components/utils.js";
 import Legend from "./Legend";
 export default function StatusCard({ data }) {
 	const legends = data?.legends || [];
@@ -18,14 +18,14 @@ export default function StatusCard({ data }) {
 
 	const window = chart.slice(start, start + size);
 
-	const scroll = (direction) => {
-		const shift = start + direction * size;
-		if (direction === 1) {
-			setStart(Math.min(Math.max(chart?.length - size, 0), shift));
-		} else if (direction === -1) {
-			setStart(Math.max(shift, 0));
-		}
-	};
+	// const scroll = (direction) => {
+	// 	const shift = start + direction * size;
+	// 	if (direction === 1) {
+	// 		setStart(Math.min(Math.max(chart?.length - size, 0), shift));
+	// 	} else if (direction === -1) {
+	// 		setStart(Math.max(shift, 0));
+	// 	}
+	// };
 
 	return (
 		<div className="flex h-full">
@@ -71,7 +71,7 @@ export default function StatusCard({ data }) {
 								color={"black"}
 								variant={start === 0 ? "outlined" : "filled"}
 								disabled={start === 0}
-								onClick={() => scroll(-1)}
+								onClick={() => scroll(-1, start, size, chart?.length, setStart)}
 							>
 								<ChevronLeftIcon className="w-auto h-6" />
 							</IconButton>
@@ -87,7 +87,7 @@ export default function StatusCard({ data }) {
 								color={"black"}
 								variant={start + size >= chart?.length ? "outlined" : "filled"}
 								disabled={start + size >= chart?.length}
-								onClick={() => scroll(1)}
+								onClick={() => scroll(1, start, size, chart?.length, setStart)}
 							>
 								<ChevronRightIcon className="w-auto h-6" />
 							</IconButton>

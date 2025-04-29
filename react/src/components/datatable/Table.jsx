@@ -112,8 +112,6 @@ export default function Table({ state, setState, data, minimal }) {
 		}
 	};
 
-	// const totalPages = ;
-
 	const handleSort = (id, index) => {
 		if (index === -1) {
 			setState("sort", (prevSort) => [...prevSort, id]);

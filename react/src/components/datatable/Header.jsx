@@ -2,8 +2,8 @@ import { Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwin
 import { useState } from "react";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { getID, FORMATS } from "@components/utils.js";
-import MenuWithCheckbox from "../shared/Menu";
-import SearchBar from "../shared/SearchBar";
+import MenuWithCheckbox from "./Menu";
+import SearchBar from "./SearchBar";
 import ResetIcon from "@assets/reset.png";
 import schema from "@lib/schema.json";
 import { secureOpen, secureFetch } from "../../lib/authService";

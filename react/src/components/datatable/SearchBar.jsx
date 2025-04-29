@@ -17,7 +17,6 @@ export default function SearchBar({ allSuggestions, setValue }) {
 	const debouncedFetch = debounce(fetch, 500);
 
 	const handleInput = (event) => {
-		// const value = event.target.value;
 		setQuery(event.target.value);
 		debouncedFetch(event.target.value);
 		setShow(true);

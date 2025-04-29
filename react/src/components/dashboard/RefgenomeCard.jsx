@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, Grid, Title, BarChart, Button } from "@tremor/react";
 import { Dialog, DialogBody, DialogHeader, IconButton } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { COLORS } from "@components/utils.js";
+import { COLORS, scroll } from "@components/utils.js";
 import Legend from "./Legend";
 
 export default function RefgenomeCard({ data }) {
@@ -22,14 +22,14 @@ export default function RefgenomeCard({ data }) {
 		setActive(legends);
 	}, [legends]);
 
-	const scroll = (direction) => {
-		const shift = start + direction * size;
-		if (direction === 1) {
-			setStart(Math.min(Math.max(chart?.length - size, 0), shift));
-		} else if (direction === -1) {
-			setStart(Math.max(shift, 0));
-		}
-	};
+	// const scroll = (direction) => {
+	// 	const shift = start + direction * size;
+	// 	if (direction === 1) {
+	// 		setStart(Math.min(Math.max(chart?.length - size, 0), shift));
+	// 	} else if (direction === -1) {
+	// 		setStart(Math.max(shift, 0));
+	// 	}
+	// };
 
 	return (
 		<div className="flex flex-col space-y-4 h-full max-h-screen">
@@ -74,7 +74,7 @@ export default function RefgenomeCard({ data }) {
 					color={"black"}
 					variant={start === 0 ? "outlined" : "filled"}
 					disabled={start === 0 ? true : false}
-					onClick={() => scroll(-1)}
+					onClick={() => scroll(-1, start, size, chart?.length, setStart)}
 				>
 					<ChevronLeftIcon className="w-auto h-6" />
 				</IconButton>
@@ -89,7 +89,7 @@ export default function RefgenomeCard({ data }) {
 					color={"black"}
 					variant={start + size >= Object.keys(chart).length ? "outlined" : "filled"}
 					disabled={start + size >= Object.keys(chart).length}
-					onClick={() => scroll(1)}
+					onClick={() => scroll(1, start, size, chart?.length, setStart)}
 				>
 					<ChevronRightIcon className="w-auto h-6" />
 				</IconButton>

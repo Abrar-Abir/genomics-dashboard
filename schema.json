@@ -561,7 +561,7 @@
 				},
 				"stage_date": {
 					"type": "DATE DEFAULT NULL",
-					"filter": true,
+					"filter": false,
 					"view": false,
 					"alias": "Stage Date",
 					"group": 2,
@@ -597,7 +597,7 @@
 				},
 				"release_date": {
 					"type": "DATE DEFAULT NULL",
-					"filter": true,
+					"filter": false,
 					"view": false,
 					"alias": "Release Date",
 					"group": 2,
@@ -619,6 +619,43 @@
 			"check": [
 				"char_length(sample_id) >= 10"
 			]
+		}
+	},
+	"grid": {
+		"WGS": {
+			"order": 0,
+			"subtype": [
+				"WGS30N",
+				"WGS90N"
+			]
+		},
+		"DNAPREP-30N": {
+			"order": 1
+		},
+		"WES200": {
+			"order": 2
+		},
+		"LEX8": {
+			"order": 3
+		},
+		"mRNA": {
+			"order": 4,
+			"subtype": ["mRNA-20", "mRNA-40", "mRNA-50"]
+		},
+		"totRNA-50": {
+			"order": 5
+		},
+		"totRNAGlob-50": {
+			"order": 6
+		},
+		"10XscRNA": {
+			"order": 7
+		},
+		"NXTRA": {
+			"order": 8
+		},
+		"sRNA8M": {
+			"order": 9
 		}
 	}
 }

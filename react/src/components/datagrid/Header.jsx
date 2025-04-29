@@ -4,7 +4,7 @@ import ResetIcon from "@assets/reset.png";
 import { FORMATS } from "@components/utils.js";
 import { secureOpen } from "../../lib/authService";
 
-const DatagridHeader = ({ reset, state, setHide }) => {
+export default function Header({ reset, state, setHide }) {
 	const handleExport = (format) => {
 		const params = new URLSearchParams({ hide: state.hide ? "1" : "0" });
 
@@ -67,6 +67,4 @@ const DatagridHeader = ({ reset, state, setHide }) => {
 			</div>
 		</div>
 	);
-};
-
-export default DatagridHeader;
+}

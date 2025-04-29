@@ -7,6 +7,11 @@ import { RiDonutChartFill } from "react-icons/ri";
 import { COLORS } from "@components/utils.js";
 import Legend from "./Legend";
 
+const valueFormatter = (number) => {
+	const percentage = ((number / totalUnits) * 100).toFixed(2);
+	return `${percentage}% | ${number}`;
+};
+
 export default function DonutCard({ info, data }) {
 	const [donut, setDonut] = useState(true);
 	const legends = data?.map((item) => item.type);
@@ -17,10 +22,6 @@ export default function DonutCard({ info, data }) {
 		setActive(legends);
 	}, [data]);
 
-	const valueFormatter = (number) => {
-		const percentage = ((number / totalUnits) * 100).toFixed(2);
-		return `${percentage}% | ${number}`;
-	};
 	const filteredData = data.filter((item) => active.includes(item.type));
 	const totalUnits = filteredData?.reduce((total, item) => total + item.quantity, 0);
 
@@ -47,7 +48,6 @@ export default function DonutCard({ info, data }) {
 				</IconButton>
 			</div>
 			<div className="flex items-center justify-start gap-4 w-full">
-				{/* Donut Chart Container (Takes 60% of the parent width) */}
 				<div className="w-[75%] flex-shrink-0">
 					<DonutChart
 						showLabel={true}
@@ -70,8 +70,6 @@ export default function DonutCard({ info, data }) {
 						}}
 					/>
 				</div>
-
-				{/* Legend Container (Takes 40% of the parent width) */}
 				{data && (
 					<div className="w-[25%] flex flex-col max-h-40 flex-shrink-0 overflow-auto">
 						<Legend

@@ -19,7 +19,6 @@ export default function Sidebar({ openSide, setOpenSide }) {
 	const [openNav, setOpenNav] = useState(false);
 	const location = useLocation();
 	const currentPath = location.pathname;
-
 	return (
 		<>
 			{/* navigation bar for small screen */}

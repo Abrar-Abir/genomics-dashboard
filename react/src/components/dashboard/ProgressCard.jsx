@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { COLORS } from "@components/utils.js";
-import { preprocessData } from "@components/utils.js";
+import { COLORS, preprocessData, scroll } from "@components/utils.js";
 import {
 	Card,
 	Select,
@@ -49,14 +48,14 @@ export default function ProgressCard({ data }) {
 	}, [preprocessedData, windowSize]);
 
 	const windowedData = preprocessedData?.slice(windowStart, windowStart + windowSize);
-	const scroll = (direction) => {
-		const newStart = windowStart + direction * windowSize;
-		if (direction === 1) {
-			setWindowStart(Math.min(Math.max(preprocessedData?.length - windowSize, 0)), newStart);
-		} else if (direction === -1) {
-			setWindowStart(Math.max(newStart, 0));
-		}
-	};
+	// const scroll = (direction) => {
+	// 	const newStart = windowStart + direction * windowSize;
+	// 	if (direction === 1) {
+	// 		setWindowStart(Math.min(Math.max(preprocessedData?.length - windowSize, 0)), newStart);
+	// 	} else if (direction === -1) {
+	// 		setWindowStart(Math.max(newStart, 0));
+	// 	}
+	// };
 
 	const areaChartArgs = {
 		categories: [category],
@@ -140,14 +139,15 @@ export default function ProgressCard({ data }) {
 							color={"black"}
 							variant={windowStart === 0 ? "outlined" : "filled"}
 							disabled={windowStart === 0 ? true : false}
-							onClick={() => scroll(-1)}
+							onClick={() =>
+								scroll(-1, windowStart, windowSize, preprocessedData?.length, setWindowStart)
+							}
 						>
 							<ChevronLeftIcon className="w-auto h-6" />
 						</IconButton>
 						<NumberInput
 							className="max-w-[2rem]"
 							value={windowSize}
-							// icon={ComputerDesktopIcon}
 							step={6}
 							enableStepper={true}
 							min={0}
@@ -158,7 +158,9 @@ export default function ProgressCard({ data }) {
 							color={"black"}
 							variant={windowStart + windowSize >= preprocessedData?.length ? "outlined" : "filled"}
 							disabled={windowStart + windowSize >= preprocessedData?.length ? true : false}
-							onClick={() => scroll(1)}
+							onClick={() =>
+								scroll(1, windowStart, windowSize, preprocessedData?.length, setWindowStart)
+							}
 						>
 							<ChevronRightIcon className="w-auto h-6" />
 						</IconButton>
