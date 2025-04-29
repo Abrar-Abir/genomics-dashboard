@@ -17,7 +17,7 @@ export default function Header({ reset, state, setHide }) {
 				params.append(key, JSON.stringify(values));
 			}
 		}
-		secureOpen(`export/datagrid/${format}?${params.toString()}`, format);
+		secureOpen(`export/grid/${format}?${params.toString()}`, format);
 	};
 	return (
 		<div className="!h-14 flex justify-between items-center w-full bg-white py-2">

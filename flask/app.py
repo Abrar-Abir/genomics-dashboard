@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict, Counter
 import requests
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
@@ -58,6 +59,35 @@ for col in grid_cols:
 	if grid_cols[col].get("subtype", None):
 		dtype_clause += f""" WHEN datatype IN ({str(grid_cols[col]["subtype"])[1:-1].replace('"', "'")}) THEN '{col}'"""
 dtype_clause += " ELSE datatype END"
+
+def validate_token():
+	auth_header = request.headers.get('Authorization')
+	if not auth_header or not auth_header.startswith('Bearer '):
+		return None, 401, "Missing or invalid Authorization header"
+
+	headers = {
+        'X-API-Version': request.headers.get('X-API-Version', 'v1'),
+        'X-Protocol': request.headers.get('X-Protocol', '50'),
+        'X-Project': request.headers.get('X-Project', '416'),
+        'Authorization': auth_header
+    }
+	try:
+		response = requests.get(VALIDATION_API, headers=headers, verify = "sidra.crt")
+		response.raise_for_status()
+		return response.json(), 200, None
+	except requests.exceptions.RequestException as e:
+		return None, 500, f"Token validation failed: {str(e)}"
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        validation_data, status_code, error_message = validate_token()
+
+        if validation_data:
+            return f(*args, **kwargs)
+        else:
+            return jsonify({'error': error_message}), status_code
+    return decorated
 
 def _get_id(element):
 	try:
@@ -123,13 +153,14 @@ def _where_clause(filter_dict, filter_key=None):
 
 
 def _fetch_table(is_table, args):
+	print(list(args.items()))
 	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
               for k, v in args.items()}
 	cols_to_sort = [int(id) for id in params.get('sort', [])]
 	order_clause = _order_clause(cols_to_sort)
 	table_filter = _table_filter(params)
 	where_clause = _where_clause(table_filter)
-
+	print(where_clause)
 	if is_table:
 		count_query = f"""
             SELECT COUNT(*)
@@ -176,7 +207,7 @@ def _fetch_table(is_table, args):
 
 
 @app.route('/table')
-@jwt_required()
+@token_required
 def table():
     results, count = _fetch_table(True, request.args)
     if results is None:
@@ -184,7 +215,7 @@ def table():
     return jsonify({"table": results, "count": count})
 
 @app.route('/export/table/<format>')
-@jwt_required()
+@token_required
 def export_table(format):
     results, _ = _fetch_table(False, request.args)
     if results is None:
@@ -250,7 +281,7 @@ def _analytics(column_name, table_filter, query, fetch_arg):
 	return [(str(row[0]).replace('"', '').replace("'", "").replace("[", "").replace("]", "").replace(", ", " "), row[1]) for row in results]
 
 @ app.route('/analytics/table')
-@jwt_required()
+@token_required
 def analytics_table():
 	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
           for k, v in request.args.items()}
@@ -297,7 +328,7 @@ def analytics_table():
 	return jsonify(analytics_data)
 
 @ app.route('/search/<id>')
-@jwt_required()
+@token_required
 def search(id):
 	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
           for k, v in request.args.items()}
@@ -347,7 +378,7 @@ def _grid_filter(request):
 	return grid_filter
 
 @ app.route('/analytics/grid')
-@jwt_required()
+@token_required
 def analytics_grid():
 	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
           for k, v in request.args.items()}
@@ -405,7 +436,7 @@ def analytics_grid():
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{_where_clause({k : grid_filter[k] for k in grid_filter if k.startswith('project')})}
 		GROUP BY sample_name, pi """ + (grid_filter["hide"])*"""HAVING COUNT(DISTINCT sample.sample_id) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
-	print(dtype_query)
+	# print(dtype_query)
 	analytics_data['submission'][str(_get_id('submission.datatype'))] = _analytics('', dict(), dtype_query, "all")
 	return jsonify(analytics_data)
 
@@ -511,7 +542,7 @@ def _fetch_grid(args, include_hide=True):
 
 
 @ app.route('/grid')
-@jwt_required()
+@token_required
 def grid():
 	results, cols = _fetch_grid(request.args, True)
 	if results == None:
@@ -541,7 +572,7 @@ def grid():
 	return jsonify({"grid": grid, 'headers': ['Entity'] + cols + ['Count']})
 
 @ app.route('/export/grid/<format>')
-@jwt_required()
+@token_required
 def export_grid(format):
 	results, cols = _fetch_grid(request.args, False)			
 	if results == None:
@@ -605,7 +636,7 @@ def export_grid(format):
 ####### overview page ##################################################
 
 @ app.route('/progress-area/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def progress_area(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -641,7 +672,7 @@ def progress_area(date, no_qgp):
 
 
 @ app.route('/status-bar/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def status_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -688,7 +719,7 @@ def status_bar(date, no_qgp):
 
 
 @ app.route('/project-bar/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def project_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -735,7 +766,7 @@ def project_bar(date, no_qgp):
 
 
 @ app.route('/refgenome-bar/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def refgenome_bar(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -776,7 +807,7 @@ def refgenome_bar(date, no_qgp):
 
 
 @ app.route('/fctype-donut/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def fctype_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -802,7 +833,7 @@ def fctype_donut(date, no_qgp):
 
 
 @ app.route('/service-donut/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def service_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -831,7 +862,7 @@ def service_donut(date, no_qgp):
 
 
 @ app.route('/sequencer-donut/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def sequencer_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -857,7 +888,7 @@ def sequencer_donut(date, no_qgp):
 
 
 @ app.route('/refgenome-donut/<date>/<no_qgp>')
-@jwt_required()
+@token_required
 def refgenome_donut(date, no_qgp):
 	try:
 		start, end = parse_date(date)
@@ -882,7 +913,7 @@ def refgenome_donut(date, no_qgp):
 
 
 @ app.route('/plot')
-@jwt_required()
+@token_required
 def plot():
 	query = request.get_json()
 	table_filter = _table_filter(query)
@@ -939,53 +970,10 @@ if __name__ == '__main__':
 #  -F 'clientId="ngc-test-client"'
 # {
 # 	"token":"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VybmFtZVwiOlwiQUFiaXJcIixcInBlcm1pc3Npb25zXCI6W10sXCJjbGllbnRJZFwiOlwibmdjLXRlc3QtY2xpZW50XCIsXCJmaXJzdF9uYW1lXCI6XCJBYnJhciBUYXNuZWVtXCIsXCJsYXN0X25hbWVcIjpcIkFiaXJcIixcImVtYWlsXCI6XCJBQWJpckBzaWRyYS5vcmdcIixcImV4cGlyZXNfYXRcIjoxNzQ1NTcyMDU4MTQ4fSIsImlzcyI6ImxkYXAtYXV0aC1zZXJ2ZXIuaW50ZXJuYWwiLCJleHAiOjE3NDU1NzIwNTh9.A1c4nZINruxJ85BMA7qSf5q0T5O4PN4DDfyAymDsjoqPSy2NGNOaXdy5x8IVWn0cgwAJzer0@LAPTOP-BKQN3C80
-	
-# curl 'https://apvalidate' 
-# --header 'X-API-Version: v1' 
-# --header 'X-Protocol: 50' 
-# --header 'X-Project: 416' 
-# --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VybmFtZVwiOlwiQUFiaXJcIixcInBlcm1pc3Npb25zXCI6W10sXCJjbGllbnRJZFwiOlwibmdjLXRlc3QtY2xpZW50XCIsXCJmaXJzdF9uYW1lXCI6XCJBYnJhciBUYXNuZWVtXCIsXCJsYXN0X25hbWVcIjpcIkFiaXJcIixcImVtYWlsXCI6XCJBQWJpckBzaWRyYS5vcmdcIixcImV4cGlyZXNfYXRcIjoxNzQ1NTcyMDU4MTQ4fSIsImlzcyI6ImxkYXAtYXV0aC1zZXJ2ZXIuaW50ZXJuYWwiLCJleHAiOjE3NDU1NzIwNTh9.A1c4nZINruxJ85BMA7qSf5q0T5O4PN4DDfyAymDsjoqPSy2NGNOaXdy5x8IVWn0cgwAJo06hlUu3c2BxH_hqJw'
+
+# curl 'https://apitest.sidra.org/ram/validate' --header 'X-API-Version: v1' --header 'X-Protocol: 50' --header 'X-Project: 416' --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VybmFtZVwiOlwiQUFiaXJcIixcInBlcm1pc3Npb25zXCI6W10sXCJjbGllbnRJZFwiOlwibmdjLXRlc3QtY2xpZW50XCIsXCJmaXJzdF9uYW1lXCI6XCJBYnJhciBUYXNuZWVtXCIsXCJsYXN0X25hbWVcIjpcIkFiaXJcIixcImVtYWlsXCI6XCJBQWJpckBzaWRyYS5vcmdcIixcImV4cGlyZXNfYXRcIjoxNzQ2MDM3Mjk0OTY1fSIsImlzcyI6ImxkYXAtYXV0aC1zZXJ2ZXIuaW50ZXJuYWwiLCJleHAiOjE3NDYwMzcyOTR9.ZU107BJWi42FSS42jM1FHYvdfC7J07uDFKnp9u-Ccot8CNzlmpGqvORfmmNQMs4P2D_m_6F4pn_EoElxPGHIUA'
 
 # {"username":"AAbir","permissions":[],"clientId":"ngc-test-client","first_name":"Abrar Tasneem","last_name":"Abir","email":"AAbir@sidra.org","expires_at":"2025-04-25T09:07:38.148+0000"}
 
-# def validate_token():
-#     """
-#     Validates the token from the Authorization header against the validation API.
-#     Returns the validation data if successful, None otherwise.
-#     """
-#     auth_header = request.headers.get('Authorization')
-#     if not auth_header or not auth_header.startswith('Bearer '):
-#         return None, 401, "Missing or invalid Authorization header"
 
-#     token = auth_header.split(' ')[1]
-
-#     headers = {
-#         'X-API-Version': request.headers.get('X-API-Version', 'v1'),
-#         'X-Protocol': request.headers.get('X-Protocol', '50'),
-#         'X-Project': request.headers.get('X-Project', '416'),
-#         'Authorization': f'Bearer {token}'
-#     }
-
-#     try:
-#         response = requests.get(VALIDATE_URL, headers=headers)
-#         response.raise_for_status()
-#         return response.json(), 200, None
-#     except requests.exceptions.RequestException as e:
-#         return None, 500, f"Token validation failed: {str(e)}"
-
-# def token_required(f):
-#     """
-#     A decorator to protect Flask endpoints by validating the token.
-#     It calls the validation API and returns 401 if validation fails.
-#     If validation succeeds, it passes the validation data to the decorated function.
-#     """
-#     @wraps(f)
-#     def decorated(*args, **kwargs):
-#         validation_data, status_code, error_message = validate_token()
-
-#         if validation_data:
-#             return f(validation_data, *args, **kwargs)
-#         else:
-#             return jsonify({'error': error_message}), status_code
-#     return decorated
 

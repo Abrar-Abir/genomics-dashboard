@@ -155,8 +155,13 @@ export default function Grid({ state, setState, data }) {
 								}
 							>
 								{schema.tooltip[key] ? (
-									<Tooltip content={"aggregation of " + String(schema.tooltip[key])}>
-										<Badge color="blue"> {key}</Badge>
+									<Tooltip
+										content={"aggregation of " + String(schema.tooltip[key])}
+										// placement="top"
+									>
+										<Badge color="blue" placement="bottom-end">
+											{key}
+										</Badge>
 									</Tooltip>
 								) : (
 									key

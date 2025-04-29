@@ -28,7 +28,9 @@ const countTrueLanes = (row) => {
 const JsonIcon = ({ sampleId }) => (
 	<img
 		src={JsonPng}
-		onClick={() => secureOpen(`export/table/raw?${getID(headers, "LIMS ID")}=[${sampleId}]`, "raw")}
+		onClick={() =>
+			secureOpen(`export/table/raw?${getID(headers, "LIMS ID")}=["${sampleId}"]`, "raw")
+		}
 		className="ml-2 w-4 h-4 cursor-pointer hover:bg-blue-300 rounded"
 	></img>
 );

@@ -13,7 +13,7 @@ export const login = async (username, password) => {
 export const secureFetch = async (path) => {
     const token = localStorage.getItem('token');
     const response = await axios.get(`${BASE_URL}/${path}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: token },
     });
 	if (response.status !== 200) throw new Error(`Server error: ${response.statusText}`);
 	return response.data;

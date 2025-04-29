@@ -358,5 +358,5 @@
       "filter": 10
     }
   },
-  "tooltip": {"WGS": ["WGS30N", "WGS90N"], "mRNA": ["mRNA-20", "mRNA-40", "mRNA-50"]}
+  "tooltip" : {"WGS": ["WGS30N", "WGS90N"], "mRNA": ["mRNA-20", "mRNA-40", "mRNA-50"]}
 }

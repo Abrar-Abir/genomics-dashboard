@@ -5,6 +5,6 @@
     "port": "5432",
     "user": "postgres",
 	"login": "https://apitest.sidra.org/ram/login",
-	"validate": "https://apvalidate",
+	"validate": "https://apitest.sidra.org/ram/validate",
 	"client": "ngc-test-client"	
 }

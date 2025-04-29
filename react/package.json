@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "schema": "node schema.js",
-    "dev": "npm run schema && vite",
+    "dev": "vite",
     "build": "npm run schema && vite build",
     "preview": "vite preview"
   },
