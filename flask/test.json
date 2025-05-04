@@ -1,0 +1,225 @@
+
+[
+	{
+		"sdrNo": "SDR100002",
+		"startDate": "2017-04-03",
+		"endDate": "2024-12-31",
+		"shortTitle": "The 1000 Qataromics Study : Validating a"
+	},
+	{
+		"sdrNo": "SDR100011",
+		"startDate": "2016-11-03",
+		"endDate": "2023-12-31",
+		"shortTitle": "A high resolution map of structural vari"
+	},
+	{
+		"sdrNo": "SDR100012",
+		"startDate": "2018-10-15",
+		"endDate": "2024-01-28",
+		"shortTitle": "The BARAKA -Qatar Study: Building A nati"
+	},
+	{
+		"sdrNo": "SDR100031",
+		"startDate": "2019-11-18",
+		"endDate": "2023-11-20",
+		"shortTitle": "Precision diagnosis of neuro-development"
+	},
+	{
+		"sdrNo": "SDR100034",
+		"startDate": "2019-06-02",
+		"endDate": "2023-12-31",
+		"shortTitle": "The PMED-Qatar Study: Personalized Molec"
+	},
+	{
+		"sdrNo": "SDR100039",
+		"startDate": "2020-08-15",
+		"endDate": "2024-04-01",
+		"shortTitle": "From molecular etiology to improved repr"
+	},
+	{
+		"sdrNo": "SDR100043",
+		"startDate": "2020-04-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "The QGPRS Study; Qatar Genome Polygenic"
+	},
+	{
+		"sdrNo": "SDR100047",
+		"startDate": "2019-01-01",
+		"endDate": "2021-12-31",
+		"shortTitle": "Chronic kidney disease in Qatar: A holis"
+	},
+	{
+		"sdrNo": "SDR100062",
+		"startDate": "2021-09-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Functional validation of DCAF15 genetic "
+	},
+	{
+		"sdrNo": "SDR200016",
+		"startDate": "2017-07-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "The precision DR study : performing RNA"
+	},
+	{
+		"sdrNo": "SDR200020",
+		"startDate": "2017-07-01",
+		"endDate": "2019-12-31",
+		"shortTitle": "The BRIDGE-WGS Study: Building Robust En"
+	},
+	{
+		"sdrNo": "SDR200031",
+		"startDate": "2017-07-01",
+		"endDate": "2022-12-31",
+		"shortTitle": "Understanding the molecular mechanisms o"
+	},
+	{
+		"sdrNo": "SDR200038",
+		"startDate": "2018-04-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "ESTABLISHMENT OF BIOBANK, REGISTRY AND G"
+	},
+	{
+		"sdrNo": "SDR200048",
+		"startDate": "2018-04-01",
+		"endDate": "2022-12-31",
+		"shortTitle": "NEUROGENOMICS MODEL FOR CHILDREN AFFECTE"
+	},
+	{
+		"sdrNo": "SDR200049",
+		"startDate": "2022-04-01",
+		"endDate": "2024-12-31",
+		"shortTitle": "Unravelling genetics of childhood epilep"
+	},
+	{
+		"sdrNo": "SDR200053",
+		"startDate": "2019-09-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Early Prediction of Outcome in neonatal"
+	},
+	{
+		"sdrNo": "SDR200054",
+		"startDate": "2019-09-01",
+		"endDate": "2022-03-15",
+		"shortTitle": "Personalized Genomic lnvestigation of Id"
+	},
+	{
+		"sdrNo": "SDR200059",
+		"startDate": "2019-09-01",
+		"endDate": "2024-12-31",
+		"shortTitle": "The molecular genetics and functional ge"
+	},
+	{
+		"sdrNo": "SDR200078",
+		"startDate": "2022-05-06",
+		"endDate": "2024-05-06",
+		"shortTitle": "ASPIRE COHORT OF NEWBORNS "
+	},
+	{
+		"sdrNo": "SDR200080",
+		"startDate": "2022-04-01",
+		"endDate": "2024-12-31",
+		"shortTitle": "Elucidating new genes involved in progre"
+	},
+	{
+		"sdrNo": "SDR400034",
+		"startDate": "2018-01-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Genetic Study of Mendelian Diseases in T"
+	},
+	{
+		"sdrNo": "SDR400035",
+		"startDate": "2018-01-01",
+		"endDate": "2019-12-31",
+		"shortTitle": "Genetics of Mendelian Diseases in Qatar"
+	},
+	{
+		"sdrNo": "SDR400036",
+		"startDate": "2018-01-01",
+		"endDate": "2020-12-31",
+		"shortTitle": "RNA sequencing and methylation data form"
+	},
+	{
+		"sdrNo": "SDR400038",
+		"startDate": "2018-01-01",
+		"endDate": "2024-12-31",
+		"shortTitle": "The genetic basis of congenital hypogona"
+	},
+	{
+		"sdrNo": "SDR400039",
+		"startDate": "2018-01-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Mitochondrial DNA and non-autosomal chro"
+	},
+	{
+		"sdrNo": "SDR400098",
+		"startDate": "2018-01-01",
+		"endDate": "2019-06-30",
+		"shortTitle": "The Role of Cardiac Myosin Binding Prote"
+	},
+	{
+		"sdrNo": "SDR400099",
+		"startDate": "2018-01-01",
+		"endDate": "2019-06-30",
+		"shortTitle": "Population genetics analysis of 1,000 Qa"
+	},
+	{
+		"sdrNo": "SDR400100",
+		"startDate": "2018-01-01",
+		"endDate": "2022-12-31",
+		"shortTitle": "The burden of Mendelian Diseases in the"
+	},
+	{
+		"sdrNo": "SDR400101",
+		"startDate": "2018-01-01",
+		"endDate": "",
+		"shortTitle": "Genetics of Mendelian diseases in Qatar"
+	},
+	{
+		"sdrNo": "SDR400136",
+		"startDate": "2019-12-31",
+		"endDate": "2022-12-31",
+		"shortTitle": "Multi-Omic and Genomics characterization"
+	},
+	{
+		"sdrNo": "SDR400149",
+		"startDate": "2020-01-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Novel Type of Immune Cell autoimmune dis"
+	},
+	{
+		"sdrNo": "SDR400152",
+		"startDate": "2020-02-01",
+		"endDate": "2025-12-31",
+		"shortTitle": "Fine mapping of population structure and"
+	},
+	{
+		"sdrNo": "SDR400171",
+		"startDate": "2021-05-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "ExCode: Whole Exome sequencing for the c"
+	},
+	{
+		"sdrNo": "SDR400175",
+		"startDate": "2021-01-10",
+		"endDate": "2025-12-31",
+		"shortTitle": "IVORY: Investigating molecular pathways "
+	},
+	{
+		"sdrNo": "SDR400181",
+		"startDate": "2022-03-31",
+		"endDate": "2024-03-31",
+		"shortTitle": "Development and validation of machine le"
+	},
+	{
+		"sdrNo": "SDR400186",
+		"startDate": "2022-08-01",
+		"endDate": "2023-12-31",
+		"shortTitle": "Development and Validation of MENA Type "
+	},
+	{
+		"sdrNo": "SDRLSB002",
+		"startDate": "2024-04-30",
+		"endDate": "2026-04-29",
+		"shortTitle": "The Sidra GRAPH Protocol"
+	}
+]

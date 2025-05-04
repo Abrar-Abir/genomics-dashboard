@@ -1,9 +1,6 @@
 from library import connect_to_postgres, fetch, get_database_info, parse_date, jsonify
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 from datetime import datetime, date, timedelta
 import psycopg2
 import json
@@ -19,15 +16,6 @@ from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:mypassword@localhost/auth'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'supersecretkey'
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
-
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
 
 with open("active_config.json", 'r') as f:
 	info = json.load(f)
@@ -60,15 +48,22 @@ for col in grid_cols:
 		dtype_clause += f""" WHEN datatype IN ({str(grid_cols[col]["subtype"])[1:-1].replace('"', "'")}) THEN '{col}'"""
 dtype_clause += " ELSE datatype END"
 
+
+def _get_id(element):
+	try:
+		return columns_sorted.index(element)
+	except:
+		return -1
+
 def validate_token():
 	auth_header = request.headers.get('Authorization')
 	if not auth_header or not auth_header.startswith('Bearer '):
 		return None, 401, "Missing or invalid Authorization header"
 
 	headers = {
-        'X-API-Version': request.headers.get('X-API-Version', 'v1'),
-        'X-Protocol': request.headers.get('X-Protocol', '50'),
-        'X-Project': request.headers.get('X-Project', '416'),
+        'X-API-Version': 'v1',
+        'X-Protocol': '50',
+        'X-Project': '416',
         'Authorization': auth_header
     }
 	try:
@@ -89,11 +84,6 @@ def token_required(f):
             return jsonify({'error': error_message}), status_code
     return decorated
 
-def _get_id(element):
-	try:
-		return columns_sorted.index(element)
-	except:
-		return -1
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -102,7 +92,6 @@ def login():
 		response = requests.post(LOGIN_API, data={'username': data['username'], 'password': data['password'], 'clientId': CLIENT_ID}, verify = "sidra.crt")
 		return jsonify(response.json()), 200
 	except requests.exceptions.RequestException as e:
-		print(str(e))
 		return jsonify({'error': f'Login failed: {str(e)}'}), 500
 
 ######## table page #######################################
@@ -487,28 +476,28 @@ def _fetch_grid(args, include_hide=True):
 			) AS single_row_samples
 			GROUP BY pi, project, datatype"""
 				
-		if 'show' in grid_filter:
-			show_clause = f"""WHERE {grid_filter['show']}"""
-			if where_clause:
-				show_clause += f""" AND {where_clause[5:]}"""
-			single_query += f"""
-			UNION ALL
-			SELECT
-				sample_name,
-				pi,
-				ARRAY_AGG(project) AS project,
-				ARRAY_AGG({dtype_clause}) AS datatype,
-				1 AS count,
-				0 AS category
-			FROM
-				sample
-				LEFT JOIN submission ON sample.submission_id = submission.submission_id
-				LEFT JOIN project ON submission.project_id = project.project_id
-			{show_clause}
-			GROUP BY
-				sample_name, project.pi
-			HAVING
-				COUNT(DISTINCT sample.sample_id) = 1 {having_clause}"""
+	if 'show' in grid_filter and not grid_filter.get("hide"):
+		show_clause = f"""WHERE {grid_filter['show']}"""
+		if where_clause:
+			show_clause += f""" AND {where_clause[5:]}"""
+		single_query += f"""
+		UNION ALL
+		SELECT
+			sample_name,
+			pi,
+			ARRAY_AGG(project) AS project,
+			ARRAY_AGG({dtype_clause}) AS datatype,
+			1 AS count,
+			0 AS category
+		FROM
+			sample
+			LEFT JOIN submission ON sample.submission_id = submission.submission_id
+			LEFT JOIN project ON submission.project_id = project.project_id
+		{show_clause}
+		GROUP BY
+			sample_name, project.pi
+		HAVING
+			COUNT(DISTINCT sample.sample_id) = 1 {having_clause}"""
 
 	data_query = f"""
 		SELECT JSON_AGG(result)
@@ -975,5 +964,5 @@ if __name__ == '__main__':
 
 # {"username":"AAbir","permissions":[],"clientId":"ngc-test-client","first_name":"Abrar Tasneem","last_name":"Abir","email":"AAbir@sidra.org","expires_at":"2025-04-25T09:07:38.148+0000"}
 
-
+# curl 'https://apitest.sidra.org/ram/users/sdrs' --header 'Content-Type: application/json' --header 'Authorization: Bearer XXXX' --data-raw '{"email":"dchaussabel@sidra.org"}'
 
