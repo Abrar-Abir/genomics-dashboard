@@ -1,9 +1,0 @@
-2024-06-22 21:20:50  : Data storing for fcHFTVCDRX2
-2024-06-22 21:20:50  : Parsing '230411' for 'HFTVCDRX2'...
-2024-06-22 21:20:50  : Data stored for fcHFTVCDRX2
-2024-06-22 21:20:50  : Data storing for fcHNKCVDSX5
-2024-06-22 21:20:50  : Parsing '230413' for 'HNKCVDSX5'...
-2024-06-22 21:20:50  : Data stored for fcHNKCVDSX5
-2024-06-22 21:20:50  : Data storing for fcHNHMYDSX5
-2024-06-22 21:20:50  : Parsing '230411' for 'HNHMYDSX5'...
-2024-06-22 21:20:51  : Data stored for fcHNHMYDSX5
