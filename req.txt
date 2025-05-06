@@ -1,0 +1,5 @@
+flask
+datetime
+psycopg2
+flask_cors
+pygwalker

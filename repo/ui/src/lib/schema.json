@@ -1,0 +1,402 @@
+{
+  "headers": [
+    "Analysis",
+    "Comment",
+    "Completion Date",
+    "Coverage",
+    "Data Requirement",
+    "Data Sample Status",
+    "Datatype",
+    "Demultiplex Date",
+    "Flowcell ID",
+    "Flowcell Position",
+    "Flowcell Type",
+    "Fragment size (bp)",
+    "Index I5 ID",
+    "Index I5 Sequence",
+    "Index I7 ID",
+    "Index I7 Sequence",
+    "LIMS ID",
+    "LabChip/Bioanalyzer Conc. (nM)",
+    "Lane 1",
+    "Lane 2",
+    "Lane 3",
+    "Lane 4",
+    "Lane 5",
+    "Lane 6",
+    "Lane 7",
+    "Lane 8",
+    "Lanes",
+    "Lib QC P/F",
+    "Libraries & Info Received Date",
+    "Loaded By",
+    "Loading Conc.(nM)",
+    "Loading Date",
+    "Mean Q Score",
+    "MultiQC Ver.",
+    "Order No",
+    "PF Reads (B)",
+    "PI",
+    "Pooling ID",
+    "Pre-Norm Well",
+    "Process Date",
+    "Project ID",
+    "Q30 %",
+    "QPCR Conc. (nM) / iseq output",
+    "Ref. Genome",
+    "Release Date",
+    "Remark",
+    "Run ID",
+    "SDR No.",
+    "Sample Name",
+    "Sample QC (P/F)",
+    "Sequencer ID",
+    "Service",
+    "Stage Date",
+    "Staging Error",
+    "Submission Date",
+    "Submission ID",
+    "Urgency",
+    "Well",
+    "Yield Q30 (Gb)"
+  ],
+  "binaryStr": "10111111111110101100000000111111111111100111001111110011111",
+  "properties": {
+    "Project ID": {
+      "source": "raw.info -> prefix of 'project name' column -> {PI}_{SDR No.}",
+      "order": 3,
+      "filter": 3
+    },
+    "SDR No.": {
+      "source": "raw.info -> infix of 'project name' column",
+      "order": 4,
+      "filter": 4
+    },
+    "PI": {
+      "source": "raw.info -> prefix of 'project name' column",
+      "order": 3,
+      "filter": 3
+    },
+    "Index I5 ID": {
+      "source": "raw.info -> 'INDEX_I5_ID' column",
+      "order": 107,
+      "filter": 7
+    },
+    "Index I5 Sequence": {
+      "source": "raw.info -> 'INDEX_I5_sequencing' column",
+      "order": 108,
+      "filter": 8
+    },
+    "Index I7 ID": {
+      "source": "raw.info -> 'INDEX_I7_ID' column",
+      "order": 109,
+      "filter": 9
+    },
+    "Index I7 Sequence": {
+      "source": "raw.info -> 'INDEX_I7_sequencing' column",
+      "order": 110,
+      "filter": 10
+    },
+    "Sequencer ID": {
+      "source": "runs directory -> 2nd substring separated by '_'",
+      "order": 121,
+      "filter": 21
+    },
+    "Submission ID": {
+      "source": "raw.info -> 'project name' column",
+      "order": 5,
+      "filter": 5
+    },
+    "Submission Date": {
+      "source": "raw.info -> infix of 'project name' column",
+      "order": 7,
+      "filter": 7
+    },
+    "Datatype": {
+      "source": "raw.info -> infix of 'project name' column",
+      "order": 8,
+      "filter": 8
+    },
+    "Data Requirement": {
+      "source": "raw.info -> 'Data Requirement' column",
+      "order": 13,
+      "filter": 13
+    },
+    "Coverage": {
+      "source": "raw.info -> 'Comments' column -> COV value",
+      "order": 12,
+      "filter": 12
+    },
+    "Service": {
+      "source": "raw.info -> 'Comments' column -> SRV value",
+      "order": 9,
+      "filter": 9
+    },
+    "Analysis": {
+      "source": "raw.info -> 'Comments' column -> ANL value",
+      "order": 13,
+      "filter": 13
+    },
+    "Ref. Genome": {
+      "source": "raw.info -> 'Comments' column -> RG value",
+      "order": 11,
+      "filter": 11
+    },
+    "Comment": {
+      "source": "raw.info -> 'Comments' column",
+      "order": 10,
+      "filter": 10
+    },
+    "Flowcell ID": {
+      "source": "fcqc directory -> html file path",
+      "order": 6,
+      "filter": 6
+    },
+    "Flowcell Type": {
+      "source": "raw.info -> 'FC Type' column",
+      "order": 111,
+      "filter": 11
+    },
+    "Loaded By": {
+      "source": "raw.info -> 'Loaded By' column",
+      "order": 129,
+      "filter": 29
+    },
+    "Loading Date": {
+      "source": "runs directory -> 1st substring separated by '_' -> parsed as yymmdd",
+      "order": 127,
+      "filter": 27
+    },
+    "Completion Date": {
+      "source": "raw.info -> 'Completion Date' column",
+      "order": 128,
+      "filter": 28
+    },
+    "Demultiplex Date": {
+      "source": "flowcell multiqc.json -> value of 'config_creation_date'",
+      "order": 200,
+      "filter": 0
+    },
+    "Process Date": {
+      "source": "the date when the data was processed",
+      "order": 210,
+      "filter": 10
+    },
+    "Order No": {
+      "source": "raw.info -> 'Order No' column",
+      "order": 123,
+      "filter": 23
+    },
+    "Flowcell Position": {
+      "source": "runs directory -> 1st char of last substring separated by '_'",
+      "order": 122,
+      "filter": 22
+    },
+    "Run ID": {
+      "source": "runs directory -> 3rd substring separated by '_'",
+      "order": 124,
+      "filter": 24
+    },
+    "MultiQC Ver.": {
+      "source": "flowcell multiqc.json -> value of 'config_version'",
+      "order": 209,
+      "filter": 9
+    },
+    "Pooling ID": {
+      "source": "raw.info -> 'Pooling ID' column",
+      "order": 100,
+      "filter": 0
+    },
+    "PF Reads (B)": {
+      "source": "raw.info -> 'PF Reads' / 'Reads PF(B)' column",
+      "order": 126,
+      "filter": 26
+    },
+    "Loading Conc.(nM)": {
+      "source": "raw.info -> 'LabChip/Bioanalyzer Conc. (nM)' / 'LabChip/Bioanalyzer Conc. (pM)' column",
+      "order": 125,
+      "filter": 25
+    },
+    "Q30 %": {
+      "source": "raw.info -> 'Q30' column",
+      "order": 206,
+      "filter": 6
+    },
+    "Lane 1": {
+      "source": "raw.info -> 'Lane' column -> True if value = L1",
+      "order": 113,
+      "filter": 13
+    },
+    "Lane 2": {
+      "source": "raw.info -> 'Lane' column -> True if value = L2",
+      "order": 114,
+      "filter": 14
+    },
+    "Lane 3": {
+      "source": "raw.info -> 'Lane' column -> True if value = L3",
+      "order": 115,
+      "filter": 15
+    },
+    "Lane 4": {
+      "source": "raw.info -> 'Lane' column -> True if value = L4",
+      "order": 116,
+      "filter": 16
+    },
+    "Lane 5": {
+      "source": "raw.info -> 'Lane' column -> True if value = L5",
+      "order": 117,
+      "filter": 17
+    },
+    "Lane 6": {
+      "source": "raw.info -> 'Lane' column -> True if value = L6",
+      "order": 118,
+      "filter": 18
+    },
+    "Lane 7": {
+      "source": "raw.info -> 'Lane' column -> True if value = L7",
+      "order": 119,
+      "filter": 19
+    },
+    "Lane 8": {
+      "source": "raw.info -> 'Lane' column -> True if value = L8",
+      "order": 120,
+      "filter": 20
+    },
+    "Lanes": {
+      "source": "raw.info -> 'Lane' column -> Concatenated for each Sample ID",
+      "order": 112,
+      "filter": 12
+    },
+    "LIMS ID": {
+      "source": "raw.info -> 'Sample Name' column",
+      "order": 0,
+      "filter": 0
+    },
+    "Sample Name": {
+      "source": "raw.info -> 'Original Sample Name' column",
+      "order": 1,
+      "filter": 1
+    },
+    "QPCR Conc. (nM) / iseq output": {
+      "source": "raw.info -> 'QPCR Conc. (nM) / iseq output' column",
+      "order": 104,
+      "filter": 4
+    },
+    "Fragment size (bp)": {
+      "source": "raw.info -> 'Fragment size (bp)' column",
+      "order": 105,
+      "filter": 5
+    },
+    "LabChip/Bioanalyzer Conc. (nM)": {
+      "source": "raw.info -> 'LabChip/Bioanalyzer Conc. (nM)' column",
+      "order": 106,
+      "filter": 6
+    },
+    "Well": {
+      "source": "raw.info -> 'Well' column",
+      "order": 103,
+      "filter": 3
+    },
+    "Pre-Norm Well": {
+      "source": "raw.info -> 'Pre-Norm Well' column",
+      "order": 102,
+      "filter": 2
+    },
+    "Data Sample Status": {
+      "source": "raw.info -> 'Data Sample Status' column",
+      "order": 14,
+      "filter": 14
+    },
+    "Urgency": {
+      "source": "raw.info -> 'Urgency' column",
+      "order": 15,
+      "filter": 15
+    },
+    "Remark": {
+      "source": "raw.info -> 'Remark' column",
+      "order": 130,
+      "filter": 30
+    },
+    "Libraries & Info Received Date": {
+      "source": "raw.info -> 'Libraries & Info Received Date' / 'Libraries & Info Received & Due Date' column",
+      "order": 131,
+      "filter": 31
+    },
+    "Sample QC (P/F)": {
+      "source": "raw.info -> 'Sample QC (P/F)' column",
+      "order": 204,
+      "filter": 4
+    },
+    "Lib QC P/F": {
+      "source": "raw.info -> 'Lib QC (P/F)' column",
+      "order": 205,
+      "filter": 5
+    },
+    "Stage Date": {
+      "source": "",
+      "order": 201,
+      "filter": 1
+    },
+    "Staging Error": {
+      "source": "",
+      "order": 202,
+      "filter": 2
+    },
+    "Mean Q Score": {
+      "source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'mean_qscore'/'mean quality' -> devide by 2*number of lanes",
+      "order": 207,
+      "filter": 7
+    },
+    "Yield Q30 (Gb)": {
+      "source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'yield'/'yieldQ30' -> devide by 10^9",
+      "order": 208,
+      "filter": 8
+    },
+    "Release Date": {
+      "source": "date when the data was released",
+      "order": 210,
+      "filter": 10
+    }
+  },
+  "grid": {
+    "WGS": {
+      "order": 0,
+      "subtype": [
+        "WGS30N",
+        "WGS90N"
+      ]
+    },
+    "DNAPREP-30N": {
+      "order": 1
+    },
+    "WES200": {
+      "order": 2
+    },
+    "LEX8": {
+      "order": 3
+    },
+    "mRNA": {
+      "order": 4,
+      "subtype": [
+        "mRNA-20",
+        "mRNA-40",
+        "mRNA-50"
+      ]
+    },
+    "totRNA-50": {
+      "order": 5
+    },
+    "totRNAGlob-50": {
+      "order": 6
+    },
+    "10XscRNA": {
+      "order": 7
+    },
+    "NXTRA": {
+      "order": 8
+    },
+    "sRNA8M": {
+      "order": 9
+    }
+  }
+}

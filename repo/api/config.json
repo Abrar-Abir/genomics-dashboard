@@ -1,0 +1,5 @@
+{
+	"login": "https://apitest.sidra.org/ram/login",
+	"validate": "https://apitest.sidra.org/ram/validate",
+	"client": "ngc-test-client"	
+}

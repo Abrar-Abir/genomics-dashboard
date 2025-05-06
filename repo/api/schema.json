@@ -1,0 +1,661 @@
+{
+	"table": {
+		"project": {
+			"entity": {
+				"project_id": {
+					"type": "VARCHAR(32) NOT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Project ID",
+					"group": 0,
+					"source": "raw.info -> prefix of 'project name' column -> {PI}_{SDR No.}",
+					"order": 3
+				},
+				"project": {
+					"type": "VARCHAR(32) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "SDR No.",
+					"group": 0,
+					"source": "raw.info -> infix of 'project name' column",
+					"order": 4
+				},
+				"pi": {
+					"type": "VARCHAR(08) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "PI",
+					"group": 0,
+					"source": "raw.info -> prefix of 'project name' column",
+					"order": 3
+				}
+			},
+			"primary_key": [
+				"project_id"
+			],
+			"foriegn_key": null,
+			"check": null
+		},
+		"i5": {
+			"entity": {
+				"i5_id": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Index I5 ID",
+					"group": 1,
+					"source": "raw.info -> 'INDEX_I5_ID' column",
+					"order": 7
+				},
+				"i5_sequence": {
+					"type": "VARCHAR(40) NOT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Index I5 Sequence",
+					"group": 1,
+					"source": "raw.info -> 'INDEX_I5_sequencing' column",
+					"order": 8
+				}
+			},
+			"primary_key": [
+				"i5_id"
+			],
+			"foriegn_key": null,
+			"check": null
+		},
+		"i7": {
+			"entity": {
+				"i7_id": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Index I7 ID",
+					"group": 1,
+					"source": "raw.info -> 'INDEX_I7_ID' column",
+					"order": 9
+				},
+				"i7_sequence": {
+					"type": "VARCHAR(40) NOT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Index I7 Sequence",
+					"group": 1,
+					"source": "raw.info -> 'INDEX_I7_sequencing' column",
+					"order": 10
+				}
+			},
+			"primary_key": [
+				"i7_id"
+			],
+			"foriegn_key": null,
+			"check": null
+		},
+		"sequencer": {
+			"entity": {
+				"sequencer_id": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Sequencer ID",
+					"group": 1,
+					"source": "runs directory -> 2nd substring separated by '_'",
+					"order": 21
+				}
+			},
+			"primary_key": [
+				"sequencer_id"
+			],
+			"foriegn_key": null,
+			"check": null
+		},
+		"submission": {
+			"entity": {
+				"submission_id": {
+					"type": "VARCHAR(64) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Submission ID",
+					"group": 0,
+					"source": "raw.info -> 'project name' column",
+					"order": 5
+				},
+				"submission_date": {
+					"type": "DATE NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Submission Date",
+					"group": 0,
+					"source": "raw.info -> infix of 'project name' column",
+					"order": 7
+				},
+				"datatype": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Datatype",
+					"group": 0,
+					"source": "raw.info -> infix of 'project name' column",
+					"order": 8
+				},
+				"requirement": {
+					"type": "VARCHAR(32) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Data Requirement",
+					"group": 0,
+					"source": "raw.info -> 'Data Requirement' column",
+					"order": 13
+				},
+				"cov": {
+					"type": "VARCHAR(16) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Coverage",
+					"group": 0,
+					"source": "raw.info -> 'Comments' column -> COV value",
+					"order": 12
+				},
+				"srv": {
+					"type": "VARCHAR(16) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Service",
+					"group": 0,
+					"source": "raw.info -> 'Comments' column -> SRV value",
+					"order": 9
+				},
+				"anl": {
+					"type": "VARCHAR(16) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Analysis",
+					"group": 0,
+					"source": "raw.info -> 'Comments' column -> ANL value",
+					"order": 13
+				},
+				"rg": {
+					"type": "VARCHAR(16) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Ref. Genome",
+					"group": 0,
+					"source": "raw.info -> 'Comments' column -> RG value",
+					"order": 11
+				},
+				"comment": {
+					"type": "VARCHAR(100) DEFAULT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Comment",
+					"group": 0,
+					"source": "raw.info -> 'Comments' column",
+					"order": 10
+				}
+			},
+			"primary_key": [
+				"submission_id"
+			],
+			"foriegn_key": [
+				"project_id"
+			],
+			"check": null
+		},
+		"flowcell": {
+			"entity": {
+				"flowcell_id": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Flowcell ID",
+					"group": 0,
+					"source": "fcqc directory -> html file path",
+					"order": 6
+				},
+				"flowcell_type": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Flowcell Type",
+					"group": 1,
+					"source": "raw.info -> 'FC Type' column",
+					"order": 11
+				},
+				"loaded_by": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Loaded By",
+					"group": 1,
+					"source": "raw.info -> 'Loaded By' column",
+					"order": 29
+				},
+				"loading_date": {
+					"type": "DATE NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Loading Date",
+					"group": 1,
+					"source": "runs directory -> 1st substring separated by '_' -> parsed as yymmdd",
+					"order": 27
+				},
+				"completion_date": {
+					"type": "DATE NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Completion Date",
+					"group": 1,
+					"source": "raw.info -> 'Completion Date' column",
+					"order": 28
+				},
+				"demultiplex_date": {
+					"type": "DATE NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Demultiplex Date",
+					"group": 2,
+					"source": "flowcell multiqc.json -> value of 'config_creation_date'",
+					"order": 0
+				},
+				"process_date": {
+					"type": "DATE NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Process Date",
+					"group": 2,
+					"source": "the date when the data was processed",
+					"order": 10
+				},
+				"order_no": {
+					"type": "VARCHAR(32) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Order No",
+					"group": 1,
+					"source": "raw.info -> 'Order No' column",
+					"order": 23
+				},
+				"position": {
+					"type": "VARCHAR(08) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Flowcell Position",
+					"group": 1,
+					"source": "runs directory -> 1st char of last substring separated by '_'",
+					"order": 22
+				},
+				"run_id": {
+					"type": "VARCHAR(08) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Run ID",
+					"group": 1,
+					"source": "runs directory -> 3rd substring separated by '_'",
+					"order": 24
+				},
+				"multiqc_version": {
+					"type": "VARCHAR(04) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "MultiQC Ver.",
+					"group": 2,
+					"source": "flowcell multiqc.json -> value of 'config_version'",
+					"order": 9
+				}
+			},
+			"primary_key": [
+				"flowcell_id"
+			],
+			"foriegn_key": [
+				"sequencer_id"
+			],
+			"check": null
+		},
+		"pool": {
+			"entity": {
+				"pool_id": {
+					"type": "VARCHAR(40) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Pooling ID",
+					"group": 1,
+					"source": "raw.info -> 'Pooling ID' column",
+					"order": 0
+				},
+				"pf_reads": {
+					"type": "NUMERIC(7,2) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "PF Reads (B)",
+					"group": 1,
+					"source": "raw.info -> 'PF Reads' / 'Reads PF(B)' column",
+					"order": 26
+				},
+				"loading_conc": {
+					"type": "NUMERIC(7,2) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Loading Conc.(nM)",
+					"group": 1,
+					"source": "raw.info -> 'LabChip/Bioanalyzer Conc. (nM)' / 'LabChip/Bioanalyzer Conc. (pM)' column",
+					"order": 25
+				},
+				"q30": {
+					"type": "NUMERIC(5,2) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Q30 %",
+					"group": 2,
+					"source": "raw.info -> 'Q30' column",
+					"order": 6
+				},
+				"lane_1": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 1",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L1",
+					"order": 13
+				},
+				"lane_2": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 2",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L2",
+					"order": 14
+				},
+				"lane_3": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 3",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L3",
+					"order": 15
+				},
+				"lane_4": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 4",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L4",
+					"order": 16
+				},
+				"lane_5": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 5",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L5",
+					"order": 17
+				},
+				"lane_6": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 6",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L6",
+					"order": 18
+				},
+				"lane_7": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 7",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L7",
+					"order": 19
+				},
+				"lane_8": {
+					"type": "BOOLEAN NOT NULL",
+					"filter": true,
+					"view": false,
+					"alias": "Lane 8",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> True if value = L8",
+					"order": 20
+				},
+				"lane": {
+					"type": "VARCHAR(32) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Lanes",
+					"group": 1,
+					"source": "raw.info -> 'Lane' column -> Concatenated for each Sample ID",
+					"order": 12
+				}
+			},
+			"primary_key": [
+				"pool_id"
+			],
+			"foriegn_key": [
+				"flowcell_id"
+			],
+			"check": [
+				"(q30 >= 0) AND (q30 <= 100)"
+			]
+		},
+		"sample": {
+			"entity": {
+				"sample_id": {
+					"type": "VARCHAR(11) NOT NULL",
+					"filter": false,
+					"view": true,
+					"alias": "LIMS ID",
+					"group": 0,
+					"source": "raw.info -> 'Sample Name' column",
+					"order": 0
+				},
+				"sample_name": {
+					"type": "VARCHAR(64) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Sample Name",
+					"group": 0,
+					"source": "raw.info -> 'Original Sample Name' column",
+					"order": 1
+				},
+				"qpcr": {
+					"type": "NUMERIC(5,2) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "QPCR Conc. (nM) / iseq output",
+					"group": 1,
+					"source": "raw.info -> 'QPCR Conc. (nM) / iseq output' column",
+					"order": 4
+				},
+				"fragment": {
+					"type": "NUMERIC(3,0) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Fragment size (bp)",
+					"group": 1,
+					"source": "raw.info -> 'Fragment size (bp)' column",
+					"order": 5
+				},
+				"labchip_conc": {
+					"type": "NUMERIC(5,2) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "LabChip/Bioanalyzer Conc. (nM)",
+					"group": 1,
+					"source": "raw.info -> 'LabChip/Bioanalyzer Conc. (nM)' column",
+					"order": 6
+				},
+				"well": {
+					"type": "VARCHAR(32) NOT NULL",
+					"filter": false,
+					"view": true,
+					"alias": "Well",
+					"group": 1,
+					"source": "raw.info -> 'Well' column",
+					"order": 3
+				},
+				"pre_norm_well": {
+					"type": "VARCHAR(32) DEFAULT NULL",
+					"filter": false,
+					"view": true,
+					"alias": "Pre-Norm Well",
+					"group": 1,
+					"source": "raw.info -> 'Pre-Norm Well' column",
+					"order": 2
+				},
+				"status": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Data Sample Status",
+					"group": 0,
+					"source": "raw.info -> 'Data Sample Status' column",
+					"order": 14
+				},
+				"urgent": {
+					"type": "VARCHAR(16) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Urgency",
+					"group": 0,
+					"source": "raw.info -> 'Urgency' column",
+					"order": 15
+				},
+				"remark": {
+					"type": "TEXT DEFAULT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Remark",
+					"group": 1,
+					"source": "raw.info -> 'Remark' column",
+					"order": 30
+				},
+				"lib_received": {
+					"type": "VARCHAR(17) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Libraries & Info Received Date",
+					"group": 1,
+					"source": "raw.info -> 'Libraries & Info Received Date' / 'Libraries & Info Received & Due Date' column",
+					"order": 31
+				},
+				"sample_qc": {
+					"type": "VARCHAR(08) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Sample QC (P/F)",
+					"group": 2,
+					"source": "raw.info -> 'Sample QC (P/F)' column",
+					"order": 4
+				},
+				"lib_qc": {
+					"type": "VARCHAR(08) NOT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Lib QC P/F",
+					"group": 2,
+					"source": "raw.info -> 'Lib QC (P/F)' column",
+					"order": 5
+				},
+				"stage_date": {
+					"type": "DATE DEFAULT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Stage Date",
+					"group": 2,
+					"source": "",
+					"order": 1
+				},
+				"staging_error": {
+					"type": "VARCHAR(64)[] DEFAULT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Staging Error",
+					"group": 2,
+					"source": "",
+					"order": 2
+				},
+				"mean_qscore": {
+					"type": "NUMERIC(5,2) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Mean Q Score",
+					"group": 2,
+					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'mean_qscore'/'mean quality' -> devide by 2*number of lanes",
+					"order": 7
+				},
+				"yieldq30": {
+					"type": "NUMERIC(12,0) DEFAULT NULL",
+					"filter": true,
+					"view": true,
+					"alias": "Yield Q30 (Gb)",
+					"group": 2,
+					"source": "flowcell multiqc.json -> 'report_saved_raw_data' -> 'multiqc_bcl2fastq_bysample'/'multiqc_bclconvert_bysample' -> 'yield'/'yieldQ30' -> devide by 10^9",
+					"order": 8
+				},
+				"release_date": {
+					"type": "DATE DEFAULT NULL",
+					"filter": false,
+					"view": false,
+					"alias": "Release Date",
+					"group": 2,
+					"source": "date when the data was released",
+					"order": 10
+				}
+			},
+			"primary_key": [
+				"sample_id",
+				"flowcell_id"
+			],
+			"foriegn_key": [
+				"pool_id",
+				"flowcell_id",
+				"submission_id",
+				"i5_id",
+				"i7_id"
+			],
+			"check": [
+				"char_length(sample_id) >= 10"	
+			]
+		}
+	},
+	"grid": {
+		"WGS": {
+			"order": 0,
+			"subtype": [
+				"WGS30N",
+				"WGS90N"
+			]
+		},
+		"DNAPREP-30N": {
+			"order": 1
+		},
+		"WES200": {
+			"order": 2
+		},
+		"LEX8": {
+			"order": 3
+		},
+		"mRNA": {
+			"order": 4,
+			"subtype": ["mRNA-20", "mRNA-40", "mRNA-50"]
+		},
+		"totRNA-50": {
+			"order": 5
+		},
+		"totRNAGlob-50": {
+			"order": 6
+		},
+		"10XscRNA": {
+			"order": 7
+		},
+		"NXTRA": {
+			"order": 8
+		},
+		"sRNA8M": {
+			"order": 9
+		}
+	}
+}
