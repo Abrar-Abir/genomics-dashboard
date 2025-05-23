@@ -1,0 +1,145 @@
+{
+	"assemblies": [
+		{
+			"name": "hg19",
+			"aliases": [
+				"GRCh37"
+			],
+			"sequence": {
+				"type": "ReferenceSequenceTrack",
+				"trackId": "hg19_config",
+				"adapter": {
+					"type": "BgzipFastaAdapter",
+					"fastaLocation": {
+						"uri": "https://jbrowse.org/genomes/hg19/fasta/hg19.fa.gz",
+						"locationType": "UriLocation"
+					},
+					"faiLocation": {
+						"uri": "https://jbrowse.org/genomes/hg19/fasta/hg19.fa.gz.fai",
+						"locationType": "UriLocation"
+					},
+					"gziLocation": {
+						"uri": "https://jbrowse.org/genomes/hg19/fasta/hg19.fa.gz.gzi",
+						"locationType": "UriLocation"
+					}
+				}
+			},
+			"refNameAliases": {
+				"adapter": {
+					"type": "RefNameAliasAdapter",
+					"location": {
+						"uri": "https://s3.amazonaws.com/jbrowse.org/genomes/hg19/hg19_aliases.txt",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		}
+	],
+	"tracks": [
+		{
+			"type": "VariantTrack",
+			"trackId": "SNP",
+			"name": "SNP",
+			"assemblyNames": [
+				"hg19"
+			],
+			"adapter": {
+				"type": "VcfTabixAdapter",
+				"vcfGzLocation": {
+					"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_snp.vcf.gz",
+					"locationType": "UriLocation"
+				},
+				"index": {
+					"location": {
+						"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_snp.vcf.gz.tbi",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		},
+		{
+			"type": "VariantTrack",
+			"trackId": "STR",
+			"name": "STR",
+			"assemblyNames": [
+				"hg19"
+			],
+			"adapter": {
+				"type": "VcfTabixAdapter",
+				"vcfGzLocation": {
+					"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_str.vcf.gz",
+					"locationType": "UriLocation"
+				},
+				"index": {
+					"location": {
+						"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_str.vcf.gz.tbi",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		},
+		{
+			"type": "VariantTrack",
+			"trackId": "CNV",
+			"name": "CNV",
+			"assemblyNames": [
+				"hg19"
+			],
+			"adapter": {
+				"type": "VcfTabixAdapter",
+				"vcfGzLocation": {
+					"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_cnv.vcf.gz",
+					"locationType": "UriLocation"
+				},
+				"index": {
+					"location": {
+						"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_cnv.vcf.gz.tbi",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		},
+		{
+			"type": "VariantTrack",
+			"trackId": "SV",
+			"name": "SV",
+			"assemblyNames": [
+				"hg19"
+			],
+			"adapter": {
+				"type": "VcfTabixAdapter",
+				"vcfGzLocation": {
+					"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_sv.vcf.gz",
+					"locationType": "UriLocation"
+				},
+				"index": {
+					"location": {
+						"uri": "http://172.32.79.51:5001/file/0201382701.merged.wf_sv.vcf.gz.tbi",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		},
+		{
+			"trackId": "HAPLOTAGGED.BAM",
+			"name": "HAPLOTAGGED.BAM",
+			"assemblyNames": [
+				"hg19"
+			],
+			"type": "AlignmentsTrack",
+			"adapter": {
+				"type": "BamAdapter",
+				"bamLocation": {
+					"uri": "http://172.32.79.51:5001/file/0201382701.merged.haplotagged.bam",
+					"locationType": "UriLocation"
+				},
+				"index": {
+					"location": {
+						"uri": "http://172.32.79.51:5001/file/0201382701.merged.haplotagged.bam.bai",
+						"locationType": "UriLocation"
+					}
+				}
+			}
+		}
+	]
+}

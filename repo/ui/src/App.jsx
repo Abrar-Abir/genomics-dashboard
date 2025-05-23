@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Datatable from "./pages/Datatable";
 import Plot from "./pages/Plot";
 import Datagrid from "./pages/Datagrid";
+import JBrowse from "./pages/Jbrowse";
 import schema from "@lib/schema.json";
 import { getID } from "@components/utils.js";
 import { jwtDecode } from "jwt-decode";
@@ -86,7 +87,7 @@ export default function App() {
 	};
 
 	// Plot Page Props
-
+	const [query, setQuery] = useState("");
 	return (
 		<Router>
 			<Routes>
@@ -112,7 +113,13 @@ export default function App() {
 						path="datatable"
 						element={
 							<ProtectedRoute>
-								<Datatable state={tableState} setState={setTableState} reset={resetTable} />
+								<Datatable
+									state={tableState}
+									setState={setTableState}
+									reset={resetTable}
+									query={query}
+									setQuery={setQuery}
+								/>
 							</ProtectedRoute>
 						}
 					/>
@@ -124,7 +131,22 @@ export default function App() {
 							</ProtectedRoute>
 						}
 					/>
-					<Route path="plot" element={<Plot />} />
+					<Route
+						path="plot"
+						element={
+							<ProtectedRoute>
+								<Plot query={query} />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="jbrowse"
+						element={
+							<ProtectedRoute>
+								<JBrowse />
+							</ProtectedRoute>
+						}
+					/>
 				</Route>
 			</Routes>
 		</Router>

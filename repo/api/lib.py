@@ -5,11 +5,11 @@ from datetime import datetime
 from flask import Response
 
 def connect_db():
-	database = os.environ['DB_NAME']
-	host = os.environ['DB_HOST']
-	user = os.environ['DB_USER']
+	database = os.environ.get('DB_NAME', 'postgres')
+	host = os.environ.get('DB_HOST', '172.32.74.37')
+	user = os.environ.get('DB_USER', 'app_user_test')
 	password = os.environ['DB_PASSWORD']
-	port = os.environ['DB_PORT']
+	port = os.environ.get('DB_PORT', '5432')
 	conn = psycopg2.connect(database=database, host=host,
                             user=user, password=password, port=port)
 	conn.set_session(autocommit=True)

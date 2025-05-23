@@ -1,8 +1,7 @@
 import {format, startOfWeek, startOfMonth, startOfYear, parse } from "date-fns";
 
-export const BASE_URL = "http://localhost:5001";
-// const BASE_URL = "https://genomics-dashboard-flask.onrender.com";
-// const BASE_URL = "http://172.32.79.51:5001";
+// export const BASE_URL = "http://localhost:5000";
+export const BASE_URL = "http://172.32.79.51:5000";
 export const DATE_FORMAT = "yyyyMMdd";
 export const COLORS = [
 	"teal", // #14b8a6

@@ -59,6 +59,7 @@ export default function Header({ state, setState, reset }) {
 			</div>
 
 			<div className="flex items-center space-x-4 mr-6">
+				{/* <FileExplorer /> */}
 				<MenuWithCheckbox cols={state.cols} setCols={(cols) => setState("cols", cols)} />
 				<Menu>
 					<MenuHandler>

@@ -4,10 +4,10 @@ import Table from "@components/datatable/Table";
 import Header from "@components/datatable/Header";
 import { secureFetch } from "@lib/authService.js";
 
-export default function Datatable({ state, setState, reset }) {
+export default function Datatable({ state, setState, reset, query, setQuery }) {
 	const [data, setData] = useState({});
 	const [analytics, setAnalytics] = useState([]);
-	const [query, setQuery] = useState("");
+	// const [query, setQuery] = useState("");
 
 	const setStateKey = (key) => (valOrUpdater) => {
 		setState((prevState) => ({
@@ -40,7 +40,7 @@ export default function Datatable({ state, setState, reset }) {
 			});
 		}
 
-		const queryStr = `&${params.toString()}`;
+		const queryStr = params.toString();
 
 		if (queryStr !== query) {
 			setQuery(queryStr);
@@ -55,7 +55,7 @@ export default function Datatable({ state, setState, reset }) {
 					limit: state.limit,
 					sort: JSON.stringify(state.sort),
 				});
-				const response = await secureFetch(`table?${params.toString()}${query}`);
+				const response = await secureFetch(`table?${params.toString()}&${query}`);
 				setData(response);
 			} catch (error) {
 				console.error("Error fetching table data:", error);
@@ -69,7 +69,7 @@ export default function Datatable({ state, setState, reset }) {
 	useEffect(() => {
 		async function fetchAnalytics() {
 			try {
-				const response = await secureFetch(`analytics/table?${query.slice(1)}`);
+				const response = await secureFetch(`analytics/table?${query}`);
 				setAnalytics(response);
 
 				for (let key in response) {

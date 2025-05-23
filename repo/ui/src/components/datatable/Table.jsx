@@ -51,24 +51,29 @@ const HtmlIcon = ({ col, id }) => (
 	></img>
 );
 
-const JbrowseIcon = ({ sampleId }) => {
+const JbrowseIcon = ({ projectId, submissionId, flowcellId, sampleId }) => {
 	const handleClick = async () => {
-		window.open("http://172.32.79.51:8080/?config=0201382681.json", "_blank");
-		// try {
-		// 	const response = await fetch(`${BASE_URL}/jbrowse/${sampleId}`);
+		// window.open("http://172.32.79.51:5001/?config=test.json", "_blank");
+		try {
+			const dir = `gpfs/projects/ngs_projects/${projectId}/${submissionId}/data/${sampleId}/${flowcellId}.${sampleId}/`;
+			// const response = await fetch(`${BASE_URL}/consfig/${dir}`);
 
-		// 	if (response.ok) {
-		// 		const response = await response.json();
-		// 		const url = response.url;
-		// 		window.open(url, "_blank");
-		// 	} else {
-		// 		console.error("Error fetching custom URL:", response.statusText);
-		// 	}
-		// } catch (error) {
-		// 	console.error("Error occurred:", error);
-		// } finally {
-		// 	setLoading(false);
-		// }
+			// if (response.ok) {
+			// 	const response = await response.json();
+			// 	const url = response.url;
+			// 	window.open(url, "_blank");
+			// } else {
+			// 	console.error("Error fetching custom URL:", response.statusText);
+			// }
+			window.open(
+				`http://172.32.79.51:5001/?config=http://172.32.79.51:5000/config/${dir}`,
+				"_blank"
+			);
+		} catch (error) {
+			console.error("Error occurred:", error);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -208,7 +213,12 @@ export default function Table({ state, setState, data, minimal }) {
 																<div className="flex space-x-2 h-max">
 																	{" "}
 																	<JsonIcon sampleId={row[columnID]} />
-																	<JbrowseIcon sampleId={row[columnID]} />
+																	<JbrowseIcon
+																		projectId={row[getID(headers, "SDR No.")]}
+																		submissionId={row[getID(headers, "Submission ID")]}
+																		flowcellId={row[getID(headers, "Flowcell ID")]}
+																		sampleId={row[columnID]}
+																	/>
 																</div>
 															</div>
 														) : (

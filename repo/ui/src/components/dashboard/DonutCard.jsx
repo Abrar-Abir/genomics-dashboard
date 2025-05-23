@@ -7,11 +7,6 @@ import { RiDonutChartFill } from "react-icons/ri";
 import { COLORS } from "@components/utils.js";
 import Legend from "./Legend";
 
-const valueFormatter = (number) => {
-	const percentage = ((number / totalUnits) * 100).toFixed(2);
-	return `${percentage}% | ${number}`;
-};
-
 export default function DonutCard({ info, data }) {
 	const [donut, setDonut] = useState(true);
 	const legends = data?.map((item) => item.type);
@@ -24,6 +19,10 @@ export default function DonutCard({ info, data }) {
 
 	const filteredData = data.filter((item) => active.includes(item.type));
 	const totalUnits = filteredData?.reduce((total, item) => total + item.quantity, 0);
+	const valueFormatter = (number) => {
+		const percentage = ((number / totalUnits) * 100).toFixed(2);
+		return `${percentage}% | ${number}`;
+	};
 
 	return (
 		<Card decoration="top" decorationColor="teal" className="flex flex-col space-y-2 h-full">

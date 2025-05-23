@@ -1,14 +1,14 @@
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import {
 	PresentationChartBarIcon,
-	UserCircleIcon,
-	Cog6ToothIcon,
+	// UserCircleIcon,
+	// Cog6ToothIcon,
 	InboxIcon,
 	PowerIcon,
 	TableCellsIcon,
 	ViewColumnsIcon,
 } from "@heroicons/react/24/solid";
-
+import JbrowseLogo from "@assets/jbrowseIcon.png";
 const iconSize = "h-6 w-6";
 
 export const DASHBOARD_SIDEBAR_LINKS = [
@@ -35,6 +35,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		label: "Plot",
 		path: "/plot",
 		icon: <ChartBarIcon className={iconSize} />,
+	},
+	{
+		key: "jbrowse",
+		label: "Jbrowse",
+		path: "/jbrowse",
+		icon: <img src={JbrowseLogo} className={iconSize} />,
 	},
 ];
 

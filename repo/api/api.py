@@ -12,6 +12,8 @@ import numpy as np
 from collections import defaultdict, Counter
 import requests
 from functools import wraps
+import os
+from flask import Response
 
 app = Flask(__name__)
 CORS(app)
@@ -22,7 +24,7 @@ with open("config.json", 'r') as f:
 LOGIN_API, VALIDATION_API, CLIENT_ID = info["login"], info["validate"], info["client"]
 
 cursor = connect_db()
-
+# cursor.execute("SET search_path TO sapipe_core_dev;")
 
 with open("schema.json", "r") as f:
 	schema = json.load(f)
@@ -84,7 +86,7 @@ def token_required(f):
 def login():
 	data = request.get_json()
 	try:
-		if data['username'] not in ('aabir@smrc.sidra.org', 'asalhab@smrc.sdira.org', 'mumohamed-extern@smrc.sidra.org'):
+		if data['username'] not in ('aabir@smrc.sidra.org', 'asalhab@smrc.sidra.org', 'mumohamed-extern@smrc.sidra.org'):
 			assert False
 		response = requests.post(LOGIN_API, data={'username': data['username'], 'password': data['password'], 'clientId': CLIENT_ID}, verify = "sidra.crt")
 		return jsonify(response.json()), 200
@@ -139,14 +141,12 @@ def _where_clause(filter_dict, filter_key=None):
 
 
 def _fetch_table(is_table, args):
-	print(list(args.items()))
 	params = {k: json.loads(v) if v.startswith('[') or v.startswith('{') else v
               for k, v in args.items()}
 	cols_to_sort = [int(id) for id in params.get('sort', [])]
 	order_clause = _order_clause(cols_to_sort)
 	table_filter = _table_filter(params)
 	where_clause = _where_clause(table_filter)
-	print(where_clause)
 	if is_table:
 		count_query = f"""
             SELECT COUNT(*)
@@ -422,7 +422,6 @@ def analytics_grid():
 		LEFT JOIN project ON submission.project_id = project.project_id
 		{_where_clause({k : grid_filter[k] for k in grid_filter if k.startswith('project')})}
 		GROUP BY sample_name, pi """ + (grid_filter["hide"])*"""HAVING COUNT(DISTINCT sample.sample_id) > 1 """ + f""") AS SUBRESULT GROUP BY datatype ORDER BY total DESC;"""
-	# print(dtype_query)
 	analytics_data['submission'][str(_get_id('submission.datatype'))] = _analytics('', dict(), dtype_query, "all")
 	return jsonify(analytics_data)
 
@@ -897,42 +896,214 @@ def refgenome_donut(date, no_qgp):
 	results = fetch_result[0][0]
 	return jsonify(results)
 
-
 @ app.route('/plot')
+@ app.route('/plot/')
 @token_required
 def plot():
-	query = request.get_json()
-	table_filter = _table_filter(query)
-	where_clause = _where_clause(table_filter)
-	data_query = f"""
-		SELECT JSON_AGG(result)
-		FROM (
-			SELECT {alias_clause}
-			FROM sample
-			LEFT JOIN pool ON sample.pool_id = pool.pool_id
-			LEFT JOIN flowcell ON sample.flowcell_id = flowcell.flowcell_id
-			LEFT JOIN submission ON sample.submission_id = submission.submission_id
-			LEFT JOIN project ON submission.project_id = project.project_id
-			LEFT JOIN i5 ON sample.i5_id = i5.i5_id
-			LEFT JOIN i7 ON sample.i7_id = i7.i7_id
-			LEFT JOIN sequencer ON flowcell.sequencer_id = sequencer.sequencer_id
-			{where_clause}
-		) result;
-	"""
-	fetch_result = fetch(cursor, data_query, 'all')
-	if fetch_result == None or len(fetch_result) == 0 or fetch_result[0] == None or len(fetch_result[0]) == 0:
-		results = None
+	results, _ = _fetch_table(False, request.args)
+	if results == None:
+		print("no result")
+		return jsonify({'html': None})
 	else:
-		results = fetch_result[0][0]
+		print("yay")
 		df = pd.DataFrame(results)
 		walker = pyg.walk(df, return_html=True).to_html()
+		print("walked")
 		return jsonify({'html': walker})
+
+
+
+@app.route('/file/<path:filename>')
+def serve_file(filename):
+	def get_chunk(filename, start, end):
+		with open(filename, 'rb') as f:
+			f.seek(start)
+			return f.read(end - start + 1)
+
+	base_path = '/'
+	full_path = os.path.join(base_path, filename)
+	if not os.path.exists(full_path):
+		return 'File not found', 404
+    
+	file_size = os.path.getsize(full_path)
+	range_header = request.headers.get('Range', None)
+    
+	headers = {
+        'Accept-Ranges': 'bytes',
+        'Content-Length': str(file_size),
+        'Access-Control-Expose-Headers': 'Content-Length, Content-Range, Accept-Ranges'
+    }
+    
+	if range_header:
+		byte_range = range_header.replace('bytes=', '').split('-')
+		start = int(byte_range[0])
+		end = min(int(byte_range[1]), file_size-1) if byte_range[1] else file_size - 1
+		if start >= file_size or end >= file_size:
+			return 'Requested range not satisfiable', 416
+        
+		chunk = get_chunk(full_path, start, end)
+		headers['Content-Range'] = f'bytes {start}-{end}/{file_size}'
+		response = Response(
+            chunk,
+            206,
+            headers=headers,
+            mimetype='application/octet-stream',
+            direct_passthrough=True
+        )
+		return response
+    
+	return send_file(
+	    full_path,
+        mimetype='application/octet-stream',
+        download_name=os.path.basename(filename),
+        as_attachment=False,
+        etag=True
+    ), headers
+
+@app.route("/config/<path>")
+def jbrowse_config(path):
+	if not os.path.exists(path):
+		abort(404, description="path not found")
+
+	assembly_names = set()
+	ref_assembly = []
+	tracks = []
+
+	for root, dirs, files in os.walk(base_path):
+		parts = root.split(os.sep)
+		try:
+			data_index = parts.index("data")
+		except ValueError:
+			continue
+
+        # The structure is: .../data/sample_id/flowcell_id/ref_genome/tool_name/
+		if len(parts) >= data_index + 4:
+			ref_genome_name = parts[data_index + 3]
+			tool_name = parts[data_index + 4]
+			sample_id = parts[data_index + 1]
+
+			if ref_genome_name not in assembly_names:
+				if ref_genome_name in ('hg38', 'hs37d5'):
+					ref_assembly.append({
+						"name": ref_genome_name,
+						"sequence": {
+							"type": "ReferenceSequenceTrack",
+							"trackId": f"{ref_genome_name}",
+							"adapter": {
+								"type": "IndexedFastaAdapter",
+								"fastaLocation": {
+									"uri": f"http://172.32.79.51:5000/file/gpfs/scratch/daily-process/externs/input-data-for-externs-2372023/references/short-read/{ref_genome_name}/{ref_genome_name}.fa",
+									"locationType": "UriLocation"
+								},
+								"faiLocation": {
+									"uri": f"http://172.32.79.51:5000/file/gpfs/scratch/daily-process/externs/input-data-for-externs-2372023/references/short-read/{ref_genome_name}/{ref_genome_name}.fa.fai",
+									"locationType": "UriLocation"
+								}
+							}
+						}
+					})
+					assembly_names.add(ref_genome_name)
+				else:
+					abort(404, description=f"unknown ref genome {ref_genome_name}")
+
+			for file in files:
+				file_path = os.path.join(root, file)
+				filename_parts = file.split('.')
+                
+				track_id = f"{sample_id}_{ref_genome_name}_{tool_name}_{os.path.splitext(file)[0].replace('.', '_')}"
+				track_name = f"{sample_id} - {tool_name} - {file}"
+
+				if file.endswith(".cram") and os.path.exists(file_path + ".crai"):
+					tracks.append({
+						"type": "AlignmentsTrack",
+						"trackId": track_id,
+						"name": track_name,
+						"assemblyNames": [ref_genome_name],
+						"adapter": {
+							"type": "CramAdapter",
+							"cramLocation": {
+								"uri": f"http://172.32.79.51:5000/file/{file_path}"
+							},
+							"craiLocation": {
+								"uri": f"http://172.32.79.51:5000/file/{file_path}.crai"
+							}
+						}
+					})
+				elif file.endswith(".bam") and os.path.exists(file_path + ".bai"):
+					tracks.append({
+						"type": "AlignmentsTrack",
+						"trackId": track_id,
+						"name": track_name,
+						"assemblyNames": [ref_genome_name],
+						"adapter": {
+							"type": "BamAdapter",
+							"bamLocation": {
+								"uri": f"http://172.32.79.51:5000/file/{file_path}"
+							},
+							"baiLocation": {
+								"uri": f"http://172.32.79.51:5000/file/{file_path}.bai"
+							}
+						}
+					})
+				elif file.endswith(".vcf.gz") and os.path.exists(file_path + ".tbi"):
+					tracks.append({
+						"type": "VariantTrack",
+						"trackId": track_id,
+						"name": track_name,
+						"assemblyNames": [ref_genome_name],
+						"adapter": {
+							"type": "VcfTabixAdapter",
+							"vcfGzLocation": {
+								"uri": f"http://172.32.79.51:5000/file/{file_path}"
+							},
+							"index": {
+								"location": {
+									"uri": f"http://172.32.79.51:5000/file/{file_path}.tbi"
+								}
+							}
+						}
+					})
+
+	config = {
+        "assemblies": ref_assembly,
+        "tracks": tracks,
+        "defaultSession": {
+            "name": f"{lims_id} session",
+            "view": {
+                "id": "linearGenomeView",
+                "type": "LinearGenomeView",
+                "tracks": [
+                    { "type": t["type"], "configuration": t["trackId"] } for t in tracks
+                ]
+            }
+        }
+    }
+	return jsonify(config)
+
+@app.route('/ls/', defaults={"base_path" : ''})
+@app.route('/ls/<path:base_path>')
+@token_required
+def ls(base_path):
+	base_path = os.path.join('/', base_path)
+	file_list = []
+	try:
+		for entry_name in os.listdir(base_path):
+			full_path = os.path.join(base_path, entry_name)
+			item_type = 'directory' if os.path.isdir(full_path) else 'file'            
+			file_list.append({
+                'name': entry_name,
+				'type': item_type,
+				'size': os.path.getsize(full_path) if item_type == 'file' else None
+            })
+		return jsonify(file_list)
+	except Exception as e:
+		return jsonify({"error": f"Failed to list files: {e}"}), 500
 
 
 if __name__ == '__main__':
 	app.run(
 		host="0.0.0.0",
-		port=5001,
+		port=5000,
 		debug=False)
 
 
