@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { secureFetch } from "../../lib/authService";
 
-const FileExplorer = () => {
+export default function Upload({ close }) {
 	const [currentPath, setCurrentPath] = useState("/");
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -92,13 +92,22 @@ const FileExplorer = () => {
 			<div className="border-b border-gray-400 p-4 flex-shrink-0">
 				<div className="flex items-center justify-between mb-3">
 					<h2 className="text-lg font-semibold text-gray-900">File Explorer</h2>
-					<button
-						onClick={() => upload()}
-						disabled={loading}
-						className="p-2 bg-teal-500 text-white hover:bg-teal-300 rounded-lg"
-					>
-						Upload
-					</button>
+					<div className="ml-auto flex space-x-2">
+						<button
+							onClick={() => upload()}
+							disabled={loading}
+							className="p-2 bg-teal-500 text-white hover:bg-teal-300 rounded-lg"
+						>
+							Upload
+						</button>
+						<button
+							onClick={() => close()}
+							disabled={loading}
+							className="p-2 bg-teal-500 text-white hover:bg-teal-300 rounded-lg"
+						>
+							Close
+						</button>
+					</div>
 				</div>
 
 				<div className="flex items-center justify-between mb-3">
@@ -179,6 +188,4 @@ const FileExplorer = () => {
 			</div>
 		</div>
 	);
-};
-
-export default FileExplorer;
+}

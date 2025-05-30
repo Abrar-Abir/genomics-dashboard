@@ -902,13 +902,10 @@ def refgenome_donut(date, no_qgp):
 def plot():
 	results, _ = _fetch_table(False, request.args)
 	if results == None:
-		print("no result")
 		return jsonify({'html': None})
 	else:
-		print("yay")
 		df = pd.DataFrame(results)
 		walker = pyg.walk(df, return_html=True).to_html()
-		print("walked")
 		return jsonify({'html': walker})
 
 

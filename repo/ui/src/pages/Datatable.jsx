@@ -4,7 +4,7 @@ import Table from "@components/datatable/Table";
 import Header from "@components/datatable/Header";
 import { secureFetch } from "@lib/authService.js";
 
-export default function Datatable({ state, setState, reset, query, setQuery }) {
+export default function Datatable({ state, setState, reset, query, setQuery, setSuffix }) {
 	const [data, setData] = useState({});
 	const [analytics, setAnalytics] = useState([]);
 	// const [query, setQuery] = useState("");
@@ -109,6 +109,7 @@ export default function Datatable({ state, setState, reset, query, setQuery }) {
 					setState={(key, val) => setStateKey(key)(val)}
 					data={data}
 					minimal={false}
+					setSuffix={setSuffix}
 				/>
 			</div>
 		</div>

@@ -88,6 +88,8 @@ export default function App() {
 
 	// Plot Page Props
 	const [query, setQuery] = useState("");
+	// Jbrowse Page Props
+	const [suffix, setSuffix] = useState("");
 	return (
 		<Router>
 			<Routes>
@@ -119,6 +121,7 @@ export default function App() {
 									reset={resetTable}
 									query={query}
 									setQuery={setQuery}
+									setSuffix={setSuffix}
 								/>
 							</ProtectedRoute>
 						}
@@ -143,7 +146,7 @@ export default function App() {
 						path="jbrowse"
 						element={
 							<ProtectedRoute>
-								<JBrowse />
+								<JBrowse suffix={suffix} />
 							</ProtectedRoute>
 						}
 					/>

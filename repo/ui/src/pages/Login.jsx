@@ -12,7 +12,7 @@ export default function Login() {
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		try {
-			await login(username, password);
+			await login(`${username}@smrc.sidra.org`, password);
 		} catch (error) {
 			alert("Invalid credentials");
 		}
@@ -33,35 +33,38 @@ export default function Login() {
 					className="h-24 lg::h-32 object-cover lg:block mx-auto mb-4"
 				/>
 				<Typography variant="h3" color="teal" className="mb-20">
-					Sidra Genomics Lab Portal
+					Sidra Genomics Core Portal
 				</Typography>
 				<Typography variant="h4" color="blue-gray" className="mb-2">
 					Sign In
 				</Typography>
 				<Typography color="gray" className="mb-8 font-normal">
-					Enter your email and password to sign in
+					Enter your username and password to sign in
 				</Typography>
 
 				<form action="#" className="mx-auto max-w-[24rem] text-left">
 					<div className="mb-6">
 						<label htmlFor="email">
 							<Typography variant="small" className="mb-2 block font-medium text-gray-900">
-								Your Email
+								Your Username
 							</Typography>
 						</label>
-						<Input
-							id="email"
-							color="gray"
-							size="lg"
-							type="email"
-							name="email"
-							placeholder="username@sidra.org"
-							className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
-							labelProps={{
-								className: "hidden",
-							}}
-							onChange={(e) => setUsername(e.target.value)}
-						/>
+						<div className="flex items-center">
+							<Input
+								id="email"
+								color="gray"
+								size="lg"
+								type="email"
+								name="email"
+								placeholder="username"
+								className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200"
+								labelProps={{
+									className: "hidden",
+								}}
+								onChange={(e) => setUsername(e.target.value)}
+							/>
+							<span className="ml-2 text-gray-700 text-md">@smrc.sidra.org</span>
+						</div>
 					</div>
 					<div className="mb-6">
 						<label htmlFor="password">
@@ -83,11 +86,6 @@ export default function Login() {
 							onChange={(e) => setPassword(e.target.value)}
 							onKeyDown={handleKeyDown}
 						/>
-					</div>
-					<div className="flex flex-wrap items-center justify-end gap-2">
-						<Typography as="a" href="#" color="gray" className="font-medium">
-							Forgot password
-						</Typography>
 					</div>
 					<Button color="gray" size="lg" className="mt-6" onClick={handleLogin} fullWidth>
 						Sign In

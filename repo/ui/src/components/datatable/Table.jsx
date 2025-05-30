@@ -51,41 +51,43 @@ const HtmlIcon = ({ col, id }) => (
 	></img>
 );
 
-const JbrowseIcon = ({ projectId, submissionId, flowcellId, sampleId }) => {
-	const handleClick = async () => {
-		// window.open("http://172.32.79.51:5001/?config=test.json", "_blank");
-		try {
-			const dir = `gpfs/projects/ngs_projects/${projectId}/${submissionId}/data/${sampleId}/${flowcellId}.${sampleId}/`;
-			// const response = await fetch(`${BASE_URL}/consfig/${dir}`);
+export default function Table({ state, setState, data, minimal, setSuffix }) {
+	const JbrowseIcon = ({ projectId, submissionId, flowcellId, sampleId }) => {
+		const handleClick = async () => {
+			// window.open("http://172.32.79.51:5001/?config=test.json", "_blank");
+			try {
+				const dir = `${projectId}/${submissionId}/data/${sampleId}/${flowcellId}.${sampleId}/`;
+				setSuffix(`/?config=http://172.32.79.51:4000/config/${dir}`);
+				// const response = await fetch(`${BASE_URL}/consfig/${dir}`);
 
-			// if (response.ok) {
-			// 	const response = await response.json();
-			// 	const url = response.url;
-			// 	window.open(url, "_blank");
-			// } else {
-			// 	console.error("Error fetching custom URL:", response.statusText);
-			// }
-			window.open(
-				`http://172.32.79.51:5001/?config=http://172.32.79.51:5000/config/${dir}`,
-				"_blank"
-			);
-		} catch (error) {
-			console.error("Error occurred:", error);
-		} finally {
-			setLoading(false);
-		}
+				// if (response.ok) {
+				// 	const response = await response.json();
+				// 	const url = response.url;
+				// 	window.open(url, "_blank");
+				// } else {
+				// 	console.error("Error fetching custom URL:", response.statusText);
+				// }
+				// window.open(
+				// 	`http://172.32.79.51:5001/?config=http://172.32.79.51:4000/config/${dir}`,
+				// 	"_blank"
+				// );
+				window.open(`http://localhost:3000/jbrowse`, "_blank");
+			} catch (error) {
+				console.error("Error occurred:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		return (
+			<img
+				src={JbrowseLogo}
+				onClick={handleClick}
+				className="h-5 cursor-pointer hover:bg-blue-300 rounded"
+			></img>
+		);
 	};
 
-	return (
-		<img
-			src={JbrowseLogo}
-			onClick={handleClick}
-			className="h-5 cursor-pointer hover:bg-blue-300 rounded"
-		></img>
-	);
-};
-
-export default function Table({ state, setState, data, minimal }) {
 	const [selectedHeaders, setSelectedHeaders] = useState([]);
 
 	const handlePrev = () => {

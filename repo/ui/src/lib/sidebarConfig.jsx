@@ -30,12 +30,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		path: "/datagrid",
 		icon: <ViewColumnsIcon className={iconSize} />,
 	},
-	{
-		key: "plot",
-		label: "Plot",
-		path: "/plot",
-		icon: <ChartBarIcon className={iconSize} />,
-	},
+	// {
+	// 	key: "plot",
+	// 	label: "Plot",
+	// 	path: "/plot",
+	// 	icon: <ChartBarIcon className={iconSize} />,
+	// },
 	{
 		key: "jbrowse",
 		label: "Jbrowse",
@@ -45,12 +45,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 ];
 
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
-	{
-		key: "inbox",
-		label: "Inbox",
-		icon: <InboxIcon className={iconSize} />,
-		badge: "14",
-	},
+	// {
+	// 	key: "inbox",
+	// 	label: "Inbox",
+	// 	icon: <InboxIcon className={iconSize} />,
+	// 	badge: "",
+	// },
 	// {
 	// 	key: "profile",
 	// 	label: "Profile",

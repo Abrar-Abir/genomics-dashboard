@@ -14,3 +14,15 @@
     "rawinfo": "/gpfs/dropbox/conversion/conversion-tasks/",
     "runs": "/ddn/illumina_raw/"
 }
+
+
+"gpfs/dropbox/conversion/conversion-tasks/240818/"
+"HHMC3BGXW  HT7CGDSXC  HT7K5DSXC"
+"gpfs/ngsdata/sap_workplace/www/MultiQC/Flowcell/HHMC3BGXW/" "AL_SDR200077_240808_sRNA8M_B1"
+"gpfs/ngsdata/sap_workplace/www/MultiQC/Flowcell/HT7CGDSXC/" "QGP_QGP_240714_WGS30N_B1"
+"gpfs/ngsdata/sap_workplace/www/MultiQC/Flowcell/HT7K5DSXC/" "QGP_QGP_240714_WGS30N_B1"
+
+"gpfs/ngsdata/sap_workplace/www/MultiQC/submission/SDR200077/AL_SDR200077_240808_sRNA8M_B1/"
+
+"gpfs/projects/ngs_projects/SDR200077/AL_SDR200077_240808_sRNA8M_B1/"
+
